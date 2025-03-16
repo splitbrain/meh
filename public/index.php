@@ -2,25 +2,26 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use splitbrain\meh\Router;
 use splitbrain\meh\API\CommentsController;
 
-// Create router instance
-$router = new Router();
+// Create AltoRouter instance
+$router = new AltoRouter();
 
-// Register API routes
-$router->addRoute('GET', '/api/comments', CommentsController::class, 'getComments');
-$router->addRoute('POST', '/api/comments', CommentsController::class, 'createComment');
-$router->addRoute('PUT', '/api/comments', CommentsController::class, 'updateCommentStatus');
-$router->addRoute('DELETE', '/api/comments', CommentsController::class, 'deleteComment');
+// Set the base path if your app is not in the root directory
+// $router->setBasePath('/myapp');
 
-// Get request method and path
-$method = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// Map routes
+$router->map('GET', '/api/comments', [CommentsController::class, 'getComments'], 'get_comments');
+$router->map('POST', '/api/comments', [CommentsController::class, 'createComment'], 'create_comment');
+$router->map('PUT', '/api/comments', [CommentsController::class, 'updateCommentStatus'], 'update_comment');
+$router->map('DELETE', '/api/comments', [CommentsController::class, 'deleteComment'], 'delete_comment');
+
+// Match the current request
+$match = $router->match();
 
 // Parse JSON body for non-GET requests
 $data = [];
-if ($method !== 'GET') {
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     $input = file_get_contents('php://input');
     if (!empty($input)) {
         $data = json_decode($input, true) ?? [];
@@ -29,13 +30,29 @@ if ($method !== 'GET') {
     $data = $_GET;
 }
 
-try {
-    // Dispatch the request
-    $response = $router->dispatch($method, $path, $data);
-    echo $response;
-} catch (Exception $e) {
-    // Handle errors
-    http_response_code($e->getCode() ?: 500);
+// Process the request
+if ($match) {
+    // Add any URL parameters to the data array
+    if (isset($match['params']) && is_array($match['params'])) {
+        $data = array_merge($data, $match['params']);
+    }
+    
+    // Get the controller and method
+    list($controllerClass, $method) = $match['target'];
+    
+    try {
+        // Create controller instance and call the method
+        $controller = new $controllerClass();
+        echo $controller->$method($data);
+    } catch (Exception $e) {
+        // Handle errors
+        http_response_code($e->getCode() ?: 500);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+} else {
+    // No route was matched
+    http_response_code(404);
     header('Content-Type: application/json');
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['error' => 'Not found']);
 }
