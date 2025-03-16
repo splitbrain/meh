@@ -1,6 +1,17 @@
 {
-    "require": {
-        "splitbrain/php-sqlite": "^1.0",
-        "splitbrain/php-cli": "^1.3"
-    }
+    "name": "splitbrain/meh",
+    "description": "commenting system",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "splitbrain\\meh\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Andreas Gohr",
+            "email": "andi@splitbrain.org"
+        }
+    ],
+    "require": {}
 }

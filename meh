@@ -1,0 +1,7 @@
+#!/bin/env php
+<?php
+
+use splitbrain\meh\CliController;
+
+$cli = new CliController();
+$cli->run();
