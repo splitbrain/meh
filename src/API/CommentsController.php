@@ -19,7 +19,7 @@ class CommentsController extends Controller
         $postPath = isset($data['post']) ? $data['post'] : null;
         
         if (!$postPath) {
-            $this->error('Post path is required', 400);
+            throw new \Exception('Post path is required', 400);
         }
         
         $comments = $db->query('SELECT * FROM comments WHERE post = ? AND status = ? ORDER BY created_at ASC', 
@@ -43,7 +43,7 @@ class CommentsController extends Controller
         $requiredFields = ['post', 'author', 'text'];
         foreach ($requiredFields as $field) {
             if (!isset($data[$field]) || empty($data[$field])) {
-                $this->error("Field '$field' is required", 400);
+                throw new \Exception("Field '$field' is required", 400);
             }
         }
         
@@ -78,7 +78,7 @@ class CommentsController extends Controller
             $id = $db->lastInsertId();
             return ['success' => true, 'id' => $id];
         } catch (\Exception $e) {
-            $this->error('Failed to create comment: ' . $e->getMessage(), 500);
+            throw new \Exception('Failed to create comment: ' . $e->getMessage(), 500);
         }
     }
     
@@ -94,7 +94,7 @@ class CommentsController extends Controller
         $db = $this->getDatabase();
         
         if (!isset($data['id']) || !isset($data['status'])) {
-            $this->error('Comment ID and status are required', 400);
+            throw new \Exception('Comment ID and status are required', 400);
         }
         
         $id = $data['id'];
@@ -103,14 +103,14 @@ class CommentsController extends Controller
         // Validate status
         $validStatuses = ['pending', 'approved', 'spam', 'deleted'];
         if (!in_array($status, $validStatuses)) {
-            $this->error('Invalid status. Must be one of: ' . implode(', ', $validStatuses), 400);
+            throw new \Exception('Invalid status. Must be one of: ' . implode(', ', $validStatuses), 400);
         }
         
         try {
             $db->query('UPDATE comments SET status = ? WHERE id = ?', [$status, $id]);
             return ['success' => true];
         } catch (\Exception $e) {
-            $this->error('Failed to update comment: ' . $e->getMessage(), 500);
+            throw new \Exception('Failed to update comment: ' . $e->getMessage(), 500);
         }
     }
     
@@ -126,7 +126,7 @@ class CommentsController extends Controller
         $db = $this->getDatabase();
         
         if (!isset($data['id'])) {
-            $this->error('Comment ID is required', 400);
+            throw new \Exception('Comment ID is required', 400);
         }
         
         $id = $data['id'];
@@ -135,7 +135,7 @@ class CommentsController extends Controller
             $db->query('DELETE FROM comments WHERE id = ?', [$id]);
             return ['success' => true];
         } catch (\Exception $e) {
-            $this->error('Failed to delete comment: ' . $e->getMessage(), 500);
+            throw new \Exception('Failed to delete comment: ' . $e->getMessage(), 500);
         }
     }
 }
