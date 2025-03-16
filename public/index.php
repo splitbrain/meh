@@ -28,6 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     $data = $_GET;
 }
 
+// Set JSON content type for all responses
+header('Content-Type: application/json');
+
 // Process the request
 if ($match) {
     // Add any URL parameters to the data array
@@ -41,16 +44,19 @@ if ($match) {
     try {
         // Create controller instance and call the method
         $controller = new $controllerClass();
-        echo $controller->$method($data);
-    } catch (Exception $e) {
+        $result = $controller->$method($data);
+        
+        // Return the result wrapped in a response object
+        http_response_code(isset($result['status_code']) ? $result['status_code'] : 200);
+        echo json_encode(['response' => $result]);
+    } catch (\Exception $e) {
         // Handle errors
-        http_response_code($e->getCode() ?: 500);
-        header('Content-Type: application/json');
+        $code = $e->getCode() ?: 500;
+        http_response_code($code);
         echo json_encode(['error' => $e->getMessage()]);
     }
 } else {
     // No route was matched
     http_response_code(404);
-    header('Content-Type: application/json');
     echo json_encode(['error' => 'Not found']);
 }

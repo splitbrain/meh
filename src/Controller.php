@@ -19,16 +19,14 @@ abstract class Controller
     }
     
     /**
-     * Send a JSON response
+     * Throw an exception with the given message and code
      * 
-     * @param mixed $data Data to encode as JSON
-     * @param int $statusCode HTTP status code
-     * @return string JSON encoded response
+     * @param string $message Error message
+     * @param int $code HTTP status code
+     * @throws \Exception
      */
-    protected function jsonResponse($data, $statusCode = 200)
+    protected function error($message, $code = 400)
     {
-        http_response_code($statusCode);
-        header('Content-Type: application/json');
-        return json_encode($data);
+        throw new \Exception($message, $code);
     }
 }
