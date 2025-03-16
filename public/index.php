@@ -5,6 +5,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Include routes file
 require_once __DIR__ . '/../src/routes.php';
 
+// Create App instance
+$app = new splitbrain\meh\App();
+
 // Create AltoRouter instance
 $router = new AltoRouter();
 
@@ -12,7 +15,7 @@ $router = new AltoRouter();
 // $router->setBasePath('/myapp');
 
 // Register all routes
-registerRoutes($router);
+registerRoutes($router, $app);
 
 // Match the current request
 $match = $router->match();
@@ -43,7 +46,7 @@ if ($match) {
     
     try {
         // Create controller instance and call the method
-        $controller = new $controllerClass();
+        $controller = new $controllerClass($app);
         $result = $controller->$method($data);
         
         // Return the result wrapped in a response object

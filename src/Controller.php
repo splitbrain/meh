@@ -7,14 +7,27 @@ use splitbrain\phpsqlite\SQLite;
 abstract class Controller
 {
     /**
+     * @var App Application container
+     */
+    protected $app;
+    
+    /**
+     * Constructor
+     * 
+     * @param App $app Application container
+     */
+    public function __construct(App $app)
+    {
+        $this->app = $app;
+    }
+    
+    /**
      * Get the database connection
      * 
      * @return SQLite
      */
     protected function getDatabase()
     {
-        $file = __DIR__ . '/../data/meh.sqlite';
-        $schema = __DIR__ . '/../db/';
-        return new SQLite($file, $schema);
+        return $this->app->getDatabase();
     }
 }

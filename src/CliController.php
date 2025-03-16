@@ -8,6 +8,20 @@ use splitbrain\phpsqlite\SQLite;
 
 class CliController extends CLI
 {
+    /**
+     * @var App Application container
+     */
+    protected $app;
+    
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->app = new App();
+    }
+    
 
     protected function setup(Options $options)
     {
@@ -34,14 +48,13 @@ class CliController extends CLI
     }
 
     /**
-     * @todo move this to a central place and use configuration for location
+     * Get the database connection
+     * 
      * @return SQLite
      */
     protected function getDatabase()
     {
-        $file = __DIR__ . '/../data/meh.sqlite';
-        $schema = __DIR__ . '/../db/';
-        return new SQLite($file, $schema);
+        return $this->app->getDatabase();
     }
 
     protected function migrateDatabase()
