@@ -1,11 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
 // Include routes file
 require_once __DIR__ . '/../src/routes.php';
 
-// Create App instance
+// Load Composer's autoloader
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Create App instance with environment variables
 $app = new splitbrain\meh\App();
 
 // Create AltoRouter instance

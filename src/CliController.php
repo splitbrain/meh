@@ -15,11 +15,13 @@ class CliController extends CLI
     
     /**
      * Constructor
+     * 
+     * @param App|null $app Application container
      */
-    public function __construct()
+    public function __construct(App $app = null)
     {
         parent::__construct();
-        $this->app = new App();
+        $this->app = $app ?: new App();
     }
     
 
