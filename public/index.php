@@ -2,7 +2,8 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use splitbrain\meh\API\CommentsController;
+// Include routes file
+require_once __DIR__ . '/../src/routes.php';
 
 // Create AltoRouter instance
 $router = new AltoRouter();
@@ -10,11 +11,8 @@ $router = new AltoRouter();
 // Set the base path if your app is not in the root directory
 // $router->setBasePath('/myapp');
 
-// Map routes
-$router->map('GET', '/api/comments', [CommentsController::class, 'getComments'], 'get_comments');
-$router->map('POST', '/api/comments', [CommentsController::class, 'createComment'], 'create_comment');
-$router->map('PUT', '/api/comments', [CommentsController::class, 'updateCommentStatus'], 'update_comment');
-$router->map('DELETE', '/api/comments', [CommentsController::class, 'deleteComment'], 'delete_comment');
+// Register all routes
+registerRoutes($router);
 
 // Match the current request
 $match = $router->match();
