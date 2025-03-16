@@ -13,5 +13,8 @@
             "email": "andi@splitbrain.org"
         }
     ],
-    "require": {}
+    "require": {
+        "splitbrain/php-sqlite": "^1.0",
+        "splitbrain/php-cli": "^1.3"
+    }
 }
