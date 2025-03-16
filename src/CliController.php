@@ -3,10 +3,10 @@
 namespace splitbrain\meh;
 
 use splitbrain\phpcli\Options;
-use splitbrain\phpcli\PSR3CLIv3;
+use splitbrain\phpcli\CLI;
 use splitbrain\phpsqlite\SQLite;
 
-class CliController extends PSR3CLIv3
+class CliController extends CLI
 {
 
     protected function setup(Options $options)
