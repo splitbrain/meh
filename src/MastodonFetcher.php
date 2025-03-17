@@ -78,20 +78,21 @@ class MastodonFetcher
         $siteUrl = $this->app->conf('site_url');
         $this->cli->info("Looking for posts linking to: $siteUrl");
 
-        // Fetch the statuses
-        $statuses = $this->fetchStatuses($instance, $accountId, $limit);
-        if (empty($statuses)) {
+        // Fetch all statuses with pagination
+        $allStatuses = $this->fetchAllStatuses($instance, $accountId, $limit);
+        if (empty($allStatuses)) {
             $this->cli->warning("No posts found for this account");
             return;
         }
 
-        $this->cli->info("Fetched " . count($statuses) . " posts");
+        $this->cli->info("Fetched " . count($allStatuses) . " posts");
 
         // Process the statuses to find links to our site
         $matchingPosts = [];
         $db = $this->app->db();
+        $importCount = 0;
 
-        foreach ($statuses as $status) {
+        foreach ($allStatuses as $status) {
             // Skip non-public posts
             if ($status->visibility !== 'public') {
                 continue;
@@ -138,11 +139,32 @@ class MastodonFetcher
                 $text = strip_tags($status->content);
 
                 // Insert into database
-                var_dump($status);
+                try {
+                    $db->query(
+                        'INSERT INTO comments 
+                        (post, author, website, text, html, status, created_at) 
+                        VALUES 
+                        (?, ?, ?, ?, ?, ?, ?)',
+                        [
+                            $postPath,
+                            $username . '@' . $instanceHost,
+                            $status->url,
+                            $text,
+                            $status->content,
+                            'approved',
+                            date('Y-m-d H:i:s', strtotime($status->created_at))
+                        ]
+                    );
+                    $importCount++;
+                    $this->cli->success("Imported comment from Mastodon post: " . $status->url);
+                } catch (\Exception $e) {
+                    $this->cli->error("Error importing comment: " . $e->getMessage());
+                }
             }
         }
 
         $this->cli->success("Found " . count($matchingPosts) . " posts linking to your site");
+        $this->cli->success("Successfully imported $importCount comments");
     }
 
     /**
@@ -166,23 +188,54 @@ class MastodonFetcher
     }
 
     /**
-     * Fetch statuses from a Mastodon account
+     * Fetch all statuses from a Mastodon account using pagination
      *
      * @param string $instance The Mastodon instance URL
      * @param string $accountId The account ID
-     * @param int $limit Maximum number of statuses to fetch
+     * @param int $limit Maximum number of statuses to fetch in total
      * @return array The statuses
      */
-    protected function fetchStatuses(string $instance, string $accountId, int $limit): array
+    protected function fetchAllStatuses(string $instance, string $accountId, int $limit): array
     {
-        $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$limit";
-
-        $response = $this->makeHttpRequest($url);
-        if (!$response) {
-            return [];
+        $allStatuses = [];
+        $pageSize = min(40, $limit); // Mastodon API typically limits to 40 per request
+        $maxPages = ceil($limit / $pageSize);
+        $maxId = null;
+        $page = 1;
+        
+        $this->cli->info("Fetching up to $limit posts in batches of $pageSize...");
+        
+        while (count($allStatuses) < $limit && $page <= $maxPages) {
+            $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$pageSize";
+            
+            if ($maxId) {
+                $url .= "&max_id=$maxId";
+            }
+            
+            $response = $this->makeHttpRequest($url);
+            if (!$response) {
+                break;
+            }
+            
+            $statuses = json_decode($response) ?: [];
+            if (empty($statuses)) {
+                break; // No more statuses to fetch
+            }
+            
+            $allStatuses = array_merge($allStatuses, $statuses);
+            $this->cli->info("Fetched page $page with " . count($statuses) . " posts (total: " . count($allStatuses) . ")");
+            
+            // Get the ID of the last status for pagination
+            $lastStatus = end($statuses);
+            $maxId = $lastStatus->id;
+            
+            $page++;
+            
+            // Small delay to avoid rate limiting
+            usleep(300000); // 300ms
         }
-
-        return json_decode($response) ?: [];
+        
+        return $allStatuses;
     }
 
     /**
