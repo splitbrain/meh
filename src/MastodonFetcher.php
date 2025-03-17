@@ -139,6 +139,7 @@ class MastodonFetcher
                 $text = strip_tags($status->content);
 
                 // Insert into database
+
                 try {
                     $db->query(
                         'INSERT INTO comments 
@@ -202,39 +203,39 @@ class MastodonFetcher
         $maxPages = ceil($limit / $pageSize);
         $maxId = null;
         $page = 1;
-        
+
         $this->cli->info("Fetching up to $limit posts in batches of $pageSize...");
-        
+
         while (count($allStatuses) < $limit && $page <= $maxPages) {
             $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$pageSize";
-            
+
             if ($maxId) {
                 $url .= "&max_id=$maxId";
             }
-            
+
             $response = $this->makeHttpRequest($url);
             if (!$response) {
                 break;
             }
-            
+
             $statuses = json_decode($response) ?: [];
             if (empty($statuses)) {
                 break; // No more statuses to fetch
             }
-            
+
             $allStatuses = array_merge($allStatuses, $statuses);
             $this->cli->info("Fetched page $page with " . count($statuses) . " posts (total: " . count($allStatuses) . ")");
-            
+
             // Get the ID of the last status for pagination
             $lastStatus = end($statuses);
             $maxId = $lastStatus->id;
-            
+
             $page++;
-            
+
             // Small delay to avoid rate limiting
             usleep(300000); // 300ms
         }
-        
+
         return $allStatuses;
     }
 
