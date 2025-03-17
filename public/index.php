@@ -44,9 +44,14 @@ if ($match) {
     }
 
     // Get the controller and method
-    [$controllerClass, $method] = $match['target'];
+    [$controllerClass, $method, $scopes] = $match['target'];
 
     try {
+        if($scopes) {
+            // Check if the user has the required scopes
+            $app->checkScopes($scopes);
+        }
+
         // Create controller instance and call the method
         $controller = new $controllerClass($app);
         $result = $controller->$method($data);
@@ -67,6 +72,7 @@ if ($match) {
                 'message' => $e->getMessage(),
                 'code' => $e->getCode() ?: 1,
                 'trace' => $e->getTrace() // FIXME make configurable
+                // FIXME add info on previous exception if any
             ]
         ], JSON_PRETTY_PRINT);
     }

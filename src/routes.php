@@ -17,9 +17,11 @@ function registerRoutes(AltoRouter $router): void
 
     $router->map('POST', '/comment', [CommentController::class, 'create'], 'comment.create');
     $router->map('GET', '/comment/[i:id]', [CommentController::class, 'get'], 'comment.get');
-    $router->map('PATCH', '/comment/[i:id]', [CommentController::class, 'edit'], 'comment.edit');
-    $router->map('DELETE', '/comment/[i:id]', [CommentController::class, 'delete'], 'comment.delete');
-    $router->map('PUT', '/comment/[i:id]/[s:status]', [CommentController::class, 'status'], 'comment.status');
+
+    // admin scope required
+    $router->map('PATCH', '/comment/[i:id]', [CommentController::class, 'edit', 'admin'], 'comment.edit');
+    $router->map('DELETE', '/comment/[i:id]', [CommentController::class, 'delete', 'admin'], 'comment.delete');
+    $router->map('PUT', '/comment/[i:id]/[s:status]', [CommentController::class, 'status', 'admin'], 'comment.status');
 
     // You can add more routes here as needed
 }
