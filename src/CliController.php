@@ -37,6 +37,8 @@ class CliController extends CLI
         $options->registerCommand('mastodon', 'Fetch posts from a Mastodon account that link to your site');
         $options->registerArgument('account', 'The Mastodon account (e.g., @user@instance.social)', true, 'mastodon');
         $options->registerOption('instance', 'Mastodon instance URL (e.g., https://mastodon.social)', 'i', true, 'mastodon');
+        
+        $options->registerCommand('mastodon-replies', 'Fetch replies to Mastodon threads and add them as comments');
     }
 
     protected function main(Options $options)
@@ -52,6 +54,9 @@ class CliController extends CLI
                 $account = $options->getArgs()[0];
                 $instance = $options->getOpt('instance');
                 $this->fetchMastodonPosts($account, $instance);
+                break;
+            case 'mastodon-replies':
+                $this->fetchMastodonReplies();
                 break;
             default:
                 echo $options->help();
@@ -182,5 +187,16 @@ class CliController extends CLI
     {
         $fetcher = new MastodonFetcher($this, $this->app);
         $fetcher->fetchPosts($account, $instance);
+    }
+    
+    /**
+     * Fetch replies to Mastodon threads and add them as comments
+     *
+     * @return void
+     */
+    protected function fetchMastodonReplies(): void
+    {
+        $fetcher = new MastodonFetcher($this, $this->app);
+        $fetcher->fetchReplies();
     }
 }

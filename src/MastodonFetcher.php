@@ -84,7 +84,7 @@ class MastodonFetcher
         } else {
             $this->cli->info("No previous imports found, fetching all posts");
         }
-        
+
         // Fetch all statuses with pagination
         $allStatuses = $this->fetchAllStatuses($instance, $accountId, $sinceId);
         if (empty($allStatuses)) {
@@ -199,7 +199,7 @@ class MastodonFetcher
     protected function getLatestImportedStatusId(string $accountId): ?string
     {
         $db = $this->app->db();
-        
+
         try {
             // Query the database for the latest status ID
             $result = $db->queryRecord(
@@ -209,14 +209,14 @@ class MastodonFetcher
                  LIMIT 1',
                 ['%@%'] // We can't directly match on account ID, so we'll filter in PHP
             );
-            
+
             if ($result && isset($result['id'])) {
                 return $result['id'];
             }
         } catch (\Exception $e) {
             $this->cli->error("Error querying database: " . $e->getMessage());
         }
-        
+
         return null;
     }
 
@@ -244,7 +244,7 @@ class MastodonFetcher
             if ($maxId) {
                 $url .= "&max_id=$maxId";
             }
-            
+
             if ($sinceId) {
                 $url .= "&since_id=$sinceId";
             }
@@ -261,7 +261,7 @@ class MastodonFetcher
 
             $allStatuses = array_merge($allStatuses, $statuses);
             $this->cli->info("Fetched page $page with " . count($statuses) . " posts (total: " . count($allStatuses) . ")");
-            
+
             // If we got fewer than pageSize, we've reached the end
             if (count($statuses) < $pageSize) {
                 break;
@@ -278,6 +278,153 @@ class MastodonFetcher
         }
 
         return $allStatuses;
+    }
+
+    /**
+     * Fetch replies to Mastodon threads and add them as comments
+     *
+     * @return void
+     */
+    public function fetchReplies(): void
+    {
+        $db = $this->app->db();
+
+        // Get all threads from the database
+        try {
+            $threads = $db->queryAll('SELECT * FROM mastodon_threads ORDER BY created_at DESC');
+        } catch (\Exception $e) {
+            $this->cli->error("Error querying database: " . $e->getMessage());
+            return;
+        }
+
+        if (empty($threads)) {
+            $this->cli->warning("No Mastodon threads found in the database");
+            return;
+        }
+
+        $this->cli->info("Found " . count($threads) . " Mastodon threads to check for replies");
+
+        $totalReplies = 0;
+        $importedReplies = 0;
+
+        foreach ($threads as $thread) {
+            // Extract instance from the URL
+            $instance = parse_url($thread['url'], PHP_URL_HOST);
+            if (!$instance) {
+                $this->cli->warning("Could not determine instance from URL: " . $thread['url']);
+                continue;
+            }
+
+            $instance = "https://$instance";
+
+            // Get the status ID from the URL or URI
+            $statusId = $thread['id'];
+
+            $this->cli->info("Checking for replies to thread: " . $thread['url']);
+
+            // Fetch the context (replies) for this status
+            $context = $this->fetchStatusContext($instance, $statusId);
+            if (!$context || empty($context->descendants)) {
+                $this->cli->info("No replies found for this thread");
+                continue;
+            }
+
+            $this->cli->info("Found " . count($context->descendants) . " replies to this thread");
+            $totalReplies += count($context->descendants);
+
+            // Process each reply
+            foreach ($context->descendants as $reply) {
+                // Skip if we've already imported this reply
+                if ($this->isReplyImported($reply->uri)) {
+                    $this->cli->info("Reply already imported: " . $reply->url);
+                    continue;
+                }
+
+                // Skip non-public replies
+                if ($reply->visibility !== 'public') {
+                    continue;
+                }
+
+                // Extract the text content
+                $text = strip_tags($reply->content);
+
+                // Insert into comments table
+                try {
+                    $commentId = $db->exec(
+                        'INSERT INTO comments 
+                        (post, author, website, text, html, status, created_at) 
+                        VALUES 
+                        (?, ?, ?, ?, ?, ?, ?)',
+                        [
+                            $thread['post'],
+                            $reply->account->acct,
+                            $reply->url,
+                            $text,
+                            $reply->content,
+                            'approved',
+                            date('Y-m-d H:i:s', strtotime($reply->created_at))
+                        ]
+                    );
+
+
+                    // Record this reply in the mastodon_posts table
+                    $db->query(
+                        'INSERT INTO mastodon_posts (uri, comment_id) VALUES (?, ?)',
+                        [$reply->uri, $commentId]
+                    );
+
+                    $importedReplies++;
+                    $this->cli->success("Imported reply from " . $reply->account->acct . ": " . $reply->url);
+                } catch (\Exception $e) {
+                    $this->cli->error("Error importing reply: " . $e->getMessage());
+                }
+            }
+        }
+
+        $this->cli->success("Found $totalReplies replies in total");
+        $this->cli->success("Successfully imported $importedReplies new replies as comments");
+    }
+
+    /**
+     * Check if a reply has already been imported
+     *
+     * @param string $uri The URI of the reply
+     * @return bool True if already imported, false otherwise
+     */
+    protected function isReplyImported(string $uri): bool
+    {
+        $db = $this->app->db();
+
+        try {
+            $result = $db->queryRecord(
+                'SELECT uri FROM mastodon_posts WHERE uri = ?',
+                [$uri]
+            );
+
+            return !empty($result);
+        } catch (\Exception $e) {
+            $this->cli->error("Error checking if reply is imported: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Fetch the context (replies) for a status
+     *
+     * @param string $instance The Mastodon instance URL
+     * @param string $statusId The status ID
+     * @return object|null The context object or null on failure
+     */
+    protected function fetchStatusContext(string $instance, string $statusId): ?object
+    {
+        $url = "$instance/api/v1/statuses/$statusId/context";
+
+        $response = $this->makeHttpRequest($url);
+        if (!$response) {
+            return null;
+        }
+
+        return json_decode($response);
     }
 
     /**
