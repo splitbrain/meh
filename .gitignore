@@ -1,4 +1,5 @@
 .aider*
+/.phpunit.cache/
 /data/
 /vendor/
 .env

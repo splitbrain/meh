@@ -37,6 +37,7 @@ class App
             'db_schema' => __DIR__ . '/../db/',
             'jwt_secret' => getenv('JWT_SECRET') ?: 'not very secret', # FIXME we probably want a default only for testing
             'admin_password' => getenv('ADMIN_PASSWORD') ?: '',
+            'site_url' => getenv('SITE_URL') ?: 'http://localhost:8000',
         ];
 
         // Override with any provided config
