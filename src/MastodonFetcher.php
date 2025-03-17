@@ -135,37 +135,32 @@ class MastodonFetcher
                     'author' => $username . '@' . $instanceHost
                 ];
 
-                // Extract the text content
-                $text = strip_tags($status->content);
-
-                // Insert into database
-
+                // Insert into mastodon_threads table
                 try {
                     $db->query(
-                        'INSERT INTO comments 
-                        (post, author, website, text, html, status, created_at) 
+                        'INSERT INTO mastodon_threads 
+                        (id, account, url, uri, post, created_at) 
                         VALUES 
-                        (?, ?, ?, ?, ?, ?, ?)',
+                        (?, ?, ?, ?, ?, ?)',
                         [
-                            $postPath,
+                            $status->id,
                             $username . '@' . $instanceHost,
                             $status->url,
-                            $text,
-                            $status->content,
-                            'approved',
+                            $status->uri ?? $status->url,
+                            $postPath,
                             date('Y-m-d H:i:s', strtotime($status->created_at))
                         ]
                     );
                     $importCount++;
-                    $this->cli->success("Imported comment from Mastodon post: " . $status->url);
+                    $this->cli->success("Imported Mastodon thread: " . $status->url);
                 } catch (\Exception $e) {
-                    $this->cli->error("Error importing comment: " . $e->getMessage());
+                    $this->cli->error("Error importing Mastodon thread: " . $e->getMessage());
                 }
             }
         }
 
         $this->cli->success("Found " . count($matchingPosts) . " posts linking to your site");
-        $this->cli->success("Successfully imported $importCount comments");
+        $this->cli->success("Successfully imported $importCount Mastodon threads");
     }
 
     /**
