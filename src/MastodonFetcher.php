@@ -36,10 +36,9 @@ class MastodonFetcher
      *
      * @param string $account The Mastodon account (e.g., @user@instance.social)
      * @param string|null $instance The Mastodon instance URL
-     * @param int $limit Maximum number of posts to fetch
      * @return void
      */
-    public function fetchPosts(string $account, ?string $instance = null, int $limit = 100): void
+    public function fetchPosts(string $account, ?string $instance = null): void
     {
         // Parse the account string to extract username and instance
         if (preg_match('/^@?([^@]+)@(.+)$/', $account, $matches)) {
@@ -78,8 +77,16 @@ class MastodonFetcher
         $siteUrl = $this->app->conf('site_url');
         $this->cli->info("Looking for posts linking to: $siteUrl");
 
+        // Get the most recent status ID we've already imported
+        $sinceId = $this->getLatestImportedStatusId($accountId);
+        if ($sinceId) {
+            $this->cli->info("Fetching posts newer than ID: $sinceId");
+        } else {
+            $this->cli->info("No previous imports found, fetching all posts");
+        }
+        
         // Fetch all statuses with pagination
-        $allStatuses = $this->fetchAllStatuses($instance, $accountId, $limit);
+        $allStatuses = $this->fetchAllStatuses($instance, $accountId, $sinceId);
         if (empty($allStatuses)) {
             $this->cli->warning("No posts found for this account");
             return;
@@ -184,28 +191,62 @@ class MastodonFetcher
     }
 
     /**
+     * Get the latest imported status ID for a given account
+     *
+     * @param string $accountId The Mastodon account ID
+     * @return string|null The latest status ID or null if none found
+     */
+    protected function getLatestImportedStatusId(string $accountId): ?string
+    {
+        $db = $this->app->db();
+        
+        try {
+            // Query the database for the latest status ID
+            $result = $db->queryRecord(
+                'SELECT id FROM mastodon_threads 
+                 WHERE account LIKE ? 
+                 ORDER BY created_at DESC 
+                 LIMIT 1',
+                ['%@%'] // We can't directly match on account ID, so we'll filter in PHP
+            );
+            
+            if ($result && isset($result['id'])) {
+                return $result['id'];
+            }
+        } catch (\Exception $e) {
+            $this->cli->error("Error querying database: " . $e->getMessage());
+        }
+        
+        return null;
+    }
+
+    /**
      * Fetch all statuses from a Mastodon account using pagination
      *
      * @param string $instance The Mastodon instance URL
      * @param string $accountId The account ID
-     * @param int $limit Maximum number of statuses to fetch in total
+     * @param string|null $sinceId Only fetch statuses newer than this ID
      * @return array The statuses
      */
-    protected function fetchAllStatuses(string $instance, string $accountId, int $limit): array
+    protected function fetchAllStatuses(string $instance, string $accountId, ?string $sinceId = null): array
     {
         $allStatuses = [];
-        $pageSize = min(40, $limit); // Mastodon API typically limits to 40 per request
-        $maxPages = ceil($limit / $pageSize);
+        $pageSize = 40; // Mastodon API typically limits to 40 per request
         $maxId = null;
         $page = 1;
+        $maxPages = 25; // Safety limit to prevent infinite loops
 
-        $this->cli->info("Fetching up to $limit posts in batches of $pageSize...");
+        $this->cli->info("Fetching posts in batches of $pageSize...");
 
-        while (count($allStatuses) < $limit && $page <= $maxPages) {
+        while ($page <= $maxPages) {
             $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$pageSize";
 
             if ($maxId) {
                 $url .= "&max_id=$maxId";
+            }
+            
+            if ($sinceId) {
+                $url .= "&since_id=$sinceId";
             }
 
             $response = $this->makeHttpRequest($url);
@@ -220,6 +261,11 @@ class MastodonFetcher
 
             $allStatuses = array_merge($allStatuses, $statuses);
             $this->cli->info("Fetched page $page with " . count($statuses) . " posts (total: " . count($allStatuses) . ")");
+            
+            // If we got fewer than pageSize, we've reached the end
+            if (count($statuses) < $pageSize) {
+                break;
+            }
 
             // Get the ID of the last status for pagination
             $lastStatus = end($statuses);

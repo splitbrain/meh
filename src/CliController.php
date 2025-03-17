@@ -37,7 +37,6 @@ class CliController extends CLI
         $options->registerCommand('mastodon', 'Fetch posts from a Mastodon account that link to your site');
         $options->registerArgument('account', 'The Mastodon account (e.g., @user@instance.social)', true, 'mastodon');
         $options->registerOption('instance', 'Mastodon instance URL (e.g., https://mastodon.social)', 'i', true, 'mastodon');
-        $options->registerOption('limit', 'Maximum number of posts to fetch (default: 100)', 'l', true, 'mastodon');
     }
 
     protected function main(Options $options)
@@ -52,8 +51,7 @@ class CliController extends CLI
             case 'mastodon':
                 $account = $options->getArgs()[0];
                 $instance = $options->getOpt('instance');
-                $limit = (int)($options->getOpt('limit') ?: 100);
-                $this->fetchMastodonPosts($account, $instance, $limit);
+                $this->fetchMastodonPosts($account, $instance);
                 break;
             default:
                 echo $options->help();
@@ -178,12 +176,11 @@ class CliController extends CLI
      *
      * @param string $account The Mastodon account (e.g., @user@instance.social)
      * @param string|null $instance The Mastodon instance URL
-     * @param int $limit Maximum number of posts to fetch
      * @return void
      */
-    protected function fetchMastodonPosts(string $account, ?string $instance = null, int $limit = 100): void
+    protected function fetchMastodonPosts(string $account, ?string $instance = null): void
     {
         $fetcher = new MastodonFetcher($this, $this->app);
-        $fetcher->fetchPosts($account, $instance, $limit);
+        $fetcher->fetchPosts($account, $instance);
     }
 }
