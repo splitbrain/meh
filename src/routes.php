@@ -2,6 +2,7 @@
 
 use splitbrain\meh\Controllers\CommentController;
 use splitbrain\meh\Controllers\CommentListController;
+use splitbrain\meh\Controllers\TokenController;
 
 /**
  * Define all application routes
@@ -23,5 +24,8 @@ function registerRoutes(AltoRouter $router): void
     $router->map('DELETE', '/comment/[i:id]', [CommentController::class, 'delete', 'admin'], 'comment.delete');
     $router->map('PUT', '/comment/[i:id]/[s:status]', [CommentController::class, 'status', 'admin'], 'comment.status');
 
+    // Authentication routes
+    $router->map('POST', '/token/admin', [TokenController::class, 'admin'], 'token.admin');
+    
     // You can add more routes here as needed
 }
