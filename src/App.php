@@ -7,14 +7,14 @@ use splitbrain\phpsqlite\SQLite;
 class App
 {
     /**
-     * @var SQLite Database connection
+     * @var SQLite|null Database connection
      */
-    protected $db;
+    protected ?SQLite $db;
 
     /**
      * @var array Configuration options
      */
-    protected $config;
+    protected array $config;
 
     /**
      * Constructor
@@ -54,7 +54,7 @@ class App
      *
      * @return SQLite
      */
-    public function getDatabase()
+    public function getDatabase(): SQLite
     {
         if (!$this->db) {
             $file = $this->config['db_path'];
@@ -65,37 +65,16 @@ class App
     }
 
     /**
-     * Set a custom database connection (useful for testing)
-     *
-     * @param SQLite $db
-     * @return void
-     */
-    public function setDatabase(SQLite $db)
-    {
-        $this->db = $db;
-    }
-
-    /**
      * Get a configuration value
      *
      * @param string $key Configuration key
-     * @param mixed $default Default value if key doesn't exist
+     * @param mixed|null $default Default value if key doesn't exist
      * @return mixed Configuration value
      */
-    public function getConfig($key, $default = null)
+    public function getConfig(string $key, mixed $default = null): mixed
     {
-        return isset($this->config[$key]) ? $this->config[$key] : $default;
+        return $this->config[$key] ?? $default;
     }
 
-    /**
-     * Set a configuration value
-     *
-     * @param string $key Configuration key
-     * @param mixed $value Configuration value
-     * @return void
-     */
-    public function setConfig($key, $value)
-    {
-        $this->config[$key] = $value;
-    }
+
 }
