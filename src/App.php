@@ -31,12 +31,22 @@ class App
 
         // Set default configuration
         $this->config = [
-            'db_path' => getenv('DB_PATH') ?: __DIR__.'/data/meh.sqlite',
+            'db_path' => getenv('DB_PATH') ?: 'data/meh.sqlite',
             'db_schema' => __DIR__ . '/../db/',
         ];
 
         // Override with any provided config
         $this->config = array_merge($this->config, $config);
+
+        // Check if database path is absolute or relative
+        $dbdir = dirname($this->config['db_path']);
+        if (!is_dir($dbdir)) {
+            $dbdir = __DIR__ . '/../' . $dbdir;
+            if (is_dir($dbdir)) {
+                $this->config['db_path'] = __DIR__ . '/../' . $this->config['db_path'];
+            }
+        }
+
     }
 
     /**
@@ -47,8 +57,8 @@ class App
     public function getDatabase()
     {
         if (!$this->db) {
-            $file = __DIR__ . '/../' . $this->config['db_path'];
-            $schema = __DIR__ . '/../' . $this->config['db_schema'];
+            $file = $this->config['db_path'];
+            $schema = $this->config['db_schema'];
             $this->db = new SQLite($file, $schema);
         }
         return $this->db;

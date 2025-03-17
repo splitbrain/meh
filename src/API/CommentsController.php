@@ -29,8 +29,8 @@ class CommentsController extends Controller
             throw new \Exception('Post path is required', 400);
         }
 
-        $comments = $db->query('SELECT * FROM comments WHERE post = ? AND status = ? ORDER BY created_at ASC',
-            [$postPath, 'approved'])->fetchAll();
+        $comments = $db->queryAll('SELECT * FROM comments WHERE post = ? AND status = ? ORDER BY created_at ASC',
+            [$postPath, 'approved']);
 
         return ['comments' => $comments];
     }
