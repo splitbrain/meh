@@ -10,15 +10,15 @@ class App
      * @var SQLite Database connection
      */
     protected $db;
-    
+
     /**
      * @var array Configuration options
      */
     protected $config;
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param array $config Optional configuration array to override environment variables
      */
     public function __construct(array $config = [])
@@ -28,20 +28,20 @@ class App
             $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
             $dotenv->load();
         }
-        
+
         // Set default configuration
         $this->config = [
-            'db_path' => getenv('DB_PATH') ?: 'data/meh.sqlite',
-            'db_schema' => getenv('DB_SCHEMA') ?: 'db/',
+            'db_path' => getenv('DB_PATH') ?: __DIR__.'/data/meh.sqlite',
+            'db_schema' => __DIR__ . '/../db/',
         ];
-        
+
         // Override with any provided config
         $this->config = array_merge($this->config, $config);
     }
-    
+
     /**
      * Get the database connection
-     * 
+     *
      * @return SQLite
      */
     public function getDatabase()
@@ -53,10 +53,10 @@ class App
         }
         return $this->db;
     }
-    
+
     /**
      * Set a custom database connection (useful for testing)
-     * 
+     *
      * @param SQLite $db
      * @return void
      */
@@ -64,10 +64,10 @@ class App
     {
         $this->db = $db;
     }
-    
+
     /**
      * Get a configuration value
-     * 
+     *
      * @param string $key Configuration key
      * @param mixed $default Default value if key doesn't exist
      * @return mixed Configuration value
@@ -76,10 +76,10 @@ class App
     {
         return isset($this->config[$key]) ? $this->config[$key] : $default;
     }
-    
+
     /**
      * Set a configuration value
-     * 
+     *
      * @param string $key Configuration key
      * @param mixed $value Configuration value
      * @return void

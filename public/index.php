@@ -41,23 +41,29 @@ if ($match) {
     if (isset($match['params']) && is_array($match['params'])) {
         $data = array_merge($data, $match['params']);
     }
-    
+
     // Get the controller and method
     list($controllerClass, $method) = $match['target'];
-    
+
     try {
         // Create controller instance and call the method
         $controller = new $controllerClass($app);
         $result = $controller->$method($data);
-        
+
         // Return the result wrapped in a response object
-        http_response_code(isset($result['status_code']) ? $result['status_code'] : 200);
-        echo json_encode(['response' => $result]);
+        http_response_code(200);
+        echo json_encode(['response' => $result], JSON_PRETTY_PRINT);
     } catch (\Exception $e) {
         // Handle errors
-        $code = $e->getCode() ?: 500;
+        $code = 500;
         http_response_code($code);
-        echo json_encode(['error' => $e->getMessage()]);
+        echo json_encode([
+            'error' => [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode() ?: 1,
+                'trace' => $e->getTrace() // FIXME make configurable
+                ]
+            ], JSON_PRETTY_PRINT);
     }
 } else {
     // No route was matched
