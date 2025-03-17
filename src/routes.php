@@ -1,22 +1,25 @@
 <?php
 
-use splitbrain\meh\API\CommentsController;
-use splitbrain\meh\App;
+use splitbrain\meh\Controllers\CommentController;
+use splitbrain\meh\Controllers\CommentListController;
 
 /**
  * Define all application routes
  *
  * @param AltoRouter $router The router instance
- * @param App $app The application container
  * @return void
+ * @throws Exception
  */
-function registerRoutes(AltoRouter $router, App $app) {
+function registerRoutes(AltoRouter $router): void
+{
     // API Routes
-    $router->map('GET', '/api/test', [CommentsController::class, 'test'], 'test');
-    $router->map('GET', '/api/comments', [CommentsController::class, 'getComments'], 'get_comments');
-    $router->map('POST', '/api/comments', [CommentsController::class, 'createComment'], 'create_comment');
-    $router->map('PUT', '/api/comments', [CommentsController::class, 'updateCommentStatus'], 'update_comment');
-    $router->map('DELETE', '/api/comments', [CommentsController::class, 'deleteComment'], 'delete_comment');
+    $router->map('GET', '/comments', [CommentListController::class, 'bypost'], 'comments.bypost');
+
+    $router->map('POST', '/comment', [CommentController::class, 'create'], 'comment.create');
+    $router->map('GET', '/comment/[i:id]', [CommentController::class, 'get'], 'comment.get');
+    $router->map('PATCH', '/comment/[i:id]', [CommentController::class, 'edit'], 'comment.edit');
+    $router->map('DELETE', '/comment/[i:id]', [CommentController::class, 'delete'], 'comment.delete');
+    $router->map('PUT', '/comment/[i:id]/[s:status]', [CommentController::class, 'status'], 'comment.status');
 
     // You can add more routes here as needed
 }

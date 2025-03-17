@@ -12,10 +12,10 @@ class CliController extends CLI
      * @var App Application container
      */
     protected $app;
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param App|null $app Application container
      */
     public function __construct(App $app = null)
@@ -23,7 +23,7 @@ class CliController extends CLI
         parent::__construct();
         $this->app = $app ?: new App();
     }
-    
+
 
     protected function setup(Options $options)
     {
@@ -51,12 +51,12 @@ class CliController extends CLI
 
     /**
      * Get the database connection
-     * 
+     *
      * @return SQLite
      */
     protected function getDatabase()
     {
-        return $this->app->getDatabase();
+        return $this->app->db();
     }
 
     protected function migrateDatabase()

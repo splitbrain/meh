@@ -57,6 +57,10 @@ if ($match) {
     } catch (\Exception $e) {
         // Handle errors
         $code = 500;
+        if($e instanceof \splitbrain\meh\HttpException) {
+            $code = $e->getCode();
+        }
+
         http_response_code($code);
         echo json_encode([
             'error' => [

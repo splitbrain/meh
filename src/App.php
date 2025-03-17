@@ -9,7 +9,7 @@ class App
     /**
      * @var SQLite|null Database connection
      */
-    protected ?SQLite $db;
+    protected ?SQLite $db = null;
 
     /**
      * @var array Configuration options
@@ -54,7 +54,7 @@ class App
      *
      * @return SQLite
      */
-    public function getDatabase(): SQLite
+    public function db(): SQLite
     {
         if (!$this->db) {
             $file = $this->config['db_path'];
@@ -71,7 +71,7 @@ class App
      * @param mixed|null $default Default value if key doesn't exist
      * @return mixed Configuration value
      */
-    public function getConfig(string $key, mixed $default = null): mixed
+    public function conf(string $key, mixed $default = null): mixed
     {
         return $this->config[$key] ?? $default;
     }
