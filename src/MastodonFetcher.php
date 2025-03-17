@@ -347,14 +347,20 @@ class MastodonFetcher
 
                 // Extract the text content
                 $text = strip_tags($reply->content);
+                
+                // Get avatar URL
+                $avatarUrl = '';
+                if (isset($reply->account->avatar)) {
+                    $avatarUrl = $reply->account->avatar;
+                }
 
                 // Insert into comments table
                 try {
                     $commentId = $db->exec(
                         'INSERT INTO comments 
-                        (post, author, website, text, html, status, created_at) 
+                        (post, author, website, text, html, status, created_at, avatar) 
                         VALUES 
-                        (?, ?, ?, ?, ?, ?, ?)',
+                        (?, ?, ?, ?, ?, ?, ?, ?)',
                         [
                             $thread['post'],
                             $reply->account->acct,
@@ -362,7 +368,8 @@ class MastodonFetcher
                             $text,
                             $reply->content,
                             'approved',
-                            date('Y-m-d H:i:s', strtotime($reply->created_at))
+                            date('Y-m-d H:i:s', strtotime($reply->created_at)),
+                            $avatarUrl
                         ]
                     );
 
