@@ -1,3 +1,4 @@
 .aider*
 /data/
 /vendor/
+.env
