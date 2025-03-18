@@ -34,14 +34,9 @@ export class MehForm {
   private handleSubmit = async (e: Event) => {
     e.preventDefault();
     
-    // Get form data
+    // Get form data and convert to object
     const formData = new FormData(this.formElement);
-    
-    // Extract values from form data
-    const author = formData.get('author') as string;
-    const email = formData.get('email') as string;
-    const website = formData.get('website') as string;
-    const text = formData.get('text') as string;
+    const formValues = Object.fromEntries(formData.entries());
     
     // Set submitting state
     this.status = 'submitting';
@@ -57,10 +52,7 @@ export class MehForm {
         },
         body: JSON.stringify({
           post: this.post,
-          author,
-          email,
-          website,
-          text,
+          ...formValues
         }),
       });
 
