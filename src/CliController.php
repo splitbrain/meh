@@ -33,11 +33,10 @@ class CliController extends CLI
 
         $options->registerCommand('disqus', 'Import comments from disqus');
         $options->registerArgument('export.xml', 'The export file to import', true, 'disqus');
-        
+
         $options->registerCommand('mastodon', 'Fetch posts from a Mastodon account that link to your site');
         $options->registerArgument('account', 'The Mastodon account (e.g., @user@instance.social)', true, 'mastodon');
-        $options->registerOption('instance', 'Mastodon instance URL (e.g., https://mastodon.social)', 'i', true, 'mastodon');
-        
+
         $options->registerCommand('mastodon-replies', 'Fetch replies to Mastodon threads and add them as comments');
     }
 
@@ -52,8 +51,7 @@ class CliController extends CLI
                 break;
             case 'mastodon':
                 $account = $options->getArgs()[0];
-                $instance = $options->getOpt('instance');
-                $this->fetchMastodonPosts($account, $instance);
+                $this->fetchMastodonPosts($account);
                 break;
             case 'mastodon-replies':
                 $this->fetchMastodonReplies();
@@ -180,15 +178,14 @@ class CliController extends CLI
      * Fetch posts from a Mastodon account and look for links to the site
      *
      * @param string $account The Mastodon account (e.g., @user@instance.social)
-     * @param string|null $instance The Mastodon instance URL
      * @return void
      */
-    protected function fetchMastodonPosts(string $account, ?string $instance = null): void
+    protected function fetchMastodonPosts(string $account): void
     {
         $fetcher = new MastodonFetcher($this, $this->app);
-        $fetcher->fetchPosts($account, $instance);
+        $fetcher->fetchPosts($account);
     }
-    
+
     /**
      * Fetch replies to Mastodon threads and add them as comments
      *

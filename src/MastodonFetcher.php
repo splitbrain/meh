@@ -36,29 +36,19 @@ class MastodonFetcher
      * Fetch posts from a Mastodon account and look for links to the site
      *
      * @param string $account The Mastodon account (e.g., @user@instance.social)
-     * @param string|null $instance The Mastodon instance URL
      * @return void
      */
-    public function fetchPosts(string $account, ?string $instance = null): void
+    public function fetchPosts(string $account): void
     {
         // Parse the account string to extract username and instance
-        if (preg_match('/^@?([^@]+)@(.+)$/', $account, $matches)) {
-            $username = $matches[1];
-            $instanceHost = $matches[2];
-        } else {
-            // If no instance in account string, require the instance parameter
-            if (empty($instance)) {
-                $this->cli->error("Invalid account format. Use @username@instance.social or provide --instance parameter");
-                return;
-            }
-            $username = ltrim($account, '@');
-            $instanceHost = parse_url($instance, PHP_URL_HOST) ?: $instance;
+        if (!preg_match('/^@?([^@]+)@(.+)$/', $account, $matches)) {
+            $this->cli->error("Invalid account format. Use @username@instance.social");
+            return;
         }
-
-        // Normalize instance URL
-        if (empty($instance)) {
-            $instance = "https://$instanceHost";
-        }
+        
+        $username = $matches[1];
+        $instanceHost = $matches[2];
+        $instance = "https://$instanceHost";
 
         // Remove trailing slash if present
         $instance = rtrim($instance, '/');
