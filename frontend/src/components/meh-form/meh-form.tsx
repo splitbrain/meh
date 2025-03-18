@@ -2,6 +2,7 @@ import {Component, Prop, h, State} from '@stencil/core';
 
 @Component({
     tag: 'meh-form',
+    styleUrl: 'meh-form.css',
     shadow: true,
 })
 export class MehForm {
@@ -72,8 +73,7 @@ export class MehForm {
 
     render() {
         return (
-            <div>
-                <h3>Leave a Comment</h3>
+            <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
 
                 {this.status === 'success' && (
                     <div>
@@ -87,32 +87,36 @@ export class MehForm {
                     </div>
                 )}
 
-                <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
+                <div class="userdata">
                     <label class="required">
                         <span>Your Name</span>
                         <input name="author" type="text" placeholder="Jane Doe" required/>
                     </label>
 
                     <label>
-                        <span>Email</span>
+                        <span>Your Email Address</span>
                         <input name="email" type="email" placeholder="jane@example.com"/>
                     </label>
 
                     <label>
-                        <span>Website</span>
+                        <span>Your Website</span>
                         <input name="website" type="url" placeholder="https://example.com/~jane"/>
                     </label>
+                </div>
 
+                <div>
                     <label class="required">
-                        <span>Comment</span>
+                        <span>Your Comment</span>
                         <textarea name="text" required rows={5} placeholder="Lorem Ipsum…"></textarea>
                     </label>
+                </div>
 
+                <div>
                     <button type="submit" disabled={this.status === 'submitting'}>
                         {this.status === 'submitting' ? 'Submitting...' : 'Submit Comment'}
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         );
     }
 }

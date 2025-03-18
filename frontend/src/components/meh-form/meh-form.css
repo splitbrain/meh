@@ -1,3 +1,54 @@
 :host {
   display: block;
+
+  --spacing: 1em;
+  --input-pad: 0.25em;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  box-sizing: border-box;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  label {
+    display: block;
+
+    span {
+      display: block;
+      font-weight: bold;
+      margin-bottom: var(--input-pad);
+    }
+  }
+
+  label.required span::after {
+    content: "*";
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: var(--input-pad);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  .userdata {
+    display: flex;
+    flex-direction: row;
+    gap: var(--spacing);
+    flex-wrap: wrap;
+
+    > label {
+      flex-grow: 1;
+      flex-shrink: 1;
+      min-width: 15em;
+
+    }
+  }
 }
