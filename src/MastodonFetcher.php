@@ -45,7 +45,7 @@ class MastodonFetcher
             $this->cli->error("Invalid account format. Use @username@instance.social");
             return;
         }
-        
+
         $username = $matches[1];
         $instanceHost = $matches[2];
         $instance = "https://$instanceHost";
@@ -91,8 +91,8 @@ class MastodonFetcher
         $importCount = 0;
 
         foreach ($allStatuses as $status) {
-            // Skip non-public posts
-            if ($status->visibility !== 'public') {
+            // Skip private posts
+            if (in_array($status->visibility, ['private', 'direct'])) {
                 continue;
             }
 
@@ -332,13 +332,13 @@ class MastodonFetcher
                 }
 
                 // Skip non-public replies
-                if ($reply->visibility !== 'public') {
+                if (in_array($reply->visibility, ['private', 'direct'])) {
                     continue;
                 }
 
                 // Extract the text content
                 $text = strip_tags($reply->content);
-                
+
                 // Get avatar URL
                 $avatarUrl = '';
                 if (isset($reply->account->avatar)) {
@@ -436,13 +436,13 @@ class MastodonFetcher
         $headers = [
             'User-Agent' => 'Meh Comment System/1.0'
         ];
-        
+
         // Add Authorization header if token is configured
         $token = $this->app->conf('mastodon_token');
         if (!empty($token)) {
             $headers['Authorization'] = 'Bearer ' . $token;
         }
-        
+
         $client = new \GuzzleHttp\Client([
             'timeout' => 30,
             'headers' => $headers
