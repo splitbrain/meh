@@ -10,18 +10,28 @@ export class MehForm {
    */
   @Prop() post: string;
 
-  @State() author: string = '';
-  @State() email: string = '';
-  @State() website: string = '';
-  @State() text: string = '';
+  // Only keep status-related state properties
   @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
   @State() errorMessage: string = '';
+
+  // References to form elements
+  private authorInput?: HTMLInputElement;
+  private emailInput?: HTMLInputElement;
+  private websiteInput?: HTMLInputElement;
+  private textArea?: HTMLTextAreaElement;
+  private formElement?: HTMLFormElement;
 
   private handleSubmit = async (e: Event) => {
     e.preventDefault();
     
+    // Get values directly from the DOM elements
+    const author = this.authorInput.value;
+    const email = this.emailInput.value;
+    const website = this.websiteInput.value;
+    const text = this.textArea.value;
+    
     // Basic validation
-    if (!this.author || !this.text) {
+    if (!author || !text) {
       this.errorMessage = 'Name and comment text are required';
       this.status = 'error';
       return;
@@ -38,10 +48,10 @@ export class MehForm {
         },
         body: JSON.stringify({
           post: this.post,
-          author: this.author,
-          email: this.email,
-          website: this.website,
-          text: this.text,
+          author,
+          email,
+          website,
+          text,
         }),
       });
 
@@ -51,10 +61,7 @@ export class MehForm {
       }
 
       // Reset form on success
-      this.author = '';
-      this.email = '';
-      this.website = '';
-      this.text = '';
+      this.formElement.reset();
       this.status = 'success';
     } catch (error) {
       this.errorMessage = error.message || 'An error occurred while submitting your comment';
@@ -79,14 +86,13 @@ export class MehForm {
           </div>
         )}
 
-        <form onSubmit={this.handleSubmit}>
+        <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
           <div>
             <label htmlFor="author">Name *</label>
             <input
               id="author"
               type="text"
-              value={this.author}
-              onInput={(e) => this.author = (e.target as HTMLInputElement).value}
+              ref={(el) => this.authorInput = el as HTMLInputElement}
               required
             />
           </div>
@@ -96,8 +102,7 @@ export class MehForm {
             <input
               id="email"
               type="email"
-              value={this.email}
-              onInput={(e) => this.email = (e.target as HTMLInputElement).value}
+              ref={(el) => this.emailInput = el as HTMLInputElement}
             />
           </div>
 
@@ -106,8 +111,7 @@ export class MehForm {
             <input
               id="website"
               type="url"
-              value={this.website}
-              onInput={(e) => this.website = (e.target as HTMLInputElement).value}
+              ref={(el) => this.websiteInput = el as HTMLInputElement}
             />
           </div>
 
@@ -115,8 +119,7 @@ export class MehForm {
             <label htmlFor="text">Comment *</label>
             <textarea
               id="text"
-              value={this.text}
-              onInput={(e) => this.text = (e.target as HTMLTextAreaElement).value}
+              ref={(el) => this.textArea = el as HTMLTextAreaElement}
               required
               rows={5}
             ></textarea>
