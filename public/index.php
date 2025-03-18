@@ -1,10 +1,10 @@
 <?php
 
 // Include routes file
-require_once __DIR__ . '/../src/routes.php';
+require_once __DIR__ . '/../backend/src/routes.php';
 
 // Load Composer's autoloader
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../backend/vendor/autoload.php';
 
 // Create App instance with environment variables
 $app = new splitbrain\meh\App();
