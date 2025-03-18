@@ -6,6 +6,12 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface MehForm {
+        /**
+          * The post path to associate the comment with
+         */
+        "post": string;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -22,6 +28,12 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLMehFormElement extends Components.MehForm, HTMLStencilElement {
+    }
+    var HTMLMehFormElement: {
+        prototype: HTMLMehFormElement;
+        new (): HTMLMehFormElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
@@ -29,10 +41,17 @@ declare global {
         new (): HTMLMyComponentElement;
     };
     interface HTMLElementTagNameMap {
+        "meh-form": HTMLMehFormElement;
         "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
+    interface MehForm {
+        /**
+          * The post path to associate the comment with
+         */
+        "post"?: string;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -48,6 +67,7 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
     interface IntrinsicElements {
+        "meh-form": MehForm;
         "my-component": MyComponent;
     }
 }
@@ -55,6 +75,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "meh-form": LocalJSX.MehForm & JSXBase.HTMLAttributes<HTMLMehFormElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }
