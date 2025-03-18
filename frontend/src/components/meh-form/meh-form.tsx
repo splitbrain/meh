@@ -7,6 +7,7 @@ import { Component, Prop, h, State } from '@stencil/core';
 export class MehForm {
   /**
    * The post path to associate the comment with
+   * If not provided, defaults to the current page path
    */
   @Prop() post: string;
 
@@ -16,6 +17,13 @@ export class MehForm {
 
   // Reference to the form element only
   private formElement?: HTMLFormElement;
+  
+  componentWillLoad() {
+    // If post prop is not set, use the current page's path
+    if (!this.post) {
+      this.post = window.location.pathname;
+    }
+  }
 
   private handleSubmit = async (e: Event) => {
     e.preventDefault();
