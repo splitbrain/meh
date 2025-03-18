@@ -38,6 +38,8 @@ class App
             'jwt_secret' => $_ENV['JWT_SECRET'] ?? 'not very secret', # FIXME we probably want a default only for testing
             'admin_password' => $_ENV['ADMIN_PASSWORD'] ?? '',
             'site_url' => $_ENV['SITE_URL'] ?? 'http://localhost:8000',
+            'mastodon_account' => $_ENV['MASTODON_ACCOUNT'] ?? '',
+            'mastodon_token' => $_ENV['MASTODON_TOKEN'] ?? '',
         ];
 
         // Override with any provided config
