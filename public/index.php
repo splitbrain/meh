@@ -67,7 +67,13 @@ if (file_exists($filePath) && !is_dir($filePath)) {
 
 // If we get here, the file doesn't exist in frontend/dist
 // Serve the main index.html for SPA routing
-$indexPath = $frontendDistPath . '/index.html';
+if($requestUri === '/') {
+    $indexPath = $frontendDistPath . '/index.html';
+} else {
+    $indexPath = $frontendDistPath . '/404.html';
+}
+
+$indexPath = '/index.html';
 if (file_exists($indexPath)) {
     header('Content-Type: text/html');
     readfile($indexPath);
