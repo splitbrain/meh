@@ -2,6 +2,7 @@
 
 namespace splitbrain\meh;
 
+use GuzzleHttp\Client;
 use splitbrain\phpcli\CLI;
 
 /**
@@ -435,30 +436,30 @@ class MastodonFetcher
     }
 
     /**
-     * Make an HTTP request
+     * Make an HTTP request using Guzzle
      *
      * @param string $url The URL to request
      * @return string|null The response body or null on failure
      */
     protected function makeHttpRequest(string $url): ?string
     {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Meh Comment System/1.0');
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $client = new \GuzzleHttp\Client([
+            'timeout' => 30,
+            'headers' => [
+                'User-Agent' => 'Meh Comment System/1.0'
+            ]
+        ]);
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if ($httpCode >= 400 || $response === false) {
-            $error = curl_error($ch);
-            $this->cli->error("HTTP request failed: $error (HTTP $httpCode)");
-            curl_close($ch);
+        try {
+            $response = $client->request('GET', $url);
+            return (string) $response->getBody();
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 'unknown';
+            $this->cli->error("HTTP request failed: {$e->getMessage()} (HTTP $statusCode)");
+            return null;
+        } catch (\Exception $e) {
+            $this->cli->error("HTTP request failed: {$e->getMessage()}");
             return null;
         }
-
-        curl_close($ch);
-        return $response;
     }
 }
