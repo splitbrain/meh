@@ -43,13 +43,7 @@ export class MehForm {
     const website = formData.get('website') as string;
     const text = formData.get('text') as string;
     
-    // Basic validation
-    if (!author || !text) {
-      this.errorMessage = 'Name and comment text are required';
-      this.status = 'error';
-      return;
-    }
-
+    // Set submitting state
     this.status = 'submitting';
     this.errorMessage = '';
 
