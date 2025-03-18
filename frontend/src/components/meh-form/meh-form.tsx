@@ -87,41 +87,45 @@ export class MehForm {
 
         <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
           <div>
-            <label htmlFor="author">Name *</label>
-            <input
-              id="author"
-              name="author"
-              type="text"
-              required
-            />
+            <label>
+              Name *
+              <input
+                name="author"
+                type="text"
+                required
+              />
+            </label>
           </div>
 
           <div>
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-            />
+            <label>
+              Email
+              <input
+                name="email"
+                type="email"
+              />
+            </label>
           </div>
 
           <div>
-            <label htmlFor="website">Website</label>
-            <input
-              id="website"
-              name="website"
-              type="url"
-            />
+            <label>
+              Website
+              <input
+                name="website"
+                type="url"
+              />
+            </label>
           </div>
 
           <div>
-            <label htmlFor="text">Comment *</label>
-            <textarea
-              id="text"
-              name="text"
-              required
-              rows={5}
-            ></textarea>
+            <label>
+              Comment *
+              <textarea
+                name="text"
+                required
+                rows={5}
+              ></textarea>
+            </label>
           </div>
 
           <button type="submit" disabled={this.status === 'submitting'}>
