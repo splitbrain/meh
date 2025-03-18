@@ -4,6 +4,8 @@ namespace splitbrain\meh;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use splitbrain\phpsqlite\SQLite;
 
 class App
@@ -19,12 +21,19 @@ class App
     protected array $config;
 
     /**
+     * @var LoggerInterface Logger
+     */
+    protected LoggerInterface $logger;
+
+    /**
      * Constructor
      *
      * @param array $config Optional configuration array to override environment variables
      */
     public function __construct(array $config = [])
     {
+        $this->logger = new NullLogger();
+
         // Load environment variables from .env file if it exists
         if (file_exists(__DIR__ . '/../.env')) {
             $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
@@ -46,7 +55,7 @@ class App
         $this->config = array_merge($this->config, $config);
 
         // Check if database path is absolute or relative
-        $dbdir = dirname((string) $this->config['db_path']);
+        $dbdir = dirname((string)$this->config['db_path']);
         if (!is_dir($dbdir)) {
             $dbdir = __DIR__ . '/../' . $dbdir;
             if (is_dir($dbdir)) {
@@ -84,6 +93,26 @@ class App
     }
 
     /**
+     * Get the logger
+     *
+     * @return LoggerInterface
+     */
+    public function log(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    /**
+     * Set the logger
+     *
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * Check if the user has the required scopes
      *
      * @param string|string[] $required list of or single required scope(s)
@@ -93,7 +122,7 @@ class App
     {
         // get bearer token
         $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        if (preg_match('/^Bearer (.+)$/', (string) $token, $matches)) {
+        if (preg_match('/^Bearer (.+)$/', (string)$token, $matches)) {
             $token = $matches[1];
         } else {
             throw new HttpException('No valid token given', 401);

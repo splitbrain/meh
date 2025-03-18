@@ -3,10 +3,10 @@
 namespace splitbrain\meh;
 
 use splitbrain\phpcli\Options;
-use splitbrain\phpcli\CLI;
+use splitbrain\phpcli\PSR3CLIv3;
 use splitbrain\phpsqlite\SQLite;
 
-class CliController extends CLI
+class CliController extends PSR3CLIv3
 {
     /**
      * @var App Application container
@@ -22,9 +22,10 @@ class CliController extends CLI
     {
         parent::__construct();
         $this->app = $app ?: new App();
+        $this->app->setLogger($this);
     }
 
-
+    /** @inheritdoc */
     protected function setup(Options $options)
     {
         $options->setHelp('Command line tool for the meh commenting system');
@@ -37,6 +38,7 @@ class CliController extends CLI
         $options->registerCommand('mastodon', 'Fetch posts from a Mastodon account that link to your site and import replies as comments');
     }
 
+    /** @inheritdoc */
     protected function main(Options $options)
     {
         switch ($options->getCmd()) {
@@ -167,6 +169,7 @@ class CliController extends CLI
 
         $this->success("Successfully imported $count comments");
     }
+
     /**
      * Fetch posts from a Mastodon account, look for links to the site,
      * and import replies as comments
@@ -180,13 +183,13 @@ class CliController extends CLI
             $this->error("No Mastodon account configured. Set MASTODON_ACCOUNT in your .env file.");
             return;
         }
-        
-        $fetcher = new MastodonFetcher($this, $this->app);
-        
+
+        $fetcher = new MastodonFetcher($this->app);
+
         // First fetch posts from the account
         $this->info("Step 1: Fetching posts from Mastodon account");
         $fetcher->fetchPosts($account);
-        
+
         // Then fetch replies to those posts
         $this->info("Step 2: Fetching replies to Mastodon posts");
         $fetcher->fetchReplies();

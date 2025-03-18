@@ -12,9 +12,6 @@ use splitbrain\phpcli\CLI;
  */
 class MastodonFetcher
 {
-    /** @var CLI CLI instance for output */
-    protected $cli;
-
     /** @var App Application container */
     protected $app;
 
@@ -24,12 +21,10 @@ class MastodonFetcher
     /**
      * Constructor
      *
-     * @param CLI $cli CLI instance for output
      * @param App $app Application container
      */
-    public function __construct(CLI $cli, App $app)
+    public function __construct(App $app)
     {
-        $this->cli = $cli;
         $this->app = $app;
         $this->siteUrl = $this->app->conf('site_url');
     }
@@ -49,34 +44,34 @@ class MastodonFetcher
         }
 
         $instance = "https://$instanceHost";
-        $this->cli->info("Fetching posts from $username@$instanceHost");
+        $this->app->log()->info("Fetching posts from $username@$instanceHost");
 
         // Look up the account ID
         $accountId = $this->lookupAccount($instance, $username);
         if (!$accountId) {
-            $this->cli->error("Could not find Mastodon account: $username@$instanceHost");
+            $this->app->log()->error("Could not find Mastodon account: $username@$instanceHost");
             return;
         }
 
-        $this->cli->info("Found account ID: $accountId");
-        $this->cli->info("Looking for posts linking to: {$this->siteUrl}");
+        $this->app->log()->info("Found account ID: $accountId");
+        $this->app->log()->info("Looking for posts linking to: {$this->siteUrl}");
 
         // Get the most recent status ID we've already imported
         $sinceId = $this->getLatestImportedStatusId($account);
         if ($sinceId) {
-            $this->cli->info("Fetching posts newer than ID: $sinceId");
+            $this->app->log()->info("Fetching posts newer than ID: $sinceId");
         } else {
-            $this->cli->info("No previous imports found, fetching all posts");
+            $this->app->log()->info("No previous imports found, fetching all posts");
         }
 
         // Fetch all statuses
         $allStatuses = $this->fetchAllStatuses($instance, $accountId, $sinceId);
         if (empty($allStatuses)) {
-            $this->cli->warning("No posts found for this account");
+            $this->app->log()->warning("No posts found for this account");
             return;
         }
 
-        $this->cli->info("Fetched " . count($allStatuses) . " posts");
+        $this->app->log()->info("Fetched " . count($allStatuses) . " posts");
 
         // Process and import matching posts
         $this->processAndImportPosts($allStatuses, $account, $username, $instanceHost);
@@ -91,7 +86,7 @@ class MastodonFetcher
     protected function parseAccount(string $account): array
     {
         if (!preg_match('/^@?([^@]+)@(.+)$/', $account, $matches)) {
-            $this->cli->error("Invalid account format. Use @username@instance.social");
+            $this->app->log()->error("Invalid account format. Use @username@instance.social");
             return [null, null];
         }
 
@@ -109,7 +104,7 @@ class MastodonFetcher
     {
         $url = "$instance/api/v1/accounts/lookup?acct=$username";
         $response = $this->makeHttpRequest($url);
-        
+
         if (!$response) {
             return null;
         }
@@ -139,7 +134,7 @@ class MastodonFetcher
 
             return $result['id'] ?? null;
         } catch (\Exception $e) {
-            $this->cli->error("Error querying database: " . $e->getMessage());
+            $this->app->log()->error("Error querying database: " . $e->getMessage());
             return null;
         }
     }
@@ -160,7 +155,7 @@ class MastodonFetcher
         $page = 1;
         $maxPages = 25;
 
-        $this->cli->info("Fetching posts in batches of $pageSize...");
+        $this->app->log()->info("Fetching posts in batches of $pageSize...");
 
         while ($page <= $maxPages) {
             $url = $this->buildStatusesUrl($instance, $accountId, $pageSize, $maxId, $sinceId);
@@ -176,7 +171,7 @@ class MastodonFetcher
             }
 
             $allStatuses = array_merge($allStatuses, $statuses);
-            $this->cli->info("Fetched page $page with " . count($statuses) . " posts (total: " . count($allStatuses) . ")");
+            $this->app->log()->info("Fetched page $page with " . count($statuses) . " posts (total: " . count($allStatuses) . ")");
 
             // Check if we've reached the end
             if (count($statuses) < $pageSize) {
@@ -272,14 +267,14 @@ class MastodonFetcher
                     ]
                 );
                 $importCount++;
-                $this->cli->success("Imported Mastodon thread: " . $status->url);
+                $this->app->log()->notice("Imported Mastodon thread: " . $status->url);
             } catch (\Exception $e) {
-                $this->cli->error("Error importing Mastodon thread: " . $e->getMessage());
+                $this->app->log()->error("Error importing Mastodon thread: " . $e->getMessage());
             }
         }
 
-        $this->cli->success("Found " . count($matchingPosts) . " posts linking to your site");
-        $this->cli->success("Successfully imported $importCount Mastodon threads");
+        $this->app->log()->notice("Found " . count($matchingPosts) . " posts linking to your site");
+        $this->app->log()->notice("Successfully imported $importCount Mastodon threads");
     }
 
     /**
@@ -324,7 +319,7 @@ class MastodonFetcher
             return;
         }
 
-        $this->cli->info("Found " . count($threads) . " Mastodon threads to check for replies");
+        $this->app->log()->info("Found " . count($threads) . " Mastodon threads to check for replies");
 
         $totalReplies = 0;
         $importedReplies = 0;
@@ -336,16 +331,16 @@ class MastodonFetcher
             }
 
             $statusId = $thread['id'];
-            $this->cli->info("Checking for replies to thread: " . $thread['url']);
+            $this->app->log()->info("Checking for replies to thread: " . $thread['url']);
 
             // Fetch the context (replies) for this status
             $context = $this->fetchStatusContext($instance, $statusId);
             if (!$context || empty($context->descendants)) {
-                $this->cli->info("No replies found for this thread");
+                $this->app->log()->info("No replies found for this thread");
                 continue;
             }
 
-            $this->cli->info("Found " . count($context->descendants) . " replies to this thread");
+            $this->app->log()->info("Found " . count($context->descendants) . " replies to this thread");
             $totalReplies += count($context->descendants);
 
             // Process each reply
@@ -357,8 +352,8 @@ class MastodonFetcher
             }
         }
 
-        $this->cli->success("Found $totalReplies replies in total");
-        $this->cli->success("Successfully imported $importedReplies new replies as comments");
+        $this->app->log()->notice("Found $totalReplies replies in total");
+        $this->app->log()->notice("Successfully imported $importedReplies new replies as comments");
     }
 
     /**
@@ -373,7 +368,7 @@ class MastodonFetcher
         try {
             return $db->queryAll('SELECT * FROM mastodon_threads ORDER BY created_at DESC');
         } catch (\Exception $e) {
-            $this->cli->error("Error querying database: " . $e->getMessage());
+            $this->app->log()->error("Error querying database: " . $e->getMessage());
             return [];
         }
     }
@@ -388,7 +383,7 @@ class MastodonFetcher
     {
         $host = parse_url($url, PHP_URL_HOST);
         if (!$host) {
-            $this->cli->warning("Could not determine instance from URL: " . $url);
+            $this->app->log()->warning("Could not determine instance from URL: " . $url);
             return null;
         }
 
@@ -407,7 +402,7 @@ class MastodonFetcher
     {
         // Skip if already imported
         if ($this->isReplyImported($reply->uri)) {
-            $this->cli->info("Reply already imported: " . $reply->url);
+            $this->app->log()->info("Reply already imported: " . $reply->url);
             return false;
         }
 
@@ -446,10 +441,10 @@ class MastodonFetcher
                 [$reply->uri, $commentId]
             );
 
-            $this->cli->success("Imported reply from " . $reply->account->acct . ": " . $reply->url);
+            $this->app->log()->notice("Imported reply from " . $reply->account->acct . ": " . $reply->url);
             return true;
         } catch (\Exception $e) {
-            $this->cli->error("Error importing reply: " . $e->getMessage());
+            $this->app->log()->error("Error importing reply: " . $e->getMessage());
             return false;
         }
     }
@@ -488,7 +483,7 @@ class MastodonFetcher
 
             return !empty($result);
         } catch (\Exception $e) {
-            $this->cli->error("Error checking if reply is imported: " . $e->getMessage());
+            $this->app->log()->error("Error checking if reply is imported: " . $e->getMessage());
             return false;
         }
     }
@@ -504,7 +499,7 @@ class MastodonFetcher
     {
         $url = "$instance/api/v1/statuses/$statusId/context";
         $response = $this->makeHttpRequest($url);
-        
+
         if (!$response) {
             return null;
         }
@@ -540,10 +535,10 @@ class MastodonFetcher
             return (string)$response->getBody();
         } catch (RequestException $e) {
             $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 'unknown';
-            $this->cli->error("HTTP request failed: {$e->getMessage()} (HTTP $statusCode)");
+            $this->app->log()->error("HTTP request failed: {$e->getMessage()} (HTTP $statusCode)");
             return null;
         } catch (\Exception $e) {
-            $this->cli->error("HTTP request failed: {$e->getMessage()}");
+            $this->app->log()->error("HTTP request failed: {$e->getMessage()}");
             return null;
         }
     }
