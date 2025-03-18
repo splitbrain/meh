@@ -46,7 +46,7 @@ class App
         $this->config = array_merge($this->config, $config);
 
         // Check if database path is absolute or relative
-        $dbdir = dirname($this->config['db_path']);
+        $dbdir = dirname((string) $this->config['db_path']);
         if (!is_dir($dbdir)) {
             $dbdir = __DIR__ . '/../' . $dbdir;
             if (is_dir($dbdir)) {
@@ -93,7 +93,7 @@ class App
     {
         // get bearer token
         $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        if (preg_match('/^Bearer (.+)$/', $token, $matches)) {
+        if (preg_match('/^Bearer (.+)$/', (string) $token, $matches)) {
             $token = $matches[1];
         } else {
             throw new HttpException('No valid token given', 401);

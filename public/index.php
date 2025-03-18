@@ -16,7 +16,7 @@ $router = new AltoRouter();
 // $router->setBasePath('/myapp');
 
 // Register all routes
-registerRoutes($router, $app);
+registerRoutes($router);
 
 // Match the current request
 $match = $router->match();

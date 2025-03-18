@@ -26,6 +26,6 @@ function registerRoutes(AltoRouter $router): void
 
     // Authentication routes
     $router->map('POST', '/token/admin', [TokenController::class, 'admin'], 'token.admin');
-    
+
     // You can add more routes here as needed
 }

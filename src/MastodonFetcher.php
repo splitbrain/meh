@@ -43,7 +43,7 @@ class MastodonFetcher
     public function fetchPosts(string $account): void
     {
         // Parse the account string
-        list($username, $instanceHost) = $this->parseAccount($account);
+        [$username, $instanceHost] = $this->parseAccount($account);
         if (!$username || !$instanceHost) {
             return;
         }
@@ -165,7 +165,7 @@ class MastodonFetcher
         while ($page <= $maxPages) {
             $url = $this->buildStatusesUrl($instance, $accountId, $pageSize, $maxId, $sinceId);
             $response = $this->makeHttpRequest($url);
-            
+
             if (!$response) {
                 break;
             }
@@ -250,7 +250,7 @@ class MastodonFetcher
                 'id' => $status->id,
                 'url' => $status->url,
                 'created_at' => $status->created_at,
-                'content' => strip_tags($status->content),
+                'content' => strip_tags((string) $status->content),
                 'post_path' => $postPath,
                 'author' => $username . '@' . $instanceHost
             ];
@@ -268,7 +268,7 @@ class MastodonFetcher
                         $status->url,
                         $status->uri ?? $status->url,
                         $postPath,
-                        date('Y-m-d H:i:s', strtotime($status->created_at))
+                        date('Y-m-d H:i:s', strtotime((string) $status->created_at))
                     ]
                 );
                 $importCount++;
@@ -294,7 +294,7 @@ class MastodonFetcher
         if (isset($status->content)) {
             if (preg_match_all('/<a[^>]+href="([^"]+)"[^>]*>/i', $status->content, $matches)) {
                 foreach ($matches[1] as $url) {
-                    if (strpos($url, $this->siteUrl) === 0) {
+                    if (str_starts_with($url, $this->siteUrl)) {
                         return parse_url($url, PHP_URL_PATH);
                     }
                 }
@@ -304,7 +304,7 @@ class MastodonFetcher
         // Check card links if available
         if (isset($status->card) && isset($status->card->url)) {
             $cardUrl = $status->card->url;
-            if (strpos($cardUrl, $this->siteUrl) === 0) {
+            if (str_starts_with($cardUrl, $this->siteUrl)) {
                 return parse_url($cardUrl, PHP_URL_PATH);
             }
         }

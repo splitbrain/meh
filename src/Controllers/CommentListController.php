@@ -16,7 +16,7 @@ class CommentListController extends Controller
      */
     public function bypost($data)
     {
-        $postPath = isset($data['post']) ? $data['post'] : null;
+        $postPath = $data['post'] ?? null;
 
         if (!$postPath) {
             throw new HttpException('Post path is required', 400);
