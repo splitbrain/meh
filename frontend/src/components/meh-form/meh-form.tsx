@@ -14,21 +14,20 @@ export class MehForm {
   @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
   @State() errorMessage: string = '';
 
-  // References to form elements
-  private authorInput?: HTMLInputElement;
-  private emailInput?: HTMLInputElement;
-  private websiteInput?: HTMLInputElement;
-  private textArea?: HTMLTextAreaElement;
+  // Reference to the form element only
   private formElement?: HTMLFormElement;
 
   private handleSubmit = async (e: Event) => {
     e.preventDefault();
     
-    // Get values directly from the DOM elements
-    const author = this.authorInput.value;
-    const email = this.emailInput.value;
-    const website = this.websiteInput.value;
-    const text = this.textArea.value;
+    // Get form data
+    const formData = new FormData(this.formElement);
+    
+    // Extract values from form data
+    const author = formData.get('author') as string;
+    const email = formData.get('email') as string;
+    const website = formData.get('website') as string;
+    const text = formData.get('text') as string;
     
     // Basic validation
     if (!author || !text) {
@@ -91,8 +90,8 @@ export class MehForm {
             <label htmlFor="author">Name *</label>
             <input
               id="author"
+              name="author"
               type="text"
-              ref={(el) => this.authorInput = el as HTMLInputElement}
               required
             />
           </div>
@@ -101,8 +100,8 @@ export class MehForm {
             <label htmlFor="email">Email</label>
             <input
               id="email"
+              name="email"
               type="email"
-              ref={(el) => this.emailInput = el as HTMLInputElement}
             />
           </div>
 
@@ -110,8 +109,8 @@ export class MehForm {
             <label htmlFor="website">Website</label>
             <input
               id="website"
+              name="website"
               type="url"
-              ref={(el) => this.websiteInput = el as HTMLInputElement}
             />
           </div>
 
@@ -119,7 +118,7 @@ export class MehForm {
             <label htmlFor="text">Comment *</label>
             <textarea
               id="text"
-              ref={(el) => this.textArea = el as HTMLTextAreaElement}
+              name="text"
               required
               rows={5}
             ></textarea>
