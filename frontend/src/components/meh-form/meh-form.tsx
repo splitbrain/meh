@@ -11,6 +11,12 @@ export class MehForm {
    */
   @Prop() post: string;
 
+  /**
+   * The base URL for the API
+   * If not provided, defaults to "/"
+   */
+  @Prop() api: string = '/';
+
   // Only keep status-related state properties
   @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
   @State() errorMessage: string = '';
@@ -48,7 +54,9 @@ export class MehForm {
     this.errorMessage = '';
 
     try {
-      const response = await fetch('/comment', {
+      // Ensure API URL ends with a slash if not empty
+      const apiBase = this.api.endsWith('/') || this.api === '' ? this.api : `${this.api}/`;
+      const response = await fetch(`${apiBase}comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

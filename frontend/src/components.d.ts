@@ -8,6 +8,10 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface MehForm {
         /**
+          * The base URL for the API If not provided, defaults to "/"
+         */
+        "api": string;
+        /**
           * The post path to associate the comment with If not provided, defaults to the current page path
          */
         "post": string;
@@ -47,6 +51,10 @@ declare global {
 }
 declare namespace LocalJSX {
     interface MehForm {
+        /**
+          * The base URL for the API If not provided, defaults to "/"
+         */
+        "api"?: string;
         /**
           * The post path to associate the comment with If not provided, defaults to the current page path
          */
