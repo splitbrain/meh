@@ -433,11 +433,19 @@ class MastodonFetcher
      */
     protected function makeHttpRequest(string $url): ?string
     {
+        $headers = [
+            'User-Agent' => 'Meh Comment System/1.0'
+        ];
+        
+        // Add Authorization header if token is configured
+        $token = $this->app->conf('mastodon_token');
+        if (!empty($token)) {
+            $headers['Authorization'] = 'Bearer ' . $token;
+        }
+        
         $client = new \GuzzleHttp\Client([
             'timeout' => 30,
-            'headers' => [
-                'User-Agent' => 'Meh Comment System/1.0'
-            ]
+            'headers' => $headers
         ]);
 
         try {
