@@ -3,6 +3,8 @@
 namespace splitbrain\meh;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use splitbrain\phpcli\CLI;
 
 /**
@@ -69,7 +71,7 @@ class MastodonFetcher
         $this->cli->info("Looking for posts linking to: $siteUrl");
 
         // Get the most recent status ID we've already imported
-        $sinceId = $this->getLatestImportedStatusId($accountId);
+        $sinceId = $this->getLatestImportedStatusId($account);
         if ($sinceId) {
             $this->cli->info("Fetching posts newer than ID: $sinceId");
         } else {
@@ -142,7 +144,7 @@ class MastodonFetcher
                         (?, ?, ?, ?, ?, ?)',
                         [
                             $status->id,
-                            $username . '@' . $instanceHost,
+                            $account,
                             $status->url,
                             $status->uri ?? $status->url,
                             $postPath,
@@ -184,10 +186,10 @@ class MastodonFetcher
     /**
      * Get the latest imported status ID for a given account
      *
-     * @param string $accountId The Mastodon account ID
+     * @param string $account The Mastodon account
      * @return string|null The latest status ID or null if none found
      */
-    protected function getLatestImportedStatusId(string $accountId): ?string
+    protected function getLatestImportedStatusId(string $account): ?string
     {
         $db = $this->app->db();
 
@@ -195,10 +197,10 @@ class MastodonFetcher
             // Query the database for the latest status ID
             $result = $db->queryRecord(
                 'SELECT id FROM mastodon_threads 
-                 WHERE account LIKE ? 
+                 WHERE account = ? 
                  ORDER BY created_at DESC 
                  LIMIT 1',
-                ['%@%'] // We can't directly match on account ID, so we'll filter in PHP
+                [$account]
             );
 
             if ($result && isset($result['id'])) {
@@ -237,7 +239,7 @@ class MastodonFetcher
             }
 
             if ($sinceId) {
-                $url .= "&since_id=$sinceId";
+                $url .= "&min_id=$sinceId";
             }
 
             $response = $this->makeHttpRequest($url);
@@ -314,7 +316,12 @@ class MastodonFetcher
             $this->cli->info("Checking for replies to thread: " . $thread['url']);
 
             // Fetch the context (replies) for this status
-            $context = $this->fetchStatusContext($instance, $statusId);
+            try {
+                $context = $this->fetchStatusContext($instance, $statusId);
+            } catch (GuzzleException $e) {
+                $this->cli->error("Error fetching status context: " . $e->getMessage());
+                continue;
+            }
             if (!$context || empty($context->descendants)) {
                 $this->cli->info("No replies found for this thread");
                 continue;
@@ -345,6 +352,12 @@ class MastodonFetcher
                     $avatarUrl = $reply->account->avatar;
                 }
 
+                // local authors should still have the instance domain
+                $author = $reply->account->acct;
+                if (!str_contains('@', $author)) {
+                    $author = $author . '@' . parse_url($instance, PHP_URL_HOST);
+                }
+
                 // Insert into comments table
                 try {
                     $commentId = $db->exec(
@@ -354,7 +367,7 @@ class MastodonFetcher
                         (?, ?, ?, ?, ?, ?, ?, ?)',
                         [
                             $thread['post'],
-                            $reply->account->acct,
+                            $author,
                             $reply->url,
                             $text,
                             $reply->content,
@@ -412,6 +425,7 @@ class MastodonFetcher
      * @param string $instance The Mastodon instance URL
      * @param string $statusId The status ID
      * @return object|null The context object or null on failure
+     * @throws GuzzleException
      */
     protected function fetchStatusContext(string $instance, string $statusId): ?object
     {
@@ -430,6 +444,7 @@ class MastodonFetcher
      *
      * @param string $url The URL to request
      * @return string|null The response body or null on failure
+     * @throws GuzzleException
      */
     protected function makeHttpRequest(string $url): ?string
     {
@@ -443,15 +458,15 @@ class MastodonFetcher
             $headers['Authorization'] = 'Bearer ' . $token;
         }
 
-        $client = new \GuzzleHttp\Client([
+        $client = new Client([
             'timeout' => 30,
             'headers' => $headers
         ]);
 
         try {
             $response = $client->request('GET', $url);
-            return (string) $response->getBody();
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            return (string)$response->getBody();
+        } catch (RequestException $e) {
             $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 'unknown';
             $this->cli->error("HTTP request failed: {$e->getMessage()} (HTTP $statusCode)");
             return null;
