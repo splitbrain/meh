@@ -34,9 +34,7 @@ class CliController extends CLI
         $options->registerCommand('disqus', 'Import comments from disqus');
         $options->registerArgument('export.xml', 'The export file to import', true, 'disqus');
 
-        $options->registerCommand('mastodon', 'Fetch posts from a Mastodon account that link to your site');
-
-        $options->registerCommand('mastodon-replies', 'Fetch replies to Mastodon threads and add them as comments');
+        $options->registerCommand('mastodon', 'Fetch posts from a Mastodon account that link to your site and import replies as comments');
     }
 
     protected function main(Options $options)
@@ -49,10 +47,7 @@ class CliController extends CLI
                 $this->importDisqus($options->getArgs()[0]);
                 break;
             case 'mastodon':
-                $this->fetchMastodonPosts();
-                break;
-            case 'mastodon-replies':
-                $this->fetchMastodonReplies();
+                $this->fetchMastodon();
                 break;
             default:
                 echo $options->help();
@@ -173,11 +168,12 @@ class CliController extends CLI
         $this->success("Successfully imported $count comments");
     }
     /**
-     * Fetch posts from a Mastodon account and look for links to the site
+     * Fetch posts from a Mastodon account, look for links to the site,
+     * and import replies as comments
      *
      * @return void
      */
-    protected function fetchMastodonPosts(): void
+    protected function fetchMastodon(): void
     {
         $account = $this->app->conf('mastodon_account');
         if (empty($account)) {
@@ -186,17 +182,13 @@ class CliController extends CLI
         }
         
         $fetcher = new MastodonFetcher($this, $this->app);
+        
+        // First fetch posts from the account
+        $this->info("Step 1: Fetching posts from Mastodon account");
         $fetcher->fetchPosts($account);
-    }
-
-    /**
-     * Fetch replies to Mastodon threads and add them as comments
-     *
-     * @return void
-     */
-    protected function fetchMastodonReplies(): void
-    {
-        $fetcher = new MastodonFetcher($this, $this->app);
+        
+        // Then fetch replies to those posts
+        $this->info("Step 2: Fetching replies to Mastodon posts");
         $fetcher->fetchReplies();
     }
 }
