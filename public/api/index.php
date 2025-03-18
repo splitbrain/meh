@@ -1,10 +1,10 @@
 <?php
 
 // Include routes file
-require_once __DIR__ . '/../backend/src/routes.php';
+require_once __DIR__ . '/../../backend/src/routes.php';
 
 // Load Composer's autoloader
-require_once __DIR__ . '/../backend/vendor/autoload.php';
+require_once __DIR__ . '/../../backend/vendor/autoload.php';
 
 // Create App instance with environment variables
 $app = new splitbrain\meh\App();
@@ -13,7 +13,7 @@ $app = new splitbrain\meh\App();
 $router = new AltoRouter();
 
 // Set the base path if your app is not in the root directory
-// $router->setBasePath('/myapp');
+$router->setBasePath('/api');
 
 // Register all routes
 registerRoutes($router);
