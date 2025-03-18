@@ -35,7 +35,6 @@ class CliController extends CLI
         $options->registerArgument('export.xml', 'The export file to import', true, 'disqus');
 
         $options->registerCommand('mastodon', 'Fetch posts from a Mastodon account that link to your site');
-        $options->registerArgument('account', 'The Mastodon account (e.g., @user@instance.social)', true, 'mastodon');
 
         $options->registerCommand('mastodon-replies', 'Fetch replies to Mastodon threads and add them as comments');
     }
@@ -50,8 +49,7 @@ class CliController extends CLI
                 $this->importDisqus($options->getArgs()[0]);
                 break;
             case 'mastodon':
-                $account = $options->getArgs()[0];
-                $this->fetchMastodonPosts($account);
+                $this->fetchMastodonPosts();
                 break;
             case 'mastodon-replies':
                 $this->fetchMastodonReplies();
@@ -177,11 +175,16 @@ class CliController extends CLI
     /**
      * Fetch posts from a Mastodon account and look for links to the site
      *
-     * @param string $account The Mastodon account (e.g., @user@instance.social)
      * @return void
      */
-    protected function fetchMastodonPosts(string $account): void
+    protected function fetchMastodonPosts(): void
     {
+        $account = $this->app->conf('mastodon_account');
+        if (empty($account)) {
+            $this->error("No Mastodon account configured. Set MASTODON_ACCOUNT in your .env file.");
+            return;
+        }
+        
         $fetcher = new MastodonFetcher($this, $this->app);
         $fetcher->fetchPosts($account);
     }
