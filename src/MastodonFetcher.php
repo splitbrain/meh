@@ -12,15 +12,14 @@ use splitbrain\phpcli\CLI;
  */
 class MastodonFetcher
 {
-    /**
-     * @var CLI CLI instance for output
-     */
+    /** @var CLI CLI instance for output */
     protected $cli;
 
-    /**
-     * @var App Application container
-     */
+    /** @var App Application container */
     protected $app;
+
+    /** @var string Site URL from configuration */
+    protected $siteUrl;
 
     /**
      * Constructor
@@ -32,6 +31,7 @@ class MastodonFetcher
     {
         $this->cli = $cli;
         $this->app = $app;
+        $this->siteUrl = $this->app->conf('site_url');
     }
 
     /**
@@ -42,22 +42,16 @@ class MastodonFetcher
      */
     public function fetchPosts(string $account): void
     {
-        // Parse the account string to extract username and instance
-        if (!preg_match('/^@?([^@]+)@(.+)$/', $account, $matches)) {
-            $this->cli->error("Invalid account format. Use @username@instance.social");
+        // Parse the account string
+        list($username, $instanceHost) = $this->parseAccount($account);
+        if (!$username || !$instanceHost) {
             return;
         }
 
-        $username = $matches[1];
-        $instanceHost = $matches[2];
         $instance = "https://$instanceHost";
-
-        // Remove trailing slash if present
-        $instance = rtrim($instance, '/');
-
         $this->cli->info("Fetching posts from $username@$instanceHost");
 
-        // First, we need to look up the account ID
+        // Look up the account ID
         $accountId = $this->lookupAccount($instance, $username);
         if (!$accountId) {
             $this->cli->error("Could not find Mastodon account: $username@$instanceHost");
@@ -65,10 +59,7 @@ class MastodonFetcher
         }
 
         $this->cli->info("Found account ID: $accountId");
-
-        // Get the site URL from config
-        $siteUrl = $this->app->conf('site_url');
-        $this->cli->info("Looking for posts linking to: $siteUrl");
+        $this->cli->info("Looking for posts linking to: {$this->siteUrl}");
 
         // Get the most recent status ID we've already imported
         $sinceId = $this->getLatestImportedStatusId($account);
@@ -78,7 +69,7 @@ class MastodonFetcher
             $this->cli->info("No previous imports found, fetching all posts");
         }
 
-        // Fetch all statuses with pagination
+        // Fetch all statuses
         $allStatuses = $this->fetchAllStatuses($instance, $accountId, $sinceId);
         if (empty($allStatuses)) {
             $this->cli->warning("No posts found for this account");
@@ -87,80 +78,24 @@ class MastodonFetcher
 
         $this->cli->info("Fetched " . count($allStatuses) . " posts");
 
-        // Process the statuses to find links to our site
-        $matchingPosts = [];
-        $db = $this->app->db();
-        $importCount = 0;
+        // Process and import matching posts
+        $this->processAndImportPosts($allStatuses, $account, $username, $instanceHost);
+    }
 
-        foreach ($allStatuses as $status) {
-            // Skip private posts
-            if (in_array($status->visibility, ['private', 'direct'])) {
-                continue;
-            }
-
-            // Check if the post contains a link to our site
-            $foundLink = false;
-            $postPath = null;
-
-            // Check content for links
-            if (isset($status->content)) {
-                // Extract URLs from the HTML content
-                if (preg_match_all('/<a[^>]+href="([^"]+)"[^>]*>/i', $status->content, $matches)) {
-                    foreach ($matches[1] as $url) {
-                        if (strpos($url, $siteUrl) === 0) {
-                            $foundLink = true;
-                            $postPath = parse_url($url, PHP_URL_PATH);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Also check card links if available
-            if (!$foundLink && isset($status->card) && isset($status->card->url)) {
-                $cardUrl = $status->card->url;
-                if (strpos($cardUrl, $siteUrl) === 0) {
-                    $foundLink = true;
-                    $postPath = parse_url($cardUrl, PHP_URL_PATH);
-                }
-            }
-
-            if ($foundLink) {
-                $matchingPosts[] = [
-                    'id' => $status->id,
-                    'url' => $status->url,
-                    'created_at' => $status->created_at,
-                    'content' => strip_tags($status->content),
-                    'post_path' => $postPath,
-                    'author' => $username . '@' . $instanceHost
-                ];
-
-                // Insert into mastodon_threads table
-                try {
-                    $db->query(
-                        'INSERT INTO mastodon_threads 
-                        (id, account, url, uri, post, created_at) 
-                        VALUES 
-                        (?, ?, ?, ?, ?, ?)',
-                        [
-                            $status->id,
-                            $account,
-                            $status->url,
-                            $status->uri ?? $status->url,
-                            $postPath,
-                            date('Y-m-d H:i:s', strtotime($status->created_at))
-                        ]
-                    );
-                    $importCount++;
-                    $this->cli->success("Imported Mastodon thread: " . $status->url);
-                } catch (\Exception $e) {
-                    $this->cli->error("Error importing Mastodon thread: " . $e->getMessage());
-                }
-            }
+    /**
+     * Parse a Mastodon account string into username and instance
+     *
+     * @param string $account The account string (e.g., @user@instance.social)
+     * @return array Array containing [username, instanceHost] or [null, null] if invalid
+     */
+    protected function parseAccount(string $account): array
+    {
+        if (!preg_match('/^@?([^@]+)@(.+)$/', $account, $matches)) {
+            $this->cli->error("Invalid account format. Use @username@instance.social");
+            return [null, null];
         }
 
-        $this->cli->success("Found " . count($matchingPosts) . " posts linking to your site");
-        $this->cli->success("Successfully imported $importCount Mastodon threads");
+        return [$matches[1], $matches[2]];
     }
 
     /**
@@ -173,8 +108,8 @@ class MastodonFetcher
     protected function lookupAccount(string $instance, string $username): ?string
     {
         $url = "$instance/api/v1/accounts/lookup?acct=$username";
-
         $response = $this->makeHttpRequest($url);
+        
         if (!$response) {
             return null;
         }
@@ -194,7 +129,6 @@ class MastodonFetcher
         $db = $this->app->db();
 
         try {
-            // Query the database for the latest status ID
             $result = $db->queryRecord(
                 'SELECT id FROM mastodon_threads 
                  WHERE account = ? 
@@ -203,14 +137,11 @@ class MastodonFetcher
                 [$account]
             );
 
-            if ($result && isset($result['id'])) {
-                return $result['id'];
-            }
+            return $result['id'] ?? null;
         } catch (\Exception $e) {
             $this->cli->error("Error querying database: " . $e->getMessage());
+            return null;
         }
-
-        return null;
     }
 
     /**
@@ -224,38 +155,30 @@ class MastodonFetcher
     protected function fetchAllStatuses(string $instance, string $accountId, ?string $sinceId = null): array
     {
         $allStatuses = [];
-        $pageSize = 40; // Mastodon API typically limits to 40 per request
+        $pageSize = 40;
         $maxId = null;
         $page = 1;
-        $maxPages = 25; // Safety limit to prevent infinite loops
+        $maxPages = 25;
 
         $this->cli->info("Fetching posts in batches of $pageSize...");
 
         while ($page <= $maxPages) {
-            $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$pageSize";
-
-            if ($maxId) {
-                $url .= "&max_id=$maxId";
-            }
-
-            if ($sinceId) {
-                $url .= "&min_id=$sinceId";
-            }
-
+            $url = $this->buildStatusesUrl($instance, $accountId, $pageSize, $maxId, $sinceId);
             $response = $this->makeHttpRequest($url);
+            
             if (!$response) {
                 break;
             }
 
             $statuses = json_decode($response) ?: [];
             if (empty($statuses)) {
-                break; // No more statuses to fetch
+                break;
             }
 
             $allStatuses = array_merge($allStatuses, $statuses);
             $this->cli->info("Fetched page $page with " . count($statuses) . " posts (total: " . count($allStatuses) . ")");
 
-            // If we got fewer than pageSize, we've reached the end
+            // Check if we've reached the end
             if (count($statuses) < $pageSize) {
                 break;
             }
@@ -263,7 +186,6 @@ class MastodonFetcher
             // Get the ID of the last status for pagination
             $lastStatus = end($statuses);
             $maxId = $lastStatus->id;
-
             $page++;
 
             // Small delay to avoid rate limiting
@@ -274,24 +196,131 @@ class MastodonFetcher
     }
 
     /**
+     * Build the URL for fetching statuses
+     *
+     * @param string $instance The Mastodon instance URL
+     * @param string $accountId The account ID
+     * @param int $limit Number of statuses to fetch
+     * @param string|null $maxId Only fetch statuses older than this ID
+     * @param string|null $sinceId Only fetch statuses newer than this ID
+     * @return string The URL
+     */
+    protected function buildStatusesUrl(string $instance, string $accountId, int $limit, ?string $maxId = null, ?string $sinceId = null): string
+    {
+        $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$limit";
+
+        if ($maxId) {
+            $url .= "&max_id=$maxId";
+        }
+
+        if ($sinceId) {
+            $url .= "&min_id=$sinceId";
+        }
+
+        return $url;
+    }
+
+    /**
+     * Process statuses and import matching posts
+     *
+     * @param array $statuses The statuses to process
+     * @param string $account The full Mastodon account
+     * @param string $username The username part
+     * @param string $instanceHost The instance host
+     * @return void
+     */
+    protected function processAndImportPosts(array $statuses, string $account, string $username, string $instanceHost): void
+    {
+        $matchingPosts = [];
+        $importCount = 0;
+        $db = $this->app->db();
+
+        foreach ($statuses as $status) {
+            // Skip private posts
+            if (in_array($status->visibility, ['private', 'direct'])) {
+                continue;
+            }
+
+            $postPath = $this->findLinkToSite($status);
+            if (!$postPath) {
+                continue;
+            }
+
+            $matchingPosts[] = [
+                'id' => $status->id,
+                'url' => $status->url,
+                'created_at' => $status->created_at,
+                'content' => strip_tags($status->content),
+                'post_path' => $postPath,
+                'author' => $username . '@' . $instanceHost
+            ];
+
+            // Import the thread
+            try {
+                $db->query(
+                    'INSERT INTO mastodon_threads 
+                    (id, account, url, uri, post, created_at) 
+                    VALUES 
+                    (?, ?, ?, ?, ?, ?)',
+                    [
+                        $status->id,
+                        $account,
+                        $status->url,
+                        $status->uri ?? $status->url,
+                        $postPath,
+                        date('Y-m-d H:i:s', strtotime($status->created_at))
+                    ]
+                );
+                $importCount++;
+                $this->cli->success("Imported Mastodon thread: " . $status->url);
+            } catch (\Exception $e) {
+                $this->cli->error("Error importing Mastodon thread: " . $e->getMessage());
+            }
+        }
+
+        $this->cli->success("Found " . count($matchingPosts) . " posts linking to your site");
+        $this->cli->success("Successfully imported $importCount Mastodon threads");
+    }
+
+    /**
+     * Find a link to the site in a status
+     *
+     * @param object $status The status to check
+     * @return string|null The post path if found, null otherwise
+     */
+    protected function findLinkToSite(object $status): ?string
+    {
+        // Check content for links
+        if (isset($status->content)) {
+            if (preg_match_all('/<a[^>]+href="([^"]+)"[^>]*>/i', $status->content, $matches)) {
+                foreach ($matches[1] as $url) {
+                    if (strpos($url, $this->siteUrl) === 0) {
+                        return parse_url($url, PHP_URL_PATH);
+                    }
+                }
+            }
+        }
+
+        // Check card links if available
+        if (isset($status->card) && isset($status->card->url)) {
+            $cardUrl = $status->card->url;
+            if (strpos($cardUrl, $this->siteUrl) === 0) {
+                return parse_url($cardUrl, PHP_URL_PATH);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Fetch replies to Mastodon threads and add them as comments
      *
      * @return void
      */
     public function fetchReplies(): void
     {
-        $db = $this->app->db();
-
-        // Get all threads from the database
-        try {
-            $threads = $db->queryAll('SELECT * FROM mastodon_threads ORDER BY created_at DESC');
-        } catch (\Exception $e) {
-            $this->cli->error("Error querying database: " . $e->getMessage());
-            return;
-        }
-
+        $threads = $this->getThreadsFromDatabase();
         if (empty($threads)) {
-            $this->cli->warning("No Mastodon threads found in the database");
             return;
         }
 
@@ -301,27 +330,16 @@ class MastodonFetcher
         $importedReplies = 0;
 
         foreach ($threads as $thread) {
-            // Extract instance from the URL
-            $instance = parse_url($thread['url'], PHP_URL_HOST);
+            $instance = $this->getInstanceFromUrl($thread['url']);
             if (!$instance) {
-                $this->cli->warning("Could not determine instance from URL: " . $thread['url']);
                 continue;
             }
 
-            $instance = "https://$instance";
-
-            // Get the status ID from the URL or URI
             $statusId = $thread['id'];
-
             $this->cli->info("Checking for replies to thread: " . $thread['url']);
 
             // Fetch the context (replies) for this status
-            try {
-                $context = $this->fetchStatusContext($instance, $statusId);
-            } catch (GuzzleException $e) {
-                $this->cli->error("Error fetching status context: " . $e->getMessage());
-                continue;
-            }
+            $context = $this->fetchStatusContext($instance, $statusId);
             if (!$context || empty($context->descendants)) {
                 $this->cli->info("No replies found for this thread");
                 continue;
@@ -332,68 +350,124 @@ class MastodonFetcher
 
             // Process each reply
             foreach ($context->descendants as $reply) {
-                // Skip if we've already imported this reply
-                if ($this->isReplyImported($reply->uri)) {
-                    $this->cli->info("Reply already imported: " . $reply->url);
-                    continue;
-                }
-
-                // Skip non-public replies
-                if (in_array($reply->visibility, ['private', 'direct'])) {
-                    continue;
-                }
-
-                // Extract the text content
-                $text = strip_tags($reply->content);
-
-                // Get avatar URL
-                $avatarUrl = '';
-                if (isset($reply->account->avatar)) {
-                    $avatarUrl = $reply->account->avatar;
-                }
-
-                // local authors should still have the instance domain
-                $author = $reply->account->acct;
-                if (!str_contains('@', $author)) {
-                    $author = $author . '@' . parse_url($instance, PHP_URL_HOST);
-                }
-
-                // Insert into comments table
-                try {
-                    $commentId = $db->exec(
-                        'INSERT INTO comments 
-                        (post, author, website, text, html, status, created_at, avatar) 
-                        VALUES 
-                        (?, ?, ?, ?, ?, ?, ?, ?)',
-                        [
-                            $thread['post'],
-                            $author,
-                            $reply->url,
-                            $text,
-                            $reply->content,
-                            'approved',
-                            date('Y-m-d H:i:s', strtotime($reply->created_at)),
-                            $avatarUrl
-                        ]
-                    );
-
-
-                    // Record this reply in the mastodon_posts table
-                    $db->query(
-                        'INSERT INTO mastodon_posts (uri, comment_id) VALUES (?, ?)',
-                        [$reply->uri, $commentId]
-                    );
-
+                $importResult = $this->processAndImportReply($reply, $thread, $instance);
+                if ($importResult) {
                     $importedReplies++;
-                    $this->cli->success("Imported reply from " . $reply->account->acct . ": " . $reply->url);
-                } catch (\Exception $e) {
-                    $this->cli->error("Error importing reply: " . $e->getMessage());
                 }
             }
         }
 
         $this->cli->success("Found $totalReplies replies in total");
         $this->cli->success("Successfully imported $importedReplies new replies as comments");
+    }
+
+    /**
+     * Get all threads from the database
+     *
+     * @return array The threads
+     */
+    protected function getThreadsFromDatabase(): array
+    {
+        $db = $this->app->db();
+
+        try {
+            return $db->queryAll('SELECT * FROM mastodon_threads ORDER BY created_at DESC');
+        } catch (\Exception $e) {
+            $this->cli->error("Error querying database: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get the instance from a URL
+     *
+     * @param string $url The URL
+     * @return string|null The instance URL or null if not found
+     */
+    protected function getInstanceFromUrl(string $url): ?string
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!$host) {
+            $this->cli->warning("Could not determine instance from URL: " . $url);
+            return null;
+        }
+
+        return "https://$host";
+    }
+
+    /**
+     * Process and import a reply
+     *
+     * @param object $reply The reply to process
+     * @param array $thread The thread the reply belongs to
+     * @param string $instance The instance URL
+     * @return bool True if imported, false otherwise
+     */
+    protected function processAndImportReply(object $reply, array $thread, string $instance): bool
+    {
+        // Skip if already imported
+        if ($this->isReplyImported($reply->uri)) {
+            $this->cli->info("Reply already imported: " . $reply->url);
+            return false;
+        }
+
+        // Skip non-public replies
+        if (in_array($reply->visibility, ['private', 'direct'])) {
+            return false;
+        }
+
+        $db = $this->app->db();
+        $text = strip_tags($reply->content);
+        $avatarUrl = $reply->account->avatar ?? '';
+        $author = $this->formatAuthor($reply->account->acct, $instance);
+
+        try {
+            // Insert into comments table
+            $commentId = $db->exec(
+                'INSERT INTO comments 
+                (post, author, website, text, html, status, created_at, avatar) 
+                VALUES 
+                (?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $thread['post'],
+                    $author,
+                    $reply->url,
+                    $text,
+                    $reply->content,
+                    'approved',
+                    date('Y-m-d H:i:s', strtotime($reply->created_at)),
+                    $avatarUrl
+                ]
+            );
+
+            // Record this reply in the mastodon_posts table
+            $db->query(
+                'INSERT INTO mastodon_posts (uri, comment_id) VALUES (?, ?)',
+                [$reply->uri, $commentId]
+            );
+
+            $this->cli->success("Imported reply from " . $reply->account->acct . ": " . $reply->url);
+            return true;
+        } catch (\Exception $e) {
+            $this->cli->error("Error importing reply: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Format an author name with instance if needed
+     *
+     * @param string $author The author name
+     * @param string $instance The instance URL
+     * @return string The formatted author name
+     */
+    protected function formatAuthor(string $author, string $instance): string
+    {
+        if (!str_contains($author, '@')) {
+            $host = parse_url($instance, PHP_URL_HOST);
+            return $author . '@' . $host;
+        }
+        return $author;
     }
 
     /**
@@ -425,13 +499,12 @@ class MastodonFetcher
      * @param string $instance The Mastodon instance URL
      * @param string $statusId The status ID
      * @return object|null The context object or null on failure
-     * @throws GuzzleException
      */
     protected function fetchStatusContext(string $instance, string $statusId): ?object
     {
         $url = "$instance/api/v1/statuses/$statusId/context";
-
         $response = $this->makeHttpRequest($url);
+        
         if (!$response) {
             return null;
         }
@@ -444,7 +517,6 @@ class MastodonFetcher
      *
      * @param string $url The URL to request
      * @return string|null The response body or null on failure
-     * @throws GuzzleException
      */
     protected function makeHttpRequest(string $url): ?string
     {
