@@ -29,6 +29,7 @@
         "phpunit/phpunit": "^10.0"
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "serve": "php -S 0.0.0.0:8000 -t public"
     }
 }
