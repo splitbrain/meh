@@ -34,6 +34,7 @@
   "scripts": {
     "build": "stencil build",
     "start": "stencil build --dev --watch --serve",
+    "watch": "stencil build --dev --watch",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate"

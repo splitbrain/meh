@@ -1,13 +1,15 @@
 <?php
 
 // Include routes file
+use splitbrain\meh\ErrorLogLogger;
+
 require_once __DIR__ . '/../../backend/src/routes.php';
 
 // Load Composer's autoloader
 require_once __DIR__ . '/../../backend/vendor/autoload.php';
 
 // Create App instance with environment variables
-$app = new splitbrain\meh\App();
+$app = new splitbrain\meh\App(new ErrorLogLogger('info'));
 
 // Create AltoRouter instance
 $router = new AltoRouter();
@@ -44,7 +46,7 @@ if ($match) {
     }
 
     // Get the controller and method
-    [$controllerClass, $method, $scopes] = $match['target'];
+    [$controllerClass, $method, $scopes] = array_pad($match['target'], 3, null);
 
     try {
         if($scopes) {
@@ -65,6 +67,8 @@ if ($match) {
         if($e instanceof \splitbrain\meh\HttpException) {
             $code = $e->getCode();
         }
+
+        $app->log()->critical($e->getMessage(), ['exception' => $e]);
 
         http_response_code($code);
         echo json_encode([
