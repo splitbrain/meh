@@ -21,14 +21,48 @@ export class MehForm {
     // Only keep status-related state properties
     @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
     @State() errorMessage: string = '';
+    
+    // User data state
+    @State() author: string = '';
+    @State() email: string = '';
+    @State() website: string = '';
 
     // Reference to the form element only
     private formElement?: HTMLFormElement;
+    
+    // LocalStorage key
+    private readonly STORAGE_KEY = 'meh-form-user-data';
 
     componentWillLoad() {
         // If post prop is not set, use the current page's path
         if (!this.post) {
             this.post = window.location.pathname;
+        }
+        
+        // Load saved user data from localStorage
+        this.loadUserDataFromStorage();
+    }
+    
+    private loadUserDataFromStorage() {
+        try {
+            const savedData = localStorage.getItem(this.STORAGE_KEY);
+            if (savedData) {
+                const userData = JSON.parse(savedData);
+                this.author = userData.author || '';
+                this.email = userData.email || '';
+                this.website = userData.website || '';
+            }
+        } catch (error) {
+            console.error('Failed to load user data from localStorage:', error);
+        }
+    }
+    
+    private saveUserDataToStorage(author: string, email: string, website: string) {
+        try {
+            const userData = { author, email, website };
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(userData));
+        } catch (error) {
+            console.error('Failed to save user data to localStorage:', error);
         }
     }
 
@@ -62,9 +96,19 @@ export class MehForm {
                 throw new Error(error.error?.message || 'Failed to submit comment');
             }
 
+            // Save user data to localStorage
+            this.saveUserDataToStorage(
+                formValues.author as string,
+                formValues.email as string,
+                formValues.website as string
+            );
+            
             // Reset form on success
             this.formElement.reset();
             this.status = 'success';
+            
+            // Reload user data to update the form fields
+            this.loadUserDataFromStorage();
         } catch (error) {
             this.errorMessage = error.message || 'An error occurred while submitting your comment';
             this.status = 'error';
@@ -90,17 +134,33 @@ export class MehForm {
                 <div class="userdata">
                     <label class="required">
                         <span>Your Name</span>
-                        <input name="author" type="text" placeholder="Jane Doe" required/>
+                        <input 
+                            name="author" 
+                            type="text" 
+                            placeholder="Jane Doe" 
+                            required
+                            value={this.author}
+                        />
                     </label>
 
                     <label>
                         <span>Your Email Address</span>
-                        <input name="email" type="email" placeholder="jane@example.com"/>
+                        <input 
+                            name="email" 
+                            type="email" 
+                            placeholder="jane@example.com"
+                            value={this.email}
+                        />
                     </label>
 
                     <label>
                         <span>Your Website</span>
-                        <input name="website" type="url" placeholder="https://example.com/~jane"/>
+                        <input 
+                            name="website" 
+                            type="url" 
+                            placeholder="https://example.com/~jane"
+                            value={this.website}
+                        />
                     </label>
                 </div>
 
