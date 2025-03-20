@@ -66,4 +66,16 @@
   a.u-url.mention {
     display: none;
   }
+
+  .comment-content img {
+    max-width: 15em;
+    max-height: 7em;
+  }
+
+  .media-attachments {
+    display: flex;
+    flex-direction: row;
+    gap: var(--meh-spacing);
+    flex-wrap: wrap;
+  }
 }
