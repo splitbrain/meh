@@ -11,7 +11,7 @@ A customizable comment form component with internationalization support.
 | ------------------- | -------------------- | ---------------------------------------------------------------------------------------------- | ------------------ | --------------- |
 | `api`               | `api`                | The base URL for the API If not provided, defaults to "/api/"                                  | `string`           | `'/api/'`       |
 | `post`              | `post`               | The post path to associate the comment with If not provided, defaults to the current page path | `string`           | `undefined`     |
-| `lang`              | `lang`               | The language code for translations (e.g., 'en', 'de', 'fr')                                   | `string`           | `'en'`          |
+| `language`          | `language`           | The language code for translations (e.g., 'en', 'de', 'fr')                                   | `string`           | `'en'`          |
 | `i18nPath`          | `i18n-path`          | Path to translation files                                                                     | `string`           | `'./assets/i18n/'`|
 | `customTranslations` | `custom-translations` | Custom translations object or JSON string that overrides default and loaded translations      | `string \| object` | `''`            |
 
@@ -52,7 +52,7 @@ interface MehFormTranslations {
 
 ### With Language Setting
 ```html
-<meh-form post="/blog/example-post" lang="de"></meh-form>
+<meh-form post="/blog/example-post" language="de"></meh-form>
 ```
 
 ### With Custom Translations (JSON string)

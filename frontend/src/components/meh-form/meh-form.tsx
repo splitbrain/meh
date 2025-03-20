@@ -44,7 +44,7 @@ export class MehForm {
    * The language code for translations
    * If not provided, defaults to 'en'
    */
-  @Prop() lang: string = 'en';
+  @Prop() language: string = 'en';
   
   /**
    * Path to translation files
@@ -92,7 +92,7 @@ export class MehForm {
   private translationCache: Record<string, MehFormTranslations> = {};
   
   // Watch for language changes
-  @Watch('lang')
+  @Watch('language')
   async languageChangedHandler() {
     await this.loadTranslations();
   }
@@ -144,23 +144,23 @@ export class MehForm {
   
   private async loadTranslations() {
     // For English or if we already have custom translations, just merge what we have
-    if (this.lang === 'en' || !this.lang) {
+    if (this.language === 'en' || !this.language) {
       this.mergeTranslations();
       return;
     }
     
     // If we've already loaded this language, use the cached version
-    if (this.translationCache[this.lang]) {
+    if (this.translationCache[this.language]) {
       this.mergeTranslations();
       return;
     }
     
     try {
       // Try to fetch the translation file
-      const response = await fetch(`${this.i18nPath}${this.lang}.json`);
+      const response = await fetch(`${this.i18nPath}${this.language}.json`);
       
       if (!response.ok) {
-        console.warn(`Translation file for ${this.lang} not found, falling back to defaults`);
+        console.warn(`Translation file for ${this.language} not found, falling back to defaults`);
         this.mergeTranslations();
         return;
       }
@@ -168,7 +168,7 @@ export class MehForm {
       const langTranslations = await response.json();
       
       // Cache for future use
-      this.translationCache[this.lang] = langTranslations;
+      this.translationCache[this.language] = langTranslations;
       
       // Merge translations
       this.mergeTranslations();
@@ -183,8 +183,8 @@ export class MehForm {
     const merged = { ...this.defaultTranslations };
     
     // Apply language-specific translations if available
-    if (this.lang && this.translationCache[this.lang]) {
-      Object.assign(merged, this.translationCache[this.lang]);
+    if (this.language && this.translationCache[this.language]) {
+      Object.assign(merged, this.translationCache[this.language]);
     }
     
     // Apply custom translations if available (highest priority)

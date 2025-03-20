@@ -22,7 +22,7 @@ export namespace Components {
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
-        "lang": string;
+        "language": string;
         /**
           * The post path to associate the comment with If not provided, defaults to the current page path
          */
@@ -57,7 +57,7 @@ declare namespace LocalJSX {
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
-        "lang"?: string;
+        "language"?: string;
         /**
           * The post path to associate the comment with If not provided, defaults to the current page path
          */
