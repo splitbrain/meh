@@ -73,23 +73,6 @@ export class MehForm {
   // Translation manager instance
   private translator: TranslationManager<typeof this.defaultTranslations>;
 
-  // Watch for language changes
-  @Watch('language')
-  async languageChangedHandler() {
-    if (this.language && this.language !== 'en') {
-      await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`);
-    } else {
-      this.translator.setTranslations(this.defaultTranslations);
-    }
-  }
-
-  // Watch for custom translations changes
-  @Watch('customTranslations')
-  customTranslationsChangedHandler() {
-    if (this.customTranslations) {
-      this.translator.setTranslations(this.customTranslations);
-    }
-  }
 
   async componentWillLoad() {
     // If post prop is not set, use the current page's path
