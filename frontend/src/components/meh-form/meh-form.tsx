@@ -73,6 +73,11 @@ export class MehForm {
   // Translation manager instance
   private translator: TranslationManager<typeof this.defaultTranslations>;
 
+  // Shorthand method for translations
+  private _(key: keyof typeof this.defaultTranslations): string {
+    return this.translator.get(key);
+  }
+
 
   async componentWillLoad() {
     // If post prop is not set, use the current page's path
@@ -174,37 +179,37 @@ export class MehForm {
       <div class="meh-form-container">
         <slot name="styles"></slot>
 
-        <h3>{this.translator.get('formTitle')}</h3>
+        <h3>{this._('formTitle')}</h3>
 
         <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
           <div class="userdata">
             <label class="required">
-              <span>{this.translator.get('nameLabel')}</span>
+              <span>{this._('nameLabel')}</span>
               <input
                 name="author"
                 type="text"
-                placeholder={this.translator.get('namePlaceholder')}
+                placeholder={this._('namePlaceholder')}
                 required
                 value={this.author}
               />
             </label>
 
             <label>
-              <span>{this.translator.get('emailLabel')}</span>
+              <span>{this._('emailLabel')}</span>
               <input
                 name="email"
                 type="email"
-                placeholder={this.translator.get('emailPlaceholder')}
+                placeholder={this._('emailPlaceholder')}
                 value={this.email}
               />
             </label>
 
             <label>
-              <span>{this.translator.get('websiteLabel')}</span>
+              <span>{this._('websiteLabel')}</span>
               <input
                 name="website"
                 type="url"
-                placeholder={this.translator.get('websitePlaceholder')}
+                placeholder={this._('websitePlaceholder')}
                 value={this.website}
               />
             </label>
@@ -212,31 +217,31 @@ export class MehForm {
 
           <div>
             <label class="required">
-              <span>{this.translator.get('commentLabel')}</span>
+              <span>{this._('commentLabel')}</span>
               <textarea
                 name="text"
                 required
                 rows={5}
-                placeholder={this.translator.get('commentPlaceholder')}
+                placeholder={this._('commentPlaceholder')}
               ></textarea>
             </label>
           </div>
 
           {this.status === 'success' && (
             <div class="success">
-              {this.translator.get('successMessage')}
+              {this._('successMessage')}
             </div>
           )}
 
           {this.status === 'error' && (
             <div class="error">
-              {this.translator.get('errorPrefix')}{this.errorMessage}
+              {this._('errorPrefix')}{this.errorMessage}
             </div>
           )}
 
           <div>
             <button type="submit" disabled={this.status === 'submitting'}>
-              {this.status === 'submitting' ? this.translator.get('submittingButton') : this.translator.get('submitButton')}
+              {this.status === 'submitting' ? this._('submittingButton') : this._('submitButton')}
             </button>
           </div>
         </form>
