@@ -137,9 +137,9 @@ export class MehComments {
         )}
 
         {!this.loading && !this.error && this.comments.length > 0 && (
-          <div class="comments-list">
+          <ul class="comments-list">
             {this.comments.map(comment => (
-              <div class="comment" key={comment.id}>
+              <li class="comment" key={comment.id}>
                 <div class="comment-header">
                   <strong class="author">
                     {comment.website ? (
@@ -155,9 +155,9 @@ export class MehComments {
                   </span>
                 </div>
                 <div class="comment-content" innerHTML={comment.html}></div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
     );
