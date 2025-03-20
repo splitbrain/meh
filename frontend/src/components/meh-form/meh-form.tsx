@@ -39,7 +39,7 @@ export class MehForm {
    * Custom translations object that overrides default and loaded translations
    * This allows users to provide their own translations directly
    */
-  @Prop() customTranslations: string | object = '';
+  @Prop() customTranslations: string | Partial<typeof this.defaultTranslations> = '';
 
   @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
   @State() errorMessage: string = '';
@@ -47,6 +47,13 @@ export class MehForm {
   @State() email: string = '';
   @State() website: string = '';
   @State() translations: typeof this.defaultTranslations;
+
+  // Reference to the form element
+  private formElement?: HTMLFormElement;
+
+  // LocalStorage key
+  private readonly STORAGE_KEY = 'meh-form-user-data';
+  
   // Default English translations that also define the translation structure
   private defaultTranslations = {
     formTitle: 'Leave a Comment',
