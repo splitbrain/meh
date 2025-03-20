@@ -419,17 +419,17 @@ class MastodonFetcher
         $author = $reply->account->display_name ?? $account;
 
         if ($reply->media_attachments) {
-            $media = '';
+            $html .= '<div class="media-attachments">';
             foreach ($reply->media_attachments as $file) {
-                if ($file->type != 'image') continue;
-
-                $media .= '<a href="' . $file->url . '" target="_blank" rel="noopener noreferrer">' .
-                    '<img src="' . $file->preview_url . '" alt="' . htmlspecialchars($file->description ?? '') . '">' .
-                    '</a>';
+                $html .= '<a href="' . $file->url . '" target="_blank" rel="noopener noreferrer" class="type-' . $file->type . '">';
+                if ($file->type != 'image') {
+                    $html .= '<img src="' . $file->preview_url . '" alt="' . htmlspecialchars($file->description ?? '') . '">';
+                } else {
+                    $html .= 'Attachment';
+                }
+                $html .= '</a>';
             }
-            if ($media) {
-                $html .= '<div class="media-attachments">' . $media . '</div>';
-            }
+            $html .= '</div>';
         }
 
         try {
