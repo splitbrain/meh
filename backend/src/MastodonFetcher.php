@@ -412,10 +412,25 @@ class MastodonFetcher
         }
 
         $db = $this->app->db();
+        $html = $reply->content;
         $text = strip_tags($reply->content);
-        $avatarUrl = $reply->account->avatar_static ?? $reply->account->avatar_static ??'';
+        $avatarUrl = $reply->account->avatar_static ?? $reply->account->avatar_static ?? '';
         $account = $this->formatAccount($reply->account->acct, $instance);
         $author = $reply->account->display_name ?? $account;
+
+        if ($reply->media_attachments) {
+            $media = '';
+            foreach ($reply->media_attachments as $file) {
+                if ($file->type != 'image') continue;
+
+                $media .= '<a href="' . $file->url . '" target="_blank" rel="noopener noreferrer">' .
+                    '<img src="' . $file->preview_url . '" alt="' . htmlspecialchars($file->description ?? '') . '">' .
+                    '</a>';
+            }
+            if ($media) {
+                $html .= '<div class="media-attachments">' . $media . '</div>';
+            }
+        }
 
         try {
             // Insert into comments table
@@ -430,7 +445,7 @@ class MastodonFetcher
                     $account,
                     $reply->url,
                     $text,
-                    $reply->content,
+                    $html,
                     'approved',
                     date('Y-m-d H:i:s', strtotime($reply->created_at)),
                     $avatarUrl
