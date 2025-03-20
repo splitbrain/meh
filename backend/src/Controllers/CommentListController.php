@@ -27,6 +27,6 @@ class CommentListController extends Controller
             [$postPath, 'approved']
         );
 
-        return ['comments' => $comments];
+        return $comments;
     }
 }

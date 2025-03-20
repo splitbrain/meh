@@ -6,6 +6,24 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface MehComments {
+        /**
+          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+         */
+        "backend": string;
+        /**
+          * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+         */
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        /**
+          * The language code for translations If not provided, defaults to 'en'
+         */
+        "language": string;
+        /**
+          * The post path to fetch comments for If not provided, defaults to the current page path
+         */
+        "post": string;
+    }
     interface MehForm {
         /**
           * The base URL for where the meh system is hosted If not provided, defaults to same origin
@@ -26,6 +44,12 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLMehCommentsElement extends Components.MehComments, HTMLStencilElement {
+    }
+    var HTMLMehCommentsElement: {
+        prototype: HTMLMehCommentsElement;
+        new (): HTMLMehCommentsElement;
+    };
     interface HTMLMehFormElement extends Components.MehForm, HTMLStencilElement {
     }
     var HTMLMehFormElement: {
@@ -33,10 +57,29 @@ declare global {
         new (): HTMLMehFormElement;
     };
     interface HTMLElementTagNameMap {
+        "meh-comments": HTMLMehCommentsElement;
         "meh-form": HTMLMehFormElement;
     }
 }
 declare namespace LocalJSX {
+    interface MehComments {
+        /**
+          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+         */
+        "backend"?: string;
+        /**
+          * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+         */
+        "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
+        /**
+          * The language code for translations If not provided, defaults to 'en'
+         */
+        "language"?: string;
+        /**
+          * The post path to fetch comments for If not provided, defaults to the current page path
+         */
+        "post"?: string;
+    }
     interface MehForm {
         /**
           * The base URL for where the meh system is hosted If not provided, defaults to same origin
@@ -56,6 +99,7 @@ declare namespace LocalJSX {
         "post"?: string;
     }
     interface IntrinsicElements {
+        "meh-comments": MehComments;
         "meh-form": MehForm;
     }
 }
@@ -63,6 +107,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "meh-comments": LocalJSX.MehComments & JSXBase.HTMLAttributes<HTMLMehCommentsElement>;
             "meh-form": LocalJSX.MehForm & JSXBase.HTMLAttributes<HTMLMehFormElement>;
         }
     }
