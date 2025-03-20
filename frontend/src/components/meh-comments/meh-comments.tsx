@@ -4,6 +4,10 @@ import { TranslationManager, formatRelativeTime } from '../../utils/utils';
 @Component({
   tag: 'meh-comments',
   shadow: true,
+  styleUrls: [
+    '../../global/defaults.css',
+    'meh-comments.css',
+  ],
 })
 export class MehComments {
   @Element() el!: HTMLElement;
@@ -38,7 +42,6 @@ export class MehComments {
 
   // Default English translations that also define the translation structure
   private defaultTranslations = {
-    commentsTitle: 'Comments',
     noComments: 'No comments yet. Be the first to comment!',
     loadingComments: 'Loading comments...',
     errorLoading: 'Error loading comments:',
@@ -115,7 +118,6 @@ export class MehComments {
   render() {
     return (
       <div class="meh-comments-container">
-        <h3>{this._('commentsTitle')}</h3>
 
         {this.loading && (
           <div class="loading">{this._('loadingComments')}</div>
