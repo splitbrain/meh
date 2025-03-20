@@ -16,7 +16,7 @@ export namespace Components {
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
         /**
-          * Path to translation files If not provided, defaults to './assets/i18n/'
+          * Path to translation files If not provided, defaults to the component's i18n directory
          */
         "i18nPath": string;
         /**
@@ -51,7 +51,7 @@ declare namespace LocalJSX {
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
         /**
-          * Path to translation files If not provided, defaults to './assets/i18n/'
+          * Path to translation files If not provided, defaults to the component's i18n directory
          */
         "i18nPath"?: string;
         /**

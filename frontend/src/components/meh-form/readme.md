@@ -12,7 +12,7 @@ A customizable comment form component with internationalization support.
 | `api`               | `api`                | The base URL for the API If not provided, defaults to "/api/"                                  | `string`           | `'/api/'`       |
 | `post`              | `post`               | The post path to associate the comment with If not provided, defaults to the current page path | `string`           | `undefined`     |
 | `language`          | `language`           | The language code for translations (e.g., 'en', 'de', 'fr')                                   | `string`           | `'en'`          |
-| `i18nPath`          | `i18n-path`          | Path to translation files                                                                     | `string`           | `'./assets/i18n/'`|
+| `i18nPath`          | `i18n-path`          | Path to translation files                                                                     | `string`           | `'./i18n/'`       |
 | `customTranslations` | `custom-translations` | Custom translations object or JSON string that overrides default and loaded translations      | `string \| object` | `''`            |
 
 ## Translation System

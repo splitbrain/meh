@@ -1,4 +1,4 @@
-import {Component, Prop, h, State, Watch, Element} from '@stencil/core';
+import {Component, Prop, h, State, Element} from '@stencil/core';
 import { TranslationManager } from '../../utils/utils';
 
 @Component({
@@ -8,6 +8,7 @@ import { TranslationManager } from '../../utils/utils';
     'meh-form.css',
   ],
   shadow: true,
+  assetsDirs: ['i18n']
 })
 export class MehForm {
   @Element() el!: HTMLElement;
@@ -32,9 +33,9 @@ export class MehForm {
 
   /**
    * Path to translation files
-   * If not provided, defaults to './assets/i18n/'
+   * If not provided, defaults to the component's i18n directory
    */
-  @Prop() i18nPath: string = './assets/i18n/';
+  @Prop() i18nPath: string = './i18n/';
 
   /**
    * Custom translations object that overrides default and loaded translations
@@ -87,12 +88,12 @@ export class MehForm {
 
     // Initialize the TranslationManager with default translations
     this.translator = new TranslationManager(this.defaultTranslations);
-    
+
     // Process any custom translations provided as prop
     if (this.customTranslations) {
       this.translator.setTranslations(this.customTranslations);
     }
-    
+
     // Load language-specific translations
     if (this.language && this.language !== 'en') {
       await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`);
