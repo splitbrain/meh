@@ -54,6 +54,8 @@ class App
             'site_url' => $_ENV['SITE_URL'] ?? 'http://localhost:8000',
             'mastodon_account' => $_ENV['MASTODON_ACCOUNT'] ?? '',
             'mastodon_token' => $_ENV['MASTODON_TOKEN'] ?? '',
+            'gravatar_fallback' => $_ENV['GRAVATAR_FALLBACK'] ?? 'initials',
+            'gravatar_rating' => $_ENV['GRAVATAR_RATING'] ?? 'g',
         ];
 
         // Override with any provided config

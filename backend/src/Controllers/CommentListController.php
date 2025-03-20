@@ -27,6 +27,37 @@ class CommentListController extends Controller
             [$postPath, 'approved']
         );
 
+        $comments = array_map([$this, 'commentEnhance'], $comments);
+
         return $comments;
+    }
+
+    /**
+     * Add missing data to a comment
+     *
+     * Currently gravatar handling only
+     *
+     * @param array $comment
+     * @return array
+     */
+    public function commentEnhance(array $comment): array
+    {
+        if (empty($comment['avatar'])) {
+            if (!empty($comment['email'])) {
+                $ident = strtolower(trim($comment['email']));
+            } else {
+                $ident = strtolower(trim($comment['author']));
+            }
+
+            $gravatar = 'https://www.gravatar.com/avatar/' . md5($ident) . '?s=256';
+            $gravatar .= '&d=' . urlencode($this->app->conf('gravatar_fallback'));
+            $gravatar .= '&r=' . $this->app->conf('gravatar_rating');
+            if ($this->app->conf('gravatar_fallback') == 'initials') {
+                $gravatar .= '&name=' . urlencode($comment['author']);
+            }
+
+            $comment['avatar'] = $gravatar;
+        }
+        return $comment;
     }
 }

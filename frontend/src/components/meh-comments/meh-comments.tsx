@@ -141,6 +141,7 @@ export class MehComments {
             {this.comments.map(comment => (
               <li class="comment" key={comment.id}>
                 <div class="comment-header">
+                  <img src={comment.avatar} alt="Avatar" class="avatar" />
                   <strong class="author">
                     {comment.website ? (
                       <a href={comment.website} target="_blank" rel="noopener noreferrer">

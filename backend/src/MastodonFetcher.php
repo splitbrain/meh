@@ -413,7 +413,7 @@ class MastodonFetcher
 
         $db = $this->app->db();
         $text = strip_tags($reply->content);
-        $avatarUrl = $reply->account->avatar ?? '';
+        $avatarUrl = $reply->account->avatar_static ?? $reply->account->avatar_static ??'';
         $account = $this->formatAccount($reply->account->acct, $instance);
         $author = $reply->account->display_name ?? $account;
 
