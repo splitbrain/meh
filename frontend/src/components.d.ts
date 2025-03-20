@@ -16,20 +16,6 @@ export namespace Components {
          */
         "post": string;
     }
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first": string;
-        /**
-          * The last name
-         */
-        "last": string;
-        /**
-          * The middle name
-         */
-        "middle": string;
-    }
 }
 declare global {
     interface HTMLMehFormElement extends Components.MehForm, HTMLStencilElement {
@@ -38,15 +24,8 @@ declare global {
         prototype: HTMLMehFormElement;
         new (): HTMLMehFormElement;
     };
-    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-    }
-    var HTMLMyComponentElement: {
-        prototype: HTMLMyComponentElement;
-        new (): HTMLMyComponentElement;
-    };
     interface HTMLElementTagNameMap {
         "meh-form": HTMLMehFormElement;
-        "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
@@ -60,23 +39,8 @@ declare namespace LocalJSX {
          */
         "post"?: string;
     }
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first"?: string;
-        /**
-          * The last name
-         */
-        "last"?: string;
-        /**
-          * The middle name
-         */
-        "middle"?: string;
-    }
     interface IntrinsicElements {
         "meh-form": MehForm;
-        "my-component": MyComponent;
     }
 }
 export { LocalJSX as JSX };
@@ -84,7 +48,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "meh-form": LocalJSX.MehForm & JSXBase.HTMLAttributes<HTMLMehFormElement>;
-            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }
 }
