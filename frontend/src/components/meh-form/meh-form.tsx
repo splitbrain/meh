@@ -79,7 +79,7 @@ export class MehForm {
     if (this.language && this.language !== 'en') {
       await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`);
     } else {
-      this.translator.reset();
+      this.translator.reset(this.defaultTranslations);
     }
   }
 

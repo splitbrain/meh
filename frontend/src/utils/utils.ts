@@ -7,16 +7,14 @@
  * and retrieve translated strings by key.
  */
 export class TranslationManager<T extends Record<string, string>> {
-  private translations: Partial<T> = {};
-  private defaultTranslations: T;
+  private translations: T;
 
   /**
    * Create a new TranslationManager
    *
-   * @param defaultTranslations - The default translations to use as fallback
+   * @param defaultTranslations - The default translations to use as initial values
    */
   constructor(defaultTranslations: T) {
-    this.defaultTranslations = { ...defaultTranslations };
     this.translations = { ...defaultTranslations };
   }
 
@@ -24,15 +22,15 @@ export class TranslationManager<T extends Record<string, string>> {
    * Get a translated string for a given key
    *
    * @param key - The translation key to look up
-   * @returns The translated string or the default if not found
+   * @returns The translated string or the key itself if not found
    */
   get<K extends keyof T>(key: K): string {
-    return (this.translations[key] as string) || this.defaultTranslations[key] || String(key);
+    return (this.translations[key] as string) || String(key);
   }
 
   /**
    * Set translations from an object or JSON string
-   * Overwrites any existing custom translations
+   * Merges with existing translations
    *
    * @param translations - Object or JSON string containing translations
    * @returns True if successful, false if there was an error
@@ -52,9 +50,9 @@ export class TranslationManager<T extends Record<string, string>> {
         return false;
       }
 
-      // Merge with default translations
+      // Merge with existing translations
       this.translations = { 
-        ...this.defaultTranslations, 
+        ...this.translations, 
         ...parsedTranslations 
       };
 
@@ -76,15 +74,15 @@ export class TranslationManager<T extends Record<string, string>> {
       const response = await fetch(url);
 
       if (!response.ok) {
-        console.warn(`Translation file at ${url} not found, falling back to defaults`);
+        console.warn(`Translation file at ${url} not found, falling back to current translations`);
         return false;
       }
 
       const loadedTranslations = await response.json();
       
-      // Merge with default translations
+      // Merge with existing translations
       this.translations = { 
-        ...this.defaultTranslations, 
+        ...this.translations, 
         ...loadedTranslations 
       };
 
@@ -96,9 +94,11 @@ export class TranslationManager<T extends Record<string, string>> {
   }
 
   /**
-   * Reset translations to defaults
+   * Reset translations to the provided values
+   * 
+   * @param translations - The translations to reset to
    */
-  reset(): void {
-    this.translations = { ...this.defaultTranslations };
+  reset(translations: T): void {
+    this.translations = { ...translations };
   }
 }
