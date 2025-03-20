@@ -77,7 +77,7 @@ export class MehForm {
   @Watch('language')
   async languageChangedHandler() {
     if (this.language && this.language !== 'en') {
-      await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`, this.language);
+      await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`);
     } else {
       this.translator.reset();
     }
@@ -107,7 +107,7 @@ export class MehForm {
     
     // Load language-specific translations
     if (this.language && this.language !== 'en') {
-      await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`, this.language);
+      await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`);
     }
 
     // Load saved user data from localStorage

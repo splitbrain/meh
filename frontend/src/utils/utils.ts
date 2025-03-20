@@ -2,14 +2,13 @@
 /**
  * TranslationManager
  *
- * A utility class for managing translations in web components.
+ * A simplified utility class for managing translations in web components.
  * Provides methods to load translations from URLs, set translations from objects or JSON strings,
  * and retrieve translated strings by key.
  */
 export class TranslationManager<T extends Record<string, string>> {
   private translations: Partial<T> = {};
   private defaultTranslations: T;
-  private cache: Record<string, Partial<T>> = {};
 
   /**
    * Create a new TranslationManager
@@ -33,6 +32,7 @@ export class TranslationManager<T extends Record<string, string>> {
 
   /**
    * Set translations from an object or JSON string
+   * Overwrites any existing custom translations
    *
    * @param translations - Object or JSON string containing translations
    * @returns True if successful, false if there was an error
@@ -52,11 +52,11 @@ export class TranslationManager<T extends Record<string, string>> {
         return false;
       }
 
-      // Cache these custom translations
-      this.cache['custom'] = parsedTranslations;
-
-      // Merge with existing translations
-      this.mergeTranslations();
+      // Merge with default translations
+      this.translations = { 
+        ...this.defaultTranslations, 
+        ...parsedTranslations 
+      };
 
       return true;
     } catch (error) {
@@ -69,10 +69,9 @@ export class TranslationManager<T extends Record<string, string>> {
    * Load translations from a URL
    *
    * @param url - The URL to load translations from
-   * @param languageCode - Optional language code to identify these translations in the cache
    * @returns Promise resolving to true if successful, false if there was an error
    */
-  async loadTranslations(url: string, languageCode?: string): Promise<boolean> {
+  async loadTranslations(url: string): Promise<boolean> {
     try {
       const response = await fetch(url);
 
@@ -81,15 +80,13 @@ export class TranslationManager<T extends Record<string, string>> {
         return false;
       }
 
-      const langTranslations = await response.json();
-
-      // Cache for future use if a language code was provided
-      if (languageCode) {
-        this.cache[languageCode] = langTranslations;
-      }
-
-      // Merge translations
-      this.mergeTranslations();
+      const loadedTranslations = await response.json();
+      
+      // Merge with default translations
+      this.translations = { 
+        ...this.defaultTranslations, 
+        ...loadedTranslations 
+      };
 
       return true;
     } catch (error) {
@@ -99,47 +96,9 @@ export class TranslationManager<T extends Record<string, string>> {
   }
 
   /**
-   * Set the active language from the cache
-   *
-   * @param languageCode - The language code to activate
-   * @returns True if the language was found in cache and activated, false otherwise
-   */
-  setLanguage(languageCode: string): boolean {
-    if (!this.cache[languageCode]) {
-      return false;
-    }
-
-    this.mergeTranslations(languageCode);
-    return true;
-  }
-
-  /**
    * Reset translations to defaults
    */
   reset(): void {
     this.translations = { ...this.defaultTranslations };
-  }
-
-  /**
-   * Merge translations from cache based on priority
-   *
-   * @param primaryLanguage - Optional language code to prioritize in the merge
-   */
-  private mergeTranslations(primaryLanguage?: string): void {
-    // Start with default translations
-    const merged = { ...this.defaultTranslations };
-
-    // Apply language-specific translations if available
-    if (primaryLanguage && this.cache[primaryLanguage]) {
-      Object.assign(merged, this.cache[primaryLanguage]);
-    }
-
-    // Apply custom translations if available (highest priority)
-    if (this.cache['custom']) {
-      Object.assign(merged, this.cache['custom']);
-    }
-
-    // Update the translations
-    this.translations = merged;
   }
 }
