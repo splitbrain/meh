@@ -149,7 +149,7 @@ export class MehForm {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error?.message || 'Failed to submit comment');
+        throw new Error(error.error?.message || `Server error: ${response.status}`);
       }
 
       // Save user data to localStorage
@@ -166,7 +166,8 @@ export class MehForm {
       // Reload user data to update the form fields
       this.loadUserDataFromStorage();
     } catch (error) {
-      this.errorMessage = error.message;
+      console.error('Comment submission error:', error);
+      this.errorMessage = error.message || 'Unknown error occurred';
       this.status = 'error';
     }
   };
