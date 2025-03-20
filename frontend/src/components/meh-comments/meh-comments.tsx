@@ -1,5 +1,5 @@
 import { Component, Prop, h, State, Element } from '@stencil/core';
-import { TranslationManager } from '../../utils/utils';
+import { TranslationManager, formatRelativeTime } from '../../utils/utils';
 
 @Component({
   tag: 'meh-comments',
@@ -119,6 +119,14 @@ export class MehComments {
     }
   }
 
+  /**
+   * Format a date as a relative time string (e.g., "5 days ago")
+   * Falls back to absolute date format if there's an error
+   */
+  private formatRelativeTime(dateString: string): string {
+    return formatRelativeTime(dateString, this.language, (date) => this.formatDate(date));
+  }
+
   render() {
     return (
       <div class="meh-comments-container">
@@ -151,8 +159,8 @@ export class MehComments {
                       comment.author
                     )}
                   </strong>
-                  <span class="date">
-                    {this._('postedOn')} {this.formatDate(comment.created_at)}
+                  <span class="date" title={this.formatDate(comment.created_at)}>
+                    {this.formatRelativeTime(comment.created_at)}
                   </span>
                 </div>
                 <div class="comment-content" innerHTML={comment.html}></div>
