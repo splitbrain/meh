@@ -1,0 +1,15 @@
+{
+  "formTitle": "Hinterlassen Sie einen Kommentar",
+  "nameLabel": "Ihr Name",
+  "namePlaceholder": "Max Mustermann",
+  "emailLabel": "Ihre E-Mail-Adresse",
+  "emailPlaceholder": "max@beispiel.de",
+  "websiteLabel": "Ihre Webseite",
+  "websitePlaceholder": "https://beispiel.de/~max",
+  "commentLabel": "Ihr Kommentar",
+  "commentPlaceholder": "Schreiben Sie hier Ihren Kommentar...",
+  "submitButton": "Kommentar absenden",
+  "submittingButton": "Wird gesendet...",
+  "successMessage": "Vielen Dank für Ihren Kommentar! Er wurde zur Überprüfung eingereicht.",
+  "errorPrefix": "Fehler: "
+}

@@ -12,6 +12,18 @@ export namespace Components {
          */
         "api": string;
         /**
+          * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+         */
+        "customTranslations": string | object;
+        /**
+          * Path to translation files If not provided, defaults to './assets/i18n/'
+         */
+        "i18nPath": string;
+        /**
+          * The language code for translations If not provided, defaults to 'en'
+         */
+        "lang": string;
+        /**
           * The post path to associate the comment with If not provided, defaults to the current page path
          */
         "post": string;
@@ -34,6 +46,18 @@ declare namespace LocalJSX {
           * The base URL for the API If not provided, defaults to "/api/"
          */
         "api"?: string;
+        /**
+          * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+         */
+        "customTranslations"?: string | object;
+        /**
+          * Path to translation files If not provided, defaults to './assets/i18n/'
+         */
+        "i18nPath"?: string;
+        /**
+          * The language code for translations If not provided, defaults to 'en'
+         */
+        "lang"?: string;
         /**
           * The post path to associate the comment with If not provided, defaults to the current page path
          */

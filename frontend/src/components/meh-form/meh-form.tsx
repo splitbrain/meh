@@ -1,4 +1,21 @@
-import {Component, Prop, h, State} from '@stencil/core';
+import {Component, Prop, h, State, Watch, Element} from '@stencil/core';
+
+// Define the translation interface within the component file
+export interface MehFormTranslations {
+  formTitle: string;
+  nameLabel: string;
+  namePlaceholder: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  websiteLabel: string;
+  websitePlaceholder: string;
+  commentLabel: string;
+  commentPlaceholder: string;
+  submitButton: string;
+  submittingButton: string;
+  successMessage: string;
+  errorPrefix: string;
+}
 
 @Component({
   tag: 'meh-form',
@@ -9,6 +26,8 @@ import {Component, Prop, h, State} from '@stencil/core';
   shadow: true,
 })
 export class MehForm {
+  @Element() el!: HTMLElement;
+
   /**
    * The post path to associate the comment with
    * If not provided, defaults to the current page path
@@ -20,30 +39,161 @@ export class MehForm {
    * If not provided, defaults to "/api/"
    */
   @Prop() api: string = '/api/';
+  
+  /**
+   * The language code for translations
+   * If not provided, defaults to 'en'
+   */
+  @Prop() lang: string = 'en';
+  
+  /**
+   * Path to translation files
+   * If not provided, defaults to './assets/i18n/'
+   */
+  @Prop() i18nPath: string = './assets/i18n/';
 
-  // Only keep status-related state properties
+  /**
+   * Custom translations object that overrides default and loaded translations
+   * This allows users to provide their own translations directly
+   */
+  @Prop() customTranslations: string | object = '';
+
   @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
   @State() errorMessage: string = '';
-
-  // User data state
   @State() author: string = '';
   @State() email: string = '';
   @State() website: string = '';
+  @State() translations: MehFormTranslations;
 
   // Reference to the form element only
   private formElement?: HTMLFormElement;
 
   // LocalStorage key
   private readonly STORAGE_KEY = 'meh-form-user-data';
+  
+  // Default English translations
+  private defaultTranslations: MehFormTranslations = {
+    formTitle: 'Leave a Comment',
+    nameLabel: 'Your Name',
+    namePlaceholder: 'Jane Doe',
+    emailLabel: 'Your Email Address',
+    emailPlaceholder: 'jane@example.com',
+    websiteLabel: 'Your Website',
+    websitePlaceholder: 'https://example.com/~jane',
+    commentLabel: 'Your Comment',
+    commentPlaceholder: 'Lorem Ipsum…',
+    submitButton: 'Submit Comment',
+    submittingButton: 'Submitting...',
+    successMessage: 'Thank you for your comment! It has been submitted for review.',
+    errorPrefix: 'Error: '
+  };
+  
+  // Cache for loaded translations
+  private translationCache: Record<string, MehFormTranslations> = {};
+  
+  // Watch for language changes
+  @Watch('lang')
+  async languageChangedHandler() {
+    await this.loadTranslations();
+  }
+  
+  // Watch for custom translations changes
+  @Watch('customTranslations')
+  customTranslationsChangedHandler() {
+    this.processCustomTranslations();
+    this.mergeTranslations();
+  }
 
-  componentWillLoad() {
+  async componentWillLoad() {
     // If post prop is not set, use the current page's path
     if (!this.post) {
       this.post = window.location.pathname;
     }
-
+    
+    // Initialize translations with defaults
+    this.translations = { ...this.defaultTranslations };
+    
+    // Process any custom translations provided as prop
+    this.processCustomTranslations();
+    
+    // Load language-specific translations
+    await this.loadTranslations();
+    
     // Load saved user data from localStorage
     this.loadUserDataFromStorage();
+  }
+  
+  private processCustomTranslations() {
+    if (!this.customTranslations) return;
+    
+    try {
+      // If customTranslations is a string, try to parse it as JSON
+      if (typeof this.customTranslations === 'string') {
+        if (this.customTranslations.trim()) {
+          this.translationCache['custom'] = JSON.parse(this.customTranslations as string);
+        }
+      } 
+      // If it's already an object, use it directly
+      else if (typeof this.customTranslations === 'object') {
+        this.translationCache['custom'] = this.customTranslations as MehFormTranslations;
+      }
+    } catch (error) {
+      console.error('Failed to parse custom translations:', error);
+    }
+  }
+  
+  private async loadTranslations() {
+    // For English or if we already have custom translations, just merge what we have
+    if (this.lang === 'en' || !this.lang) {
+      this.mergeTranslations();
+      return;
+    }
+    
+    // If we've already loaded this language, use the cached version
+    if (this.translationCache[this.lang]) {
+      this.mergeTranslations();
+      return;
+    }
+    
+    try {
+      // Try to fetch the translation file
+      const response = await fetch(`${this.i18nPath}${this.lang}.json`);
+      
+      if (!response.ok) {
+        console.warn(`Translation file for ${this.lang} not found, falling back to defaults`);
+        this.mergeTranslations();
+        return;
+      }
+      
+      const langTranslations = await response.json();
+      
+      // Cache for future use
+      this.translationCache[this.lang] = langTranslations;
+      
+      // Merge translations
+      this.mergeTranslations();
+    } catch (error) {
+      console.error(`Error loading translations for ${this.lang}:`, error);
+      this.mergeTranslations();
+    }
+  }
+  
+  private mergeTranslations() {
+    // Start with default translations
+    const merged = { ...this.defaultTranslations };
+    
+    // Apply language-specific translations if available
+    if (this.lang && this.translationCache[this.lang]) {
+      Object.assign(merged, this.translationCache[this.lang]);
+    }
+    
+    // Apply custom translations if available (highest priority)
+    if (this.translationCache['custom']) {
+      Object.assign(merged, this.translationCache['custom']);
+    }
+    
+    // Update the component state
+    this.translations = merged;
   }
 
   private loadUserDataFromStorage() {
@@ -119,41 +269,43 @@ export class MehForm {
   };
 
   render() {
+    const t = this.translations;
+    
     return (
-      [
+      <div class="meh-form-container">
         <slot name="styles"></slot>
-        ,
+        
+        <h3>{t.formTitle}</h3>
+        
         <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
-
-
           <div class="userdata">
             <label class="required">
-              <span>Your Name</span>
+              <span>{t.nameLabel}</span>
               <input
                 name="author"
                 type="text"
-                placeholder="Jane Doe"
+                placeholder={t.namePlaceholder}
                 required
                 value={this.author}
               />
             </label>
 
             <label>
-              <span>Your Email Address</span>
+              <span>{t.emailLabel}</span>
               <input
                 name="email"
                 type="email"
-                placeholder="jane@example.com"
+                placeholder={t.emailPlaceholder}
                 value={this.email}
               />
             </label>
 
             <label>
-              <span>Your Website</span>
+              <span>{t.websiteLabel}</span>
               <input
                 name="website"
                 type="url"
-                placeholder="https://example.com/~jane"
+                placeholder={t.websitePlaceholder}
                 value={this.website}
               />
             </label>
@@ -161,30 +313,35 @@ export class MehForm {
 
           <div>
             <label class="required">
-              <span>Your Comment</span>
-              <textarea name="text" required rows={5} placeholder="Lorem Ipsum…"></textarea>
+              <span>{t.commentLabel}</span>
+              <textarea 
+                name="text" 
+                required 
+                rows={5} 
+                placeholder={t.commentPlaceholder}
+              ></textarea>
             </label>
           </div>
 
           {this.status === 'success' && (
             <div class="success">
-              Thank you for your comment! It has been submitted for review.
+              {t.successMessage}
             </div>
           )}
 
           {this.status === 'error' && (
             <div class="error">
-              Error: {this.errorMessage}
+              {t.errorPrefix}{this.errorMessage}
             </div>
           )}
 
           <div>
             <button type="submit" disabled={this.status === 'submitting'}>
-              {this.status === 'submitting' ? 'Submitting...' : 'Submit Comment'}
+              {this.status === 'submitting' ? t.submittingButton : t.submitButton}
             </button>
           </div>
         </form>
-      ]
+      </div>
     );
   }
 }

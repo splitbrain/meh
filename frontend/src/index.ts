@@ -8,5 +8,6 @@
  * to consume components of this package as outlined in the `README.md`.
  */
 
-//export { format } from './utils/utils';
+// Export the translation interface for users to implement
+export { MehFormTranslations } from './components/meh-form/meh-form';
 export type * from './components.d.ts';
