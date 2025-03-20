@@ -115,50 +115,83 @@ export class MehComments {
     return formatRelativeTime(dateString, this.language);
   }
 
+  /**
+   * Render the loading state
+   */
+  private renderLoading() {
+    return <div class="loading">{this._('loadingComments')}</div>;
+  }
+
+  /**
+   * Render error message
+   */
+  private renderError() {
+    return <div class="error">{this._('errorLoading')} {this.error}</div>;
+  }
+
+  /**
+   * Render empty state when no comments are available
+   */
+  private renderNoComments() {
+    return <div class="no-comments">{this._('noComments')}</div>;
+  }
+
+  /**
+   * Render a single comment
+   */
+  private renderComment(comment: any) {
+    return (
+      <li class="comment" key={comment.id}>
+        <div class="comment-header">
+          <img src={comment.avatar} alt="Avatar" class="avatar" />
+          <strong class="author">
+            {comment.website ? (
+              <a href={comment.website} target="_blank" rel="noopener noreferrer">
+                {comment.author}
+              </a>
+            ) : (
+              comment.author
+            )}
+          </strong>
+          <time
+            class="date"
+            dateTime={new Date(comment.created_at).toISOString()}
+            title={new Date(comment.created_at).toISOString()}
+          >
+            {this.formatRelativeTime(comment.created_at)}
+          </time>
+        </div>
+        <div class="comment-content" innerHTML={comment.html}></div>
+      </li>
+    );
+  }
+
+  /**
+   * Render the list of comments
+   */
+  private renderCommentsList() {
+    return (
+      <ul class="comments-list">
+        {this.comments.map(comment => this.renderComment(comment))}
+      </ul>
+    );
+  }
+
+  /**
+   * Main render method
+   */
   render() {
     return (
       <div class="meh-comments-container">
-
-        {this.loading && (
-          <div class="loading">{this._('loadingComments')}</div>
-        )}
-
-        {!this.loading && this.error && (
-          <div class="error">{this._('errorLoading')} {this.error}</div>
-        )}
-
-        {!this.loading && !this.error && this.comments.length === 0 && (
-          <div class="no-comments">{this._('noComments')}</div>
-        )}
-
-        {!this.loading && !this.error && this.comments.length > 0 && (
-          <ul class="comments-list">
-            {this.comments.map(comment => (
-              <li class="comment" key={comment.id}>
-                <div class="comment-header">
-                  <img src={comment.avatar} alt="Avatar" class="avatar" />
-                  <strong class="author">
-                    {comment.website ? (
-                      <a href={comment.website} target="_blank" rel="noopener noreferrer">
-                        {comment.author}
-                      </a>
-                    ) : (
-                      comment.author
-                    )}
-                  </strong>
-                  <time
-                    class="date"
-                    dateTime={new Date(comment.created_at).toISOString()}
-                    title={new Date(comment.created_at).toISOString()}
-                  >
-                    {this.formatRelativeTime(comment.created_at)}
-                  </time>
-                </div>
-                <div class="comment-content" innerHTML={comment.html}></div>
-              </li>
-            ))}
-          </ul>
-        )}
+        {this.loading && this.renderLoading()}
+        
+        {!this.loading && this.error && this.renderError()}
+        
+        {!this.loading && !this.error && this.comments.length === 0 && 
+          this.renderNoComments()}
+        
+        {!this.loading && !this.error && this.comments.length > 0 && 
+          this.renderCommentsList()}
       </div>
     );
   }
