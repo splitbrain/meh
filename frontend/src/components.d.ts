@@ -8,17 +8,13 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface MehForm {
         /**
-          * The base URL for the API If not provided, defaults to "/api/"
+          * The base URL for where the meh system is hosted If not provided, defaults to same origin
          */
-        "api": string;
+        "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
-        /**
-          * Path to translation files If not provided, defaults to the component's i18n directory
-         */
-        "i18nPath": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -43,17 +39,13 @@ declare global {
 declare namespace LocalJSX {
     interface MehForm {
         /**
-          * The base URL for the API If not provided, defaults to "/api/"
+          * The base URL for where the meh system is hosted If not provided, defaults to same origin
          */
-        "api"?: string;
+        "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
-        /**
-          * Path to translation files If not provided, defaults to the component's i18n directory
-         */
-        "i18nPath"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */

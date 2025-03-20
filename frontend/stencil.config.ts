@@ -6,6 +6,9 @@ export const config: Config = {
     {
       type: 'dist',
       esmLoaderPath: '../loader',
+      copy: [
+        { src: 'components/*/i18n/*.json', dest: 'i18n', warn: true }
+        ]
     },
     {
       type: 'dist-custom-elements',

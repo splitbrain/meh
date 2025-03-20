@@ -8,7 +8,6 @@ import { TranslationManager } from '../../utils/utils';
     'meh-form.css',
   ],
   shadow: true,
-  assetsDirs: ['meh-form/i18n']
 })
 export class MehForm {
   @Element() el!: HTMLElement;
@@ -20,22 +19,16 @@ export class MehForm {
   @Prop() post: string;
 
   /**
-   * The base URL for the API
-   * If not provided, defaults to "/api/"
+   * The base URL for where the meh system is hosted
+   * If not provided, defaults to same origin
    */
-  @Prop() api: string = '/api/';
+  @Prop() backend: string = '';
 
   /**
    * The language code for translations
    * If not provided, defaults to 'en'
    */
   @Prop() language: string = 'en';
-
-  /**
-   * Path to translation files
-   * If not provided, defaults to the component's i18n directory
-   */
-  @Prop() i18nPath: string = './meh-form/i18n/';
 
   /**
    * Custom translations object that overrides default and loaded translations
@@ -68,7 +61,7 @@ export class MehForm {
     submitButton: 'Submit Comment',
     submittingButton: 'Submitting...',
     successMessage: 'Thank you for your comment! It has been submitted for review.',
-    errorPrefix: 'Error: '
+    errorPrefix: 'An error occurred while submitting your comment:',
   };
 
   // Translation manager instance
@@ -86,12 +79,17 @@ export class MehForm {
       this.post = window.location.pathname;
     }
 
+    // remove trailing slash from backend URL
+    if (this.backend.endsWith('/')) {
+      this.backend = this.backend.slice(0, -1);
+    }
+
     // Initialize the TranslationManager with default translations
     this.translator = new TranslationManager(this.defaultTranslations);
 
     // Load language-specific translations
     if (this.language && this.language !== 'en') {
-      await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`);
+      await this.translator.loadTranslations(`${this.backend}/meh/i18n/meh-form.${this.language}.json`);
     }
 
     // Process any custom translations provided as prop
@@ -138,9 +136,7 @@ export class MehForm {
     this.errorMessage = '';
 
     try {
-      // Ensure API URL ends with a slash if not empty
-      const apiBase = this.api.endsWith('/') ? this.api : `${this.api}/`;
-      const response = await fetch(`${apiBase}comment`, {
+      const response = await fetch(`${this.backend}/api/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +166,7 @@ export class MehForm {
       // Reload user data to update the form fields
       this.loadUserDataFromStorage();
     } catch (error) {
-      this.errorMessage = error.message || 'An error occurred while submitting your comment';
+      this.errorMessage = error.message;
       this.status = 'error';
     }
   };
@@ -236,7 +232,7 @@ export class MehForm {
 
           {this.status === 'error' && (
             <div class="error">
-              {this._('errorPrefix')}{this.errorMessage}
+              {this._('errorPrefix')} {this.errorMessage}
             </div>
           )}
 
