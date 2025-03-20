@@ -1,22 +1,5 @@
 import {Component, Prop, h, State, Watch, Element} from '@stencil/core';
 
-// Define the translation interface within the component file
-export interface MehFormTranslations {
-  formTitle: string;
-  nameLabel: string;
-  namePlaceholder: string;
-  emailLabel: string;
-  emailPlaceholder: string;
-  websiteLabel: string;
-  websitePlaceholder: string;
-  commentLabel: string;
-  commentPlaceholder: string;
-  submitButton: string;
-  submittingButton: string;
-  successMessage: string;
-  errorPrefix: string;
-}
-
 @Component({
   tag: 'meh-form',
   styleUrls: [
@@ -63,16 +46,8 @@ export class MehForm {
   @State() author: string = '';
   @State() email: string = '';
   @State() website: string = '';
-  @State() translations: MehFormTranslations;
-
-  // Reference to the form element only
-  private formElement?: HTMLFormElement;
-
-  // LocalStorage key
-  private readonly STORAGE_KEY = 'meh-form-user-data';
-  
-  // Default English translations
-  private defaultTranslations: MehFormTranslations = {
+  // Default English translations that also define the translation structure
+  private defaultTranslations = {
     formTitle: 'Leave a Comment',
     nameLabel: 'Your Name',
     namePlaceholder: 'Jane Doe',
@@ -89,7 +64,7 @@ export class MehForm {
   };
   
   // Cache for loaded translations
-  private translationCache: Record<string, MehFormTranslations> = {};
+  private translationCache: Record<string, Partial<typeof this.defaultTranslations>> = {};
   
   // Watch for language changes
   @Watch('language')
@@ -135,7 +110,7 @@ export class MehForm {
       } 
       // If it's already an object, use it directly
       else if (typeof this.customTranslations === 'object') {
-        this.translationCache['custom'] = this.customTranslations as MehFormTranslations;
+        this.translationCache['custom'] = this.customTranslations as Partial<typeof this.defaultTranslations>;
       }
     } catch (error) {
       console.error('Failed to parse custom translations:', error);

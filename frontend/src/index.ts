@@ -8,6 +8,6 @@
  * to consume components of this package as outlined in the `README.md`.
  */
 
-// Export the translation interface for users to implement
-export { MehFormTranslations } from './components/meh-form/meh-form';
+// Export the translation type for users to implement
+export type { MehForm } from './components';
 export type * from './components.d.ts';

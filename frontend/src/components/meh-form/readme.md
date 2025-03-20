@@ -25,21 +25,23 @@ The component supports three ways to provide translations:
 
 ### Translation Object Structure
 
+The translation object can include any of these properties (all are optional):
+
 ```typescript
-interface MehFormTranslations {
-  formTitle: string;
-  nameLabel: string;
-  namePlaceholder: string;
-  emailLabel: string;
-  emailPlaceholder: string;
-  websiteLabel: string;
-  websitePlaceholder: string;
-  commentLabel: string;
-  commentPlaceholder: string;
-  submitButton: string;
-  submittingButton: string;
-  successMessage: string;
-  errorPrefix: string;
+{
+  formTitle: string;       // Default: 'Leave a Comment'
+  nameLabel: string;       // Default: 'Your Name'
+  namePlaceholder: string; // Default: 'Jane Doe'
+  emailLabel: string;      // Default: 'Your Email Address'
+  emailPlaceholder: string; // Default: 'jane@example.com'
+  websiteLabel: string;    // Default: 'Your Website'
+  websitePlaceholder: string; // Default: 'https://example.com/~jane'
+  commentLabel: string;    // Default: 'Your Comment'
+  commentPlaceholder: string; // Default: 'Lorem Ipsum…'
+  submitButton: string;    // Default: 'Submit Comment'
+  submittingButton: string; // Default: 'Submitting...'
+  successMessage: string;  // Default: 'Thank you for your comment! It has been submitted for review.'
+  errorPrefix: string;     // Default: 'Error: '
 }
 ```
 
