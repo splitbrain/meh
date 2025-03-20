@@ -80,25 +80,11 @@ export class TranslationManager<T extends Record<string, string>> {
 
       const loadedTranslations = await response.json();
       
-      // Merge with existing translations
-      this.translations = { 
-        ...this.translations, 
-        ...loadedTranslations 
-      };
-
-      return true;
+      // Use setTranslations to merge with existing translations
+      return this.setTranslations(loadedTranslations);
     } catch (error) {
       console.error(`Error loading translations from ${url}:`, error);
       return false;
     }
-  }
-
-  /**
-   * Reset translations to the provided values
-   * 
-   * @param translations - The translations to reset to
-   */
-  reset(translations: T): void {
-    this.translations = { ...translations };
   }
 }
