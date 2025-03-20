@@ -89,14 +89,14 @@ export class MehForm {
     // Initialize the TranslationManager with default translations
     this.translator = new TranslationManager(this.defaultTranslations);
 
-    // Process any custom translations provided as prop
-    if (this.customTranslations) {
-      this.translator.setTranslations(this.customTranslations);
-    }
-
     // Load language-specific translations
     if (this.language && this.language !== 'en') {
       await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`);
+    }
+
+    // Process any custom translations provided as prop
+    if (this.customTranslations) {
+      this.translator.setTranslations(this.customTranslations);
     }
 
     // Load saved user data from localStorage
