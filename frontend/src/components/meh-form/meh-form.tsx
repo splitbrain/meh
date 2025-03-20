@@ -5,6 +5,7 @@ import { TranslationManager } from '../../utils/utils';
   tag: 'meh-form',
   styleUrls: [
     '../../global/defaults.css',
+    '../../global/form.css',
     'meh-form.css',
   ],
   shadow: true,

@@ -3,47 +3,8 @@ form {
   flex-direction: column;
   gap: var(--meh-spacing);
 
-  label {
-    display: block;
-
-    span {
-      display: block;
-      font-weight: bold;
-      margin-bottom: calc(var(--meh-spacing) / 4);
-    }
-  }
-
-  label.required span::after {
-    content: "*";
-    color: var(--meh-accent);
-  }
-
-  input, textarea, button {
-    background-color: var(--meh-background);
-    color: var(--meh-foreground);
-    border: 1px solid var(--meh-foreground);
-    border-radius: var(--meh-border-radius);
-    padding: calc(var(--meh-spacing) / 2);
-
-    &:focus {
-      outline: none;
-      border-color: var(--meh-accent);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--meh-accent), transparent 70%);
-    }
-  }
-
   input, textarea {
     width: 100%;
-  }
-
-  button {
-    cursor: pointer;
-    background-color: color-mix(in srgb, var(--meh-accent), var(--meh-background) 80%);
-    color: var(--meh-foreground);
-
-    &:hover {
-      background-color: color-mix(in srgb, var(--meh-accent), var(--meh-background) 60%);
-    }
   }
 
   .userdata {

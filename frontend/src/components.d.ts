@@ -42,6 +42,20 @@ export namespace Components {
          */
         "post": string;
     }
+    interface MehLogin {
+        /**
+          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+         */
+        "backend": string;
+        /**
+          * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+         */
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        /**
+          * The language code for translations If not provided, defaults to 'en'
+         */
+        "language": string;
+    }
 }
 declare global {
     interface HTMLMehCommentsElement extends Components.MehComments, HTMLStencilElement {
@@ -56,9 +70,16 @@ declare global {
         prototype: HTMLMehFormElement;
         new (): HTMLMehFormElement;
     };
+    interface HTMLMehLoginElement extends Components.MehLogin, HTMLStencilElement {
+    }
+    var HTMLMehLoginElement: {
+        prototype: HTMLMehLoginElement;
+        new (): HTMLMehLoginElement;
+    };
     interface HTMLElementTagNameMap {
         "meh-comments": HTMLMehCommentsElement;
         "meh-form": HTMLMehFormElement;
+        "meh-login": HTMLMehLoginElement;
     }
 }
 declare namespace LocalJSX {
@@ -98,9 +119,24 @@ declare namespace LocalJSX {
          */
         "post"?: string;
     }
+    interface MehLogin {
+        /**
+          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+         */
+        "backend"?: string;
+        /**
+          * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+         */
+        "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
+        /**
+          * The language code for translations If not provided, defaults to 'en'
+         */
+        "language"?: string;
+    }
     interface IntrinsicElements {
         "meh-comments": MehComments;
         "meh-form": MehForm;
+        "meh-login": MehLogin;
     }
 }
 export { LocalJSX as JSX };
@@ -109,6 +145,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "meh-comments": LocalJSX.MehComments & JSXBase.HTMLAttributes<HTMLMehCommentsElement>;
             "meh-form": LocalJSX.MehForm & JSXBase.HTMLAttributes<HTMLMehFormElement>;
+            "meh-login": LocalJSX.MehLogin & JSXBase.HTMLAttributes<HTMLMehLoginElement>;
         }
     }
 }

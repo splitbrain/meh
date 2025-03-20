@@ -1,0 +1,11 @@
+svg {
+  width: calc(var(--meh-spacing) + 1em);
+  height: calc(var(--meh-spacing) + 1em);
+  vertical-align: middle;
+  fill: color-mix(in srgb, var(--meh-accent), transparent 80%);
+
+  &:hover {
+    fill: var(--meh-accent);
+  }
+}
+

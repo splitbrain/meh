@@ -1,8 +1,7 @@
 {
   "login": "Anmelden",
   "logout": "Abmelden",
-  "password": "Passwort",
+  "password": "Admin-Passwort",
   "submit": "Absenden",
-  "loginError": "Anmeldung fehlgeschlagen:",
-  "enterPassword": "Admin-Passwort eingeben"
+  "loginError": "Anmeldung fehlgeschlagen:"
 }

@@ -1,11 +1,13 @@
-import { Component, Prop, h, State } from '@stencil/core';
-import { TranslationManager } from '../../utils/utils';
+import {Component, Prop, h, State} from '@stencil/core';
+import {TranslationManager} from '../../utils/utils';
 
 @Component({
   tag: 'meh-login',
   shadow: true,
   styleUrls: [
     '../../global/defaults.css',
+    '../../global/form.css',
+    'meh-login.css',
   ],
 })
 export class MehLogin {
@@ -37,10 +39,9 @@ export class MehLogin {
   private defaultTranslations = {
     login: 'Login',
     logout: 'Logout',
-    password: 'Password',
+    password: 'Admin Password',
     submit: 'Submit',
     loginError: 'Login failed:',
-    enterPassword: 'Enter admin password',
   };
 
   // Translation manager instance
@@ -89,7 +90,7 @@ export class MehLogin {
 
   private handleSubmit = async (event: Event) => {
     event.preventDefault();
-    
+
     if (!this.password) {
       return;
     }
@@ -103,7 +104,7 @@ export class MehLogin {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password: this.password }),
+        body: JSON.stringify({password: this.password}),
       });
 
       const data = await response.json();
@@ -116,7 +117,7 @@ export class MehLogin {
       this.isLoggedIn = true;
       this.showPasswordField = false;
       this.password = '';
-      
+
       // We'll handle token storage later
     } catch (error) {
       console.error('Login error:', error);
@@ -128,18 +129,32 @@ export class MehLogin {
 
   private renderLoginButton() {
     return (
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        height="24" 
-        viewBox="0 -960 960 960" 
-        width="24"
-        onClick={this.togglePasswordField} 
-        title={this._('login')}
+      <svg
+        viewBox="0 0 24 24"
+        onClick={this.togglePasswordField}
         aria-label={this._('login')}
         role="button"
-        tabIndex={0}
+        tabindex={0}
       >
-        <path d="M480-120q-138 0-240.5-91.5T122-440h82q14 104 92.5 172T480-200q117 0 198.5-81.5T760-480q0-117-81.5-198.5T480-760q-69 0-129 32t-101 88h110v80H120v-240h80v94q51-64 124.5-99T480-840q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-480q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-120Z"/>
+        <title>{this._('login')}</title>
+        <path
+          d="M11 7L9.6 8.4L12.2 11H2V13H12.2L9.6 15.6L11 17L16 12L11 7M20 19H12V21H20C21.1 21 22 20.1 22 19V5C22 3.9 21.1 3 20 3H12V5H20V19Z"/>
+      </svg>
+    );
+  }
+
+  private renderLogoutButton() {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        onClick={this.handleLogout}
+        aria-label={this._('logout')}
+        role="button"
+        tabindex={0}
+      >
+        <title>{this._('logout')}</title>
+        <path
+          d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.58L17 17L22 12M4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z"/>
       </svg>
     );
   }
@@ -147,7 +162,6 @@ export class MehLogin {
   private renderPasswordForm() {
     return (
       <form onSubmit={this.handleSubmit}>
-        <label htmlFor="password">{this._('enterPassword')}</label>
         <input
           id="password"
           type="password"
@@ -164,23 +178,6 @@ export class MehLogin {
     );
   }
 
-  private renderLogoutButton() {
-    return (
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        height="24" 
-        viewBox="0 -960 960 960" 
-        width="24"
-        onClick={this.handleLogout}
-        title={this._('logout')}
-        aria-label={this._('logout')}
-        role="button"
-        tabIndex={0}
-      >
-        <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/>
-      </svg>
-    );
-  }
 
   render() {
     if (this.isLoggedIn) {
