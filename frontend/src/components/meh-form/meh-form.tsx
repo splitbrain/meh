@@ -8,7 +8,7 @@ import { TranslationManager } from '../../utils/utils';
     'meh-form.css',
   ],
   shadow: true,
-  assetsDirs: ['i18n']
+  assetsDirs: ['meh-form/i18n']
 })
 export class MehForm {
   @Element() el!: HTMLElement;
@@ -35,7 +35,7 @@ export class MehForm {
    * Path to translation files
    * If not provided, defaults to the component's i18n directory
    */
-  @Prop() i18nPath: string = './i18n/';
+  @Prop() i18nPath: string = './meh-form/i18n/';
 
   /**
    * Custom translations object that overrides default and loaded translations
