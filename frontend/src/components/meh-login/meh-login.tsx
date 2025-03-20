@@ -1,5 +1,5 @@
 import {Component, Prop, h, State} from '@stencil/core';
-import {TranslationManager} from '../../utils/utils';
+import {TranslationManager, TOKEN_STORAGE_KEY} from '../../utils/utils';
 
 @Component({
   tag: 'meh-login',
@@ -36,8 +36,6 @@ export class MehLogin {
   @State() password: string = '';
   @State() token: string = '';
 
-  // Storage key for the auth token
-  private readonly TOKEN_STORAGE_KEY = 'meh_admin_token';
 
   // Default English translations
   private defaultTranslations = {
@@ -84,7 +82,7 @@ export class MehLogin {
    */
   private loadTokenFromStorage() {
     try {
-      const savedToken = localStorage.getItem(this.TOKEN_STORAGE_KEY);
+      const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
       if (savedToken) {
         this.token = savedToken;
         this.isLoggedIn = true;
@@ -99,7 +97,7 @@ export class MehLogin {
    */
   private saveTokenToStorage(token: string) {
     try {
-      localStorage.setItem(this.TOKEN_STORAGE_KEY, token);
+      localStorage.setItem(TOKEN_STORAGE_KEY, token);
     } catch (error) {
       console.error('Failed to save token to localStorage:', error);
     }
@@ -110,7 +108,7 @@ export class MehLogin {
    */
   private removeTokenFromStorage() {
     try {
-      localStorage.removeItem(this.TOKEN_STORAGE_KEY);
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
     } catch (error) {
       console.error('Failed to remove token from localStorage:', error);
     }

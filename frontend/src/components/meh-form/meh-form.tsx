@@ -1,5 +1,5 @@
 import {Component, Prop, h, State, Element} from '@stencil/core';
-import { TranslationManager } from '../../utils/utils';
+import { TranslationManager, getAuthToken } from '../../utils/utils';
 
 @Component({
   tag: 'meh-form',
@@ -137,11 +137,20 @@ export class MehForm {
     this.errorMessage = '';
 
     try {
+      // Prepare headers
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization header if token exists
+      const token = getAuthToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${this.backend}/api/comment`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           post: this.post,
           ...formValues

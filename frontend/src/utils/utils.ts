@@ -1,5 +1,24 @@
 
 /**
+ * Storage key for the auth token
+ */
+export const TOKEN_STORAGE_KEY = 'meh_admin_token';
+
+/**
+ * Get the authentication token from localStorage if available
+ * 
+ * @returns The token string or null if not found
+ */
+export function getAuthToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY);
+  } catch (error) {
+    console.error('Failed to get token from localStorage:', error);
+    return null;
+  }
+}
+
+/**
  * Format a date as a relative time string (e.g., "5 days ago", "3 minutes ago")
  *
  * @param dateString - The date string to format

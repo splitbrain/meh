@@ -1,5 +1,5 @@
 import {Component, Prop, h, State, Element} from '@stencil/core';
-import {TranslationManager, formatRelativeTime} from '../../utils/utils';
+import {TranslationManager, formatRelativeTime, getAuthToken} from '../../utils/utils';
 
 @Component({
   tag: 'meh-comments',
@@ -90,7 +90,20 @@ export class MehComments {
     this.error = '';
 
     try {
-      const response = await fetch(`${this.backend}/api/comments?post=${encodeURIComponent(this.post)}`);
+      // Prepare headers
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization header if token exists
+      const token = getAuthToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${this.backend}/api/comments?post=${encodeURIComponent(this.post)}`, {
+        headers
+      });
 
       if (!response.ok) {
         const error = await response.json();
