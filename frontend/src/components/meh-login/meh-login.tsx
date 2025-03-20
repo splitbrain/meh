@@ -34,6 +34,10 @@ export class MehLogin {
   @State() loading: boolean = false;
   @State() error: string = '';
   @State() password: string = '';
+  @State() token: string = '';
+
+  // Storage key for the auth token
+  private readonly TOKEN_STORAGE_KEY = 'meh_admin_token';
 
   // Default English translations
   private defaultTranslations = {
@@ -70,6 +74,46 @@ export class MehLogin {
     if (this.customTranslations) {
       this.translator.setTranslations(this.customTranslations);
     }
+
+    // Load token from localStorage if it exists
+    this.loadTokenFromStorage();
+  }
+
+  /**
+   * Load the authentication token from localStorage
+   */
+  private loadTokenFromStorage() {
+    try {
+      const savedToken = localStorage.getItem(this.TOKEN_STORAGE_KEY);
+      if (savedToken) {
+        this.token = savedToken;
+        this.isLoggedIn = true;
+      }
+    } catch (error) {
+      console.error('Failed to load token from localStorage:', error);
+    }
+  }
+
+  /**
+   * Save the authentication token to localStorage
+   */
+  private saveTokenToStorage(token: string) {
+    try {
+      localStorage.setItem(this.TOKEN_STORAGE_KEY, token);
+    } catch (error) {
+      console.error('Failed to save token to localStorage:', error);
+    }
+  }
+
+  /**
+   * Remove the authentication token from localStorage
+   */
+  private removeTokenFromStorage() {
+    try {
+      localStorage.removeItem(this.TOKEN_STORAGE_KEY);
+    } catch (error) {
+      console.error('Failed to remove token from localStorage:', error);
+    }
   }
 
   private togglePasswordField = () => {
@@ -85,7 +129,8 @@ export class MehLogin {
   private handleLogout = () => {
     this.isLoggedIn = false;
     this.password = '';
-    // We'll handle token removal later
+    this.token = '';
+    this.removeTokenFromStorage();
   }
 
   private handleSubmit = async (event: Event) => {
@@ -114,11 +159,13 @@ export class MehLogin {
       }
 
       // Successfully logged in
+      this.token = data.token;
       this.isLoggedIn = true;
       this.showPasswordField = false;
       this.password = '';
 
-      // We'll handle token storage later
+      // Store the token in localStorage
+      this.saveTokenToStorage(this.token);
     } catch (error) {
       console.error('Login error:', error);
       this.error = error.message || 'Unknown error occurred';
