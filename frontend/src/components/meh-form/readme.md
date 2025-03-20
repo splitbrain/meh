@@ -20,7 +20,7 @@ A customizable comment form component with internationalization support.
 The component supports three ways to provide translations:
 
 1. **Default English translations** - Used when no other translations are provided
-2. **Language-specific translations** - Loaded from JSON files based on the `lang` attribute
+2. **Language-specific translations** - Loaded from JSON files based on the `language` attribute
 3. **Custom translations** - Provided directly via the `customTranslations` property
 
 ### Translation Object Structure

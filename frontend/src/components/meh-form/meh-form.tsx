@@ -173,7 +173,7 @@ export class MehForm {
       // Merge translations
       this.mergeTranslations();
     } catch (error) {
-      console.error(`Error loading translations for ${this.lang}:`, error);
+      console.error(`Error loading translations for ${this.language}:`, error);
       this.mergeTranslations();
     }
   }
