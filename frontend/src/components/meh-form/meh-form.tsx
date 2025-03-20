@@ -1,4 +1,5 @@
 import {Component, Prop, h, State, Watch, Element} from '@stencil/core';
+import { TranslationManager } from '../../utils/utils';
 
 @Component({
   tag: 'meh-form',
@@ -46,8 +47,6 @@ export class MehForm {
   @State() author: string = '';
   @State() email: string = '';
   @State() website: string = '';
-  @State() translations: typeof this.defaultTranslations;
-
   // Reference to the form element
   private formElement?: HTMLFormElement;
 
@@ -71,20 +70,25 @@ export class MehForm {
     errorPrefix: 'Error: '
   };
 
-  // Cache for loaded translations
-  private translationCache: Record<string, Partial<typeof this.defaultTranslations>> = {};
+  // Translation manager instance
+  private translator: TranslationManager<typeof this.defaultTranslations>;
 
   // Watch for language changes
   @Watch('language')
   async languageChangedHandler() {
-    await this.loadTranslations();
+    if (this.language && this.language !== 'en') {
+      await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`, this.language);
+    } else {
+      this.translator.reset();
+    }
   }
 
   // Watch for custom translations changes
   @Watch('customTranslations')
   customTranslationsChangedHandler() {
-    this.processCustomTranslations();
-    this.mergeTranslations();
+    if (this.customTranslations) {
+      this.translator.setTranslations(this.customTranslations);
+    }
   }
 
   async componentWillLoad() {
@@ -93,90 +97,21 @@ export class MehForm {
       this.post = window.location.pathname;
     }
 
-    // Initialize translations with defaults
-    this.translations = { ...this.defaultTranslations };
-
+    // Initialize the TranslationManager with default translations
+    this.translator = new TranslationManager(this.defaultTranslations);
+    
     // Process any custom translations provided as prop
-    this.processCustomTranslations();
-
+    if (this.customTranslations) {
+      this.translator.setTranslations(this.customTranslations);
+    }
+    
     // Load language-specific translations
-    await this.loadTranslations();
+    if (this.language && this.language !== 'en') {
+      await this.translator.loadTranslations(`${this.i18nPath}${this.language}.json`, this.language);
+    }
 
     // Load saved user data from localStorage
     this.loadUserDataFromStorage();
-  }
-
-  private processCustomTranslations() {
-    if (!this.customTranslations) return;
-
-    try {
-      // If customTranslations is a string, try to parse it as JSON
-      if (typeof this.customTranslations === 'string') {
-        if (this.customTranslations.trim()) {
-          this.translationCache['custom'] = JSON.parse(this.customTranslations as string);
-        }
-      }
-      // If it's already an object, use it directly
-      else if (typeof this.customTranslations === 'object') {
-        this.translationCache['custom'] = this.customTranslations as Partial<typeof this.defaultTranslations>;
-      }
-    } catch (error) {
-      console.error('Failed to parse custom translations:', error);
-    }
-  }
-
-  private async loadTranslations() {
-    // For English or if we already have custom translations, just merge what we have
-    if (this.language === 'en' || !this.language) {
-      this.mergeTranslations();
-      return;
-    }
-
-    // If we've already loaded this language, use the cached version
-    if (this.translationCache[this.language]) {
-      this.mergeTranslations();
-      return;
-    }
-
-    try {
-      // Try to fetch the translation file
-      const response = await fetch(`${this.i18nPath}${this.language}.json`);
-
-      if (!response.ok) {
-        console.warn(`Translation file for ${this.language} not found, falling back to defaults`);
-        this.mergeTranslations();
-        return;
-      }
-
-      const langTranslations = await response.json();
-
-      // Cache for future use
-      this.translationCache[this.language] = langTranslations;
-
-      // Merge translations
-      this.mergeTranslations();
-    } catch (error) {
-      console.error(`Error loading translations for ${this.language}:`, error);
-      this.mergeTranslations();
-    }
-  }
-
-  private mergeTranslations() {
-    // Start with default translations
-    const merged = { ...this.defaultTranslations };
-
-    // Apply language-specific translations if available
-    if (this.language && this.translationCache[this.language]) {
-      Object.assign(merged, this.translationCache[this.language]);
-    }
-
-    // Apply custom translations if available (highest priority)
-    if (this.translationCache['custom']) {
-      Object.assign(merged, this.translationCache['custom']);
-    }
-
-    // Update the component state
-    this.translations = merged;
   }
 
   private loadUserDataFromStorage() {
@@ -252,43 +187,41 @@ export class MehForm {
   };
 
   render() {
-    const t = this.translations;
-
     return (
       <div class="meh-form-container">
         <slot name="styles"></slot>
 
-        <h3>{t.formTitle}</h3>
+        <h3>{this.translator.get('formTitle')}</h3>
 
         <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
           <div class="userdata">
             <label class="required">
-              <span>{t.nameLabel}</span>
+              <span>{this.translator.get('nameLabel')}</span>
               <input
                 name="author"
                 type="text"
-                placeholder={t.namePlaceholder}
+                placeholder={this.translator.get('namePlaceholder')}
                 required
                 value={this.author}
               />
             </label>
 
             <label>
-              <span>{t.emailLabel}</span>
+              <span>{this.translator.get('emailLabel')}</span>
               <input
                 name="email"
                 type="email"
-                placeholder={t.emailPlaceholder}
+                placeholder={this.translator.get('emailPlaceholder')}
                 value={this.email}
               />
             </label>
 
             <label>
-              <span>{t.websiteLabel}</span>
+              <span>{this.translator.get('websiteLabel')}</span>
               <input
                 name="website"
                 type="url"
-                placeholder={t.websitePlaceholder}
+                placeholder={this.translator.get('websitePlaceholder')}
                 value={this.website}
               />
             </label>
@@ -296,31 +229,31 @@ export class MehForm {
 
           <div>
             <label class="required">
-              <span>{t.commentLabel}</span>
+              <span>{this.translator.get('commentLabel')}</span>
               <textarea
                 name="text"
                 required
                 rows={5}
-                placeholder={t.commentPlaceholder}
+                placeholder={this.translator.get('commentPlaceholder')}
               ></textarea>
             </label>
           </div>
 
           {this.status === 'success' && (
             <div class="success">
-              {t.successMessage}
+              {this.translator.get('successMessage')}
             </div>
           )}
 
           {this.status === 'error' && (
             <div class="error">
-              {t.errorPrefix}{this.errorMessage}
+              {this.translator.get('errorPrefix')}{this.errorMessage}
             </div>
           )}
 
           <div>
             <button type="submit" disabled={this.status === 'submitting'}>
-              {this.status === 'submitting' ? t.submittingButton : t.submitButton}
+              {this.status === 'submitting' ? this.translator.get('submittingButton') : this.translator.get('submitButton')}
             </button>
           </div>
         </form>
