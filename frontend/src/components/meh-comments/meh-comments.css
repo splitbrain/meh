@@ -1,0 +1,69 @@
+:host {
+  --avatar-size: 3em;
+  --link-color: var(--meh-accent);
+  --border-color: color-mix(in srgb, var(--meh-foreground), transparent 90%);
+
+
+  div.error {
+    color: var(--meh-error);
+  }
+
+  > ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--meh-spacing);
+  }
+
+  li.comment {
+    display: grid;
+    grid-template-columns: var(--avatar-size) 1fr;
+    grid-template-rows: auto auto auto;
+    grid-column-gap: var(--meh-spacing);
+
+    > img.avatar {
+      grid-column: 1 / -1;
+      grid-row: 1 / 3;
+
+      border-radius: var(--meh-border-radius);
+      border: 1px solid  var(--border-color);
+      height: var(--avatar-size);
+      width: var(--avatar-size);
+
+    }
+
+    > strong.author {
+      grid-column: 2 / -1;
+      grid-row: 1 / 2;
+    }
+
+    > time {
+      grid-column: 2 / -1;
+      grid-row: 2 / 3;
+
+      font-size: small;
+    }
+
+    > div.comment-content {
+      grid-column: 2 / -1;
+      grid-row: 3 / 4;
+      border-bottom: 1px solid var(--border-color);
+    }
+  }
+
+  /* General styles - needs to cover some arbitrary content elements */
+
+  a {
+    color: var(--link-color);
+    text-decoration-color: var(--border-color);
+
+    &:hover, &:focus, &:active {
+      text-decoration-color: var(--link-color);
+    }
+  }
+
+  a.u-url.mention {
+    display: none;
+  }
+}

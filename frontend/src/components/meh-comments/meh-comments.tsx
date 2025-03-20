@@ -1,5 +1,5 @@
-import { Component, Prop, h, State, Element } from '@stencil/core';
-import { TranslationManager, formatRelativeTime } from '../../utils/utils';
+import {Component, Prop, h, State, Element} from '@stencil/core';
+import {TranslationManager, formatRelativeTime} from '../../utils/utils';
 
 @Component({
   tag: 'meh-comments',
@@ -142,25 +142,23 @@ export class MehComments {
   private renderComment(comment: any) {
     return (
       <li class="comment" key={comment.id}>
-        <div class="comment-header">
-          <img src={comment.avatar} alt="Avatar" class="avatar" />
-          <strong class="author">
-            {comment.website ? (
-              <a href={comment.website} target="_blank" rel="noopener noreferrer">
-                {comment.author}
-              </a>
-            ) : (
-              comment.author
-            )}
-          </strong>
-          <time
-            class="date"
-            dateTime={new Date(comment.created_at).toISOString()}
-            title={new Date(comment.created_at).toISOString()}
-          >
-            {this.formatRelativeTime(comment.created_at)}
-          </time>
-        </div>
+        <img src={comment.avatar} alt="Avatar" class="avatar"/>
+        <strong class="author">
+          {comment.website ? (
+            <a href={comment.website} target="_blank" rel="noopener noreferrer">
+              {comment.author}
+            </a>
+          ) : (
+            comment.author
+          )}
+        </strong>
+        <time
+          class="date"
+          dateTime={new Date(comment.created_at).toISOString()}
+          title={new Date(comment.created_at).toISOString()}
+        >
+          {this.formatRelativeTime(comment.created_at)}
+        </time>
         <div class="comment-content" innerHTML={comment.html}></div>
       </li>
     );
