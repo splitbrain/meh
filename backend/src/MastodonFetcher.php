@@ -245,7 +245,7 @@ class MastodonFetcher
                 'id' => $status->id,
                 'url' => $status->url,
                 'created_at' => $status->created_at,
-                'content' => strip_tags((string) $status->content),
+                'content' => strip_tags((string)$status->content),
                 'post_path' => $postPath,
                 'author' => $username . '@' . $instanceHost
             ];
@@ -263,7 +263,7 @@ class MastodonFetcher
                         $status->url,
                         $status->uri ?? $status->url,
                         $postPath,
-                        date('Y-m-d H:i:s', strtotime((string) $status->created_at))
+                        date('Y-m-d H:i:s', strtotime((string)$status->created_at))
                     ]
                 );
                 $importCount++;
@@ -414,18 +414,20 @@ class MastodonFetcher
         $db = $this->app->db();
         $text = strip_tags($reply->content);
         $avatarUrl = $reply->account->avatar ?? '';
-        $author = $this->formatAuthor($reply->account->acct, $instance);
+        $account = $this->formatAccount($reply->account->acct, $instance);
+        $author = $reply->account->display_name ?? $account;
 
         try {
             // Insert into comments table
             $commentId = $db->exec(
                 'INSERT INTO comments 
-                (post, author, website, text, html, status, created_at, avatar) 
+                (post, author, email, website, text, html, status, created_at, avatar) 
                 VALUES 
-                (?, ?, ?, ?, ?, ?, ?, ?)',
+                (?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 [
                     $thread['post'],
                     $author,
+                    $account,
                     $reply->url,
                     $text,
                     $reply->content,
@@ -450,19 +452,20 @@ class MastodonFetcher
     }
 
     /**
-     * Format an author name with instance if needed
+     * Format an account name with instance if needed
      *
-     * @param string $author The author name
+     * @param string $account The account name
      * @param string $instance The instance URL
-     * @return string The formatted author name
+     * @return string The formatted account name
      */
-    protected function formatAuthor(string $author, string $instance): string
+    protected function formatAccount(string $account, string $instance): string
     {
-        if (!str_contains($author, '@')) {
+        $account = ltrim($account, '@');
+        if (!str_contains($account, '@')) {
             $host = parse_url($instance, PHP_URL_HOST);
-            return $author . '@' . $host;
+            $account .= '@' . $host;
         }
-        return $author;
+        return '@' . $account;
     }
 
     /**
