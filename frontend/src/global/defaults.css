@@ -1,0 +1,20 @@
+:host {
+  /* Primary theme colors */
+  --meh-accent: var(--meh-default-accent, #2196f3);
+  --meh-background: var(--meh-default-background, #fefefe);
+  --meh-foreground: var(--meh-default-foreground, #333);
+
+  /* Spacing and layout */
+  --meh-spacing: var(--meh-default-spacing, 1em);
+  --meh-border-radius: var(--meh-default-border-radius, 3px);
+
+  /* Status colors */
+  --meh-success: var(--meh-default-success, #4caf50);
+  --meh-error: var(--meh-default-error, #f44336);
+
+  display: block;
+
+  * {
+    box-sizing: border-box;
+  }
+}

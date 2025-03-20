@@ -35,6 +35,9 @@
     "scripts": {
         "test": "phpunit",
         "rector": "rector process",
-        "serve": "php -S 0.0.0.0:8000 -t ../public"
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S 0.0.0.0:8000 -t ../public"
+        ]
     }
 }

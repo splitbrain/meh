@@ -8,7 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface MehForm {
         /**
-          * The base URL for the API If not provided, defaults to "/"
+          * The base URL for the API If not provided, defaults to "/api/"
          */
         "api": string;
         /**
@@ -52,7 +52,7 @@ declare global {
 declare namespace LocalJSX {
     interface MehForm {
         /**
-          * The base URL for the API If not provided, defaults to "/"
+          * The base URL for the API If not provided, defaults to "/api/"
          */
         "api"?: string;
         /**
