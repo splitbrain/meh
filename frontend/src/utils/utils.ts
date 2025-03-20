@@ -1,22 +1,21 @@
 
 /**
  * Format a date as a relative time string (e.g., "5 days ago", "3 minutes ago")
- * 
+ *
  * @param dateString - The date string to format
  * @param language - The language code for localization (e.g., 'en', 'de')
  * @param fallbackFormatter - Optional function to use if formatting fails
  * @returns A localized relative time string
  */
 export function formatRelativeTime(
-  dateString: string, 
+  dateString: string,
   language: string = 'en',
-  fallbackFormatter?: (date: string) => string
 ): string {
   try {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
+
     // Define time units and their values in seconds
     const units: {unit: Intl.RelativeTimeFormatUnit, seconds: number}[] = [
       { unit: 'year', seconds: 31536000 },
@@ -26,7 +25,7 @@ export function formatRelativeTime(
       { unit: 'minute', seconds: 60 },
       { unit: 'second', seconds: 1 }
     ];
-    
+
     // Find the appropriate unit
     for (const {unit, seconds} of units) {
       const value = Math.floor(diffInSeconds / seconds);
@@ -36,16 +35,12 @@ export function formatRelativeTime(
         return rtf.format(-value, unit);
       }
     }
-    
+
     // If we get here, it's just now
     const rtf = new Intl.RelativeTimeFormat(language, { numeric: 'auto' });
     return rtf.format(0, 'second');
   } catch (e) {
     console.error('Error formatting relative time:', e);
-    // Use fallback formatter if provided
-    if (fallbackFormatter) {
-      return fallbackFormatter(dateString);
-    }
     // Simple fallback
     return dateString;
   }
@@ -103,9 +98,9 @@ export class TranslationManager<T extends Record<string, string>> {
       }
 
       // Merge with existing translations
-      this.translations = { 
-        ...this.translations, 
-        ...parsedTranslations 
+      this.translations = {
+        ...this.translations,
+        ...parsedTranslations
       };
 
       return true;
@@ -131,7 +126,7 @@ export class TranslationManager<T extends Record<string, string>> {
       }
 
       const loadedTranslations = await response.json();
-      
+
       // Use setTranslations to merge with existing translations
       return this.setTranslations(loadedTranslations);
     } catch (error) {

@@ -104,27 +104,12 @@ export class MehComments {
     }
   }
 
-  private formatDate(dateString: string): string {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString(this.language, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (e) {
-      return dateString;
-    }
-  }
-
   /**
    * Format a date as a relative time string (e.g., "5 days ago")
    * Falls back to absolute date format if there's an error
    */
   private formatRelativeTime(dateString: string): string {
-    return formatRelativeTime(dateString, this.language, (date) => this.formatDate(date));
+    return formatRelativeTime(dateString, this.language);
   }
 
   render() {
@@ -159,9 +144,13 @@ export class MehComments {
                       comment.author
                     )}
                   </strong>
-                  <span class="date" title={this.formatDate(comment.created_at)}>
+                  <time
+                    class="date"
+                    dateTime={new Date(comment.created_at).toISOString()}
+                    title={new Date(comment.created_at).toISOString()}
+                  >
                     {this.formatRelativeTime(comment.created_at)}
-                  </span>
+                  </time>
                 </div>
                 <div class="comment-content" innerHTML={comment.html}></div>
               </li>
