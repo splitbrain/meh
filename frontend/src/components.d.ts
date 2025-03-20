@@ -14,7 +14,7 @@ export namespace Components {
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
-        "customTranslations": string | object;
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
         /**
           * Path to translation files If not provided, defaults to './assets/i18n/'
          */
@@ -49,7 +49,7 @@ declare namespace LocalJSX {
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
-        "customTranslations"?: string | object;
+        "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
         /**
           * Path to translation files If not provided, defaults to './assets/i18n/'
          */
