@@ -181,18 +181,14 @@ export class MehComments {
    * Main render method
    */
   render() {
-    return (
-      <div class="meh-comments-container">
-        {this.loading && this.renderLoading()}
-        
-        {!this.loading && this.error && this.renderError()}
-        
-        {!this.loading && !this.error && this.comments.length === 0 && 
-          this.renderNoComments()}
-        
-        {!this.loading && !this.error && this.comments.length > 0 && 
-          this.renderCommentsList()}
-      </div>
-    );
+    if (this.loading) {
+      return this.renderLoading();
+    } else if (this.error) {
+      return this.renderError();
+    } else if (this.comments.length === 0) {
+      return this.renderNoComments();
+    } else {
+      return this.renderCommentsList();
+    }
   }
 }
