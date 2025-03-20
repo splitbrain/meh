@@ -39,7 +39,7 @@ class CommentController extends Controller
             'website' => $data['website'] ?? '',
             'text' => $data['text'],
             'html' => $html,
-            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'ip' => $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '',
             'status' => 'pending', // New comments are pending by default
         ];
 
