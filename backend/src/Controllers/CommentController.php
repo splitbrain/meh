@@ -2,6 +2,7 @@
 
 namespace splitbrain\meh\Controllers;
 
+use Parsedown;
 use splitbrain\meh\Controller;
 use splitbrain\meh\HttpException;
 
@@ -26,13 +27,18 @@ class CommentController extends Controller
             }
         }
 
+        $parsedown = new Parsedown();
+        $parsedown->setSafeMode(true);
+        $parsedown->setBreaksEnabled(true);
+        $html = $parsedown->text($data['text']);
+
         $record = [
             'post' => $data['post'],
             'author' => $data['author'],
             'email' => $data['email'] ?? '',
             'website' => $data['website'] ?? '',
             'text' => $data['text'],
-            'html' => $data['text'], // Simple text for now, could add Markdown processing
+            'html' => $html,
             'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
             'status' => 'pending', // New comments are pending by default
         ];
