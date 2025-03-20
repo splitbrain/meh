@@ -46,6 +46,7 @@ export class MehForm {
   @State() author: string = '';
   @State() email: string = '';
   @State() website: string = '';
+  @State() translations: typeof this.defaultTranslations;
   // Default English translations that also define the translation structure
   private defaultTranslations = {
     formTitle: 'Leave a Comment',
