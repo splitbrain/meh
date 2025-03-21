@@ -83,7 +83,7 @@ export class MehComments {
 
     // Fetch comments
     await this.fetchComments();
-    
+
     // Add event listener for refresh events
     window.addEventListener('meh-refresh', this.handleRefreshEvent);
   }
@@ -104,7 +104,7 @@ export class MehComments {
       const headers: HeadersInit = {
         'Content-Type': 'application/json'
       };
-      
+
       // Add authorization header if token exists
       const token = getAuthToken();
       if (token) {
@@ -164,7 +164,7 @@ export class MehComments {
    */
   private renderComment(comment: any) {
     return (
-      <li class="comment" key={comment.id}>
+      <li class={`comment status-${comment.status}`} key={comment.id}>
         <img src={comment.avatar} alt="Avatar" class="avatar"/>
         <strong class="author">
           {comment.website ? (
@@ -197,7 +197,7 @@ export class MehComments {
       </ul>
     );
   }
-  
+
   /**
    * Clean up event listeners when component is removed
    */
