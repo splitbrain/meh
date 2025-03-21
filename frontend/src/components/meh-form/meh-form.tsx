@@ -175,6 +175,9 @@ export class MehForm {
 
       // Reload user data to update the form fields
       this.loadUserDataFromStorage();
+      
+      // Dispatch refresh event to update comments list
+      window.dispatchEvent(new CustomEvent('meh-refresh'));
     } catch (error) {
       console.error('Comment submission error:', error);
       this.errorMessage = error.message || 'Unknown error occurred';

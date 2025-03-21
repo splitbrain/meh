@@ -83,7 +83,17 @@ export class MehComments {
 
     // Fetch comments
     await this.fetchComments();
+    
+    // Add event listener for refresh events
+    window.addEventListener('meh-refresh', this.handleRefreshEvent);
   }
+
+  /**
+   * Handle the meh-refresh custom event
+   */
+  private handleRefreshEvent = async () => {
+    await this.fetchComments();
+  };
 
   private async fetchComments() {
     this.loading = true;
@@ -186,6 +196,13 @@ export class MehComments {
         {this.comments.map(comment => this.renderComment(comment))}
       </ul>
     );
+  }
+  
+  /**
+   * Clean up event listeners when component is removed
+   */
+  disconnectedCallback() {
+    window.removeEventListener('meh-refresh', this.handleRefreshEvent);
   }
 
   /**
