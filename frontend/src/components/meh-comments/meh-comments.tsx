@@ -203,12 +203,12 @@ export class MehComments {
       // Get the updated comment data from the response
       const data = await response.json();
       const updatedComment = data.response;
-      
+
       if (updatedComment) {
         // If the status is 'deleted', remove the comment element
         if (status === 'deleted') {
           commentElement.remove();
-          
+
           // If this was the last comment, show the "no comments" message
           if (this.comments.length === 1) {
             this.comments = [];
@@ -218,17 +218,9 @@ export class MehComments {
           }
         } else {
           // Update the comment in our local state
-          this.comments = this.comments.map(comment => 
+          this.comments = this.comments.map(comment =>
             comment.id === commentId ? updatedComment : comment
           );
-          
-          // Replace the comment element with the updated version
-          const parent = commentElement.parentNode;
-          if (parent) {
-            const newCommentElement = document.createElement('div');
-            newCommentElement.innerHTML = this.renderComment(updatedComment).toString();
-            parent.replaceChild(newCommentElement.firstChild, commentElement);
-          }
         }
       }
     } catch (error) {
