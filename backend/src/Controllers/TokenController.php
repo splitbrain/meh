@@ -36,7 +36,6 @@ class TokenController extends Controller
         // Create token with admin scope
         $payload = [
             'iat' => time(),
-            'exp' => time() + (60 * 60 * 24), // 24 hours
             'scopes' => ['admin']
         ];
 
@@ -44,7 +43,6 @@ class TokenController extends Controller
 
         return [
             'token' => $token,
-            'expires' => date('c', $payload['exp']),
             'scopes' => $payload['scopes']
         ];
     }

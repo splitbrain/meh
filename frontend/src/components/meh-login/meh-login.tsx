@@ -129,7 +129,7 @@ export class MehLogin {
     this.password = '';
     this.token = '';
     this.removeTokenFromStorage();
-    
+
     // Dispatch refresh event to update comments list after logout
     window.dispatchEvent(new CustomEvent('meh-refresh'));
   }
@@ -160,14 +160,14 @@ export class MehLogin {
       }
 
       // Successfully logged in
-      this.token = data.token;
+      this.token = data.response.token;
       this.isLoggedIn = true;
       this.showPasswordField = false;
       this.password = '';
 
       // Store the token in localStorage
       this.saveTokenToStorage(this.token);
-      
+
       // Dispatch refresh event to update comments list after login
       window.dispatchEvent(new CustomEvent('meh-refresh'));
     } catch (error) {
