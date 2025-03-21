@@ -141,7 +141,7 @@ export class MehForm {
       const headers: HeadersInit = {
         'Content-Type': 'application/json'
       };
-      
+
       // Add authorization header if token exists
       const token = getAuthToken();
       if (token) {
@@ -170,12 +170,12 @@ export class MehForm {
       );
 
       // Reset form on success
-      this.formElement.reset();
+      this.formElement.elements['text'].value = '';
       this.status = 'success';
 
       // Reload user data to update the form fields
       this.loadUserDataFromStorage();
-      
+
       // Dispatch refresh event to update comments list
       // Only dispatch immediately if user is logged in (has token)
       // Otherwise, the server will need to approve the comment first
