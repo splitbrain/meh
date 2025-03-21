@@ -264,10 +264,12 @@ export class MehForm {
             </div>
           )}
 
-          <div>
+          <div class="actions">
             <button type="submit" disabled={this.status === 'submitting'}>
               {this.status === 'submitting' ? this._('submittingButton') : this._('submitButton')}
             </button>
+
+            <slot></slot>
           </div>
         </form>
       </div>

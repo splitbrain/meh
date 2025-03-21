@@ -28,4 +28,11 @@ form {
   .success {
     color: var(--meh-success);
   }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    gap: var(--meh-spacing);
+    justify-content: space-between;
+  }
 }
