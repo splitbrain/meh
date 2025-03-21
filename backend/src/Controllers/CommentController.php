@@ -181,6 +181,7 @@ class CommentController extends Controller
 
         $mailer = new PHPMailer(true);
         $mailer->isSMTP();
+        $mailer->Debugoutput = $this->app->log();
         $mailer->Host       = $this->app->conf('smtp_host');
         $mailer->Port       = $this->app->conf('smtp_port');
         if($this->app->conf('smtp_encryption') == 'ssl') {
