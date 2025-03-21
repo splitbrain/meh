@@ -177,7 +177,11 @@ export class MehForm {
       this.loadUserDataFromStorage();
       
       // Dispatch refresh event to update comments list
-      window.dispatchEvent(new CustomEvent('meh-refresh'));
+      // Only dispatch immediately if user is logged in (has token)
+      // Otherwise, the server will need to approve the comment first
+      if (token) {
+        window.dispatchEvent(new CustomEvent('meh-refresh'));
+      }
     } catch (error) {
       console.error('Comment submission error:', error);
       this.errorMessage = error.message || 'Unknown error occurred';
