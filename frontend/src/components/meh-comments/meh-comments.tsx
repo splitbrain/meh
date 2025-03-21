@@ -47,6 +47,10 @@ export class MehComments {
     errorLoading: 'Error loading comments:',
     postedOn: 'Posted on',
     by: 'by',
+    approve: 'Approve',
+    reject: 'Reject',
+    delete: 'Delete',
+    edit: 'Edit',
   };
 
   // Translation manager instance
@@ -160,6 +164,39 @@ export class MehComments {
   }
 
   /**
+   * Check if the current user is an admin
+   */
+  private isAdmin(): boolean {
+    return !!getAuthToken();
+  }
+
+  /**
+   * Render admin actions for a comment
+   */
+  private renderAdminActions(comment: any) {
+    if (!this.isAdmin()) {
+      return null;
+    }
+
+    return (
+      <div class="admin-actions">
+        <a href="#" class="admin-action approve" title={this._('approve')}>
+          {this._('approve')}
+        </a>
+        <a href="#" class="admin-action reject" title={this._('reject')}>
+          {this._('reject')}
+        </a>
+        <a href="#" class="admin-action delete" title={this._('delete')}>
+          {this._('delete')}
+        </a>
+        <a href="#" class="admin-action edit" title={this._('edit')}>
+          {this._('edit')}
+        </a>
+      </div>
+    );
+  }
+
+  /**
    * Render a single comment
    */
   private renderComment(comment: any) {
@@ -183,6 +220,7 @@ export class MehComments {
           {this.formatRelativeTime(comment.created_at)}
         </time>
         <div class="comment-content" innerHTML={comment.html}></div>
+        {this.renderAdminActions(comment)}
       </li>
     );
   }

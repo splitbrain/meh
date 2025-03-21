@@ -4,5 +4,9 @@
   "loadingComments": "Kommentare werden geladen...",
   "errorLoading": "Fehler beim Laden der Kommentare:",
   "postedOn": "Gepostet am",
-  "by": "von"
+  "by": "von",
+  "approve": "Genehmigen",
+  "reject": "Ablehnen",
+  "delete": "Löschen",
+  "edit": "Bearbeiten"
 }
