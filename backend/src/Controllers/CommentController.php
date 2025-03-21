@@ -27,6 +27,14 @@ class CommentController extends Controller
             }
         }
 
+        // admin comments are immediately approved
+        try {
+            $this->app->checkScopes('admin');
+            $status = 'approved';
+        } catch (\Exception) {
+            $status = 'pending';
+        }
+
         $parsedown = new Parsedown();
         $parsedown->setSafeMode(true);
         $parsedown->setBreaksEnabled(true);
@@ -40,7 +48,7 @@ class CommentController extends Controller
             'text' => $data['text'],
             'html' => $html,
             'ip' => $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '',
-            'status' => 'pending', // New comments are pending by default
+            'status' => $status,
         ];
 
         return $this->app->db()->saveRecord('comments', $record);
