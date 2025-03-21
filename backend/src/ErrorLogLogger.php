@@ -46,6 +46,7 @@ class ErrorLogLogger extends AbstractLogger
 
         $message = "[$level] " . $this->interpolate((string)$message, $context);
         if (isset($context['exception']) && $context['exception'] instanceof \Exception) {
+            $message .= "\n" . get_class($context['exception']) . ': ' . $context['exception']->getMessage();
             $message .= "\n" . $context['exception']->getTraceAsString();
         }
 

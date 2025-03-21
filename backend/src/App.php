@@ -56,6 +56,12 @@ class App
             'mastodon_token' => $_ENV['MASTODON_TOKEN'] ?? '',
             'gravatar_fallback' => $_ENV['GRAVATAR_FALLBACK'] ?? 'initials',
             'gravatar_rating' => $_ENV['GRAVATAR_RATING'] ?? 'g',
+            'notify_email' => $_ENV['NOTIFY_EMAIL'] ?? '',
+            'smtp_host' => $_ENV['SMTP_HOST'] ?? 'localhost',
+            'smtp_port' => $_ENV['SMTP_PORT'] ?? 25,
+            'smtp_encryption' => $_ENV['SMTP_ENCRYPTION'] ?? '',
+            'smtp_user' => $_ENV['SMTP_USER'] ?? '',
+            'smtp_pass' => $_ENV['SMTP_PASS'] ?? '',
         ];
 
         // Override with any provided config

@@ -3,8 +3,10 @@
 namespace splitbrain\meh\Controllers;
 
 use Parsedown;
+use PHPMailer\PHPMailer\PHPMailer;
 use splitbrain\meh\Controller;
 use splitbrain\meh\HttpException;
+
 
 class CommentController extends Controller
 {
@@ -51,7 +53,9 @@ class CommentController extends Controller
             'status' => $status,
         ];
 
-        return $this->app->db()->saveRecord('comments', $record);
+        $result = $this->app->db()->saveRecord('comments', $record);
+        $this->sendNotification($result);
+        return $result;
     }
 
     /**
@@ -157,5 +161,59 @@ class CommentController extends Controller
             throw new HttpException('No such comment ID', 404);
         }
         return $rows;
+    }
+
+
+    /**
+     * Send a notification email about a new comment
+     *
+     * @param array $data The comment data
+     */
+    protected function sendNotification(array $data): void
+    {
+        if (!$this->app->conf('notify_email')) {
+            return;
+        }
+        if (!$this->app->conf('smtp_host')) {
+            return;
+        }
+
+        $mailer = new PHPMailer(true);
+        $mailer->isSMTP();
+        $mailer->Host       = $this->app->conf('smtp_host');
+        $mailer->Port       = $this->app->conf('smtp_port');
+        if($this->app->conf('smtp_encryption') == 'ssl') {
+            $mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        } elseif ($this->app->conf('smtp_encryption') == 'tls') {
+            $mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        }
+        if($this->app->conf('smtp_user')) {
+            $mailer->SMTPAuth   = true;
+            $mailer->Username   = $this->app->conf('smtp_user');
+            $mailer->Password   = $this->app->conf('smtp_password');
+        }
+
+        $mailer->addAddress($this->app->conf('notify_email'));
+        $mailer->setFrom($this->app->conf('notify_email'), 'Meh');
+
+        $mailer->isHTML(false);
+        $mailer->Subject = 'New Comment on ' . $data['post'];
+
+        $body = "A new comment was posted on your blog:\n\n";
+        $body .= $this->app->conf('site_url') . $data['post'] . "\n\n";
+        $body .= "Status: " . $data['status'] . "\n";
+        $body .= "Author: " . $data['author'] . "\n";
+        $body .= "E-Mail: " . $data['email'] . "\n";
+        $body .= "Website: " . $data['website'] . "\n\n";
+        $body .= $data['text'] . "\n\n";
+
+        $mailer->Body = $body;
+
+
+        try {
+            $mailer->send();
+        } catch (\Exception $e) {
+            $this->app->log()->error('Failed to send notification email', ['exception' => $e]);
+        }
     }
 }
