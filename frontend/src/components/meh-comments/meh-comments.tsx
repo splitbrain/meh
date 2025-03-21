@@ -281,7 +281,7 @@ export class MehComments {
   private renderComment(comment: any) {
     return (
       <li class={`comment status-${comment.status}`} key={comment.id}>
-        <img src={comment.avatar} alt="Avatar" class="avatar"/>
+        <img src={comment.avatar_url} alt="Avatar" class="avatar"/>
         <strong class="author">
           {comment.website ? (
             <a href={comment.website} target="_blank" rel="noopener noreferrer">

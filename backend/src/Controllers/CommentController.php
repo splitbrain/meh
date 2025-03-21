@@ -81,7 +81,7 @@ class CommentController extends Controller
             throw new HttpException('Comment not found', 404);
         }
 
-        return $record;
+        return $this->app->commentUtils()->addAvatarUrl($record);
     }
 
     /**
@@ -112,7 +112,8 @@ class CommentController extends Controller
 
         // merge with existing record
         $record = array_merge($record, $data);
-        return $this->app->db()->saveRecord('comments', $record);
+        $new = $this->app->db()->saveRecord('comments', $record);
+        return $this->app->commentUtils()->addAvatarUrl($new);
     }
 
     /**

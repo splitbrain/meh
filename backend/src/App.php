@@ -26,6 +26,11 @@ class App
     protected LoggerInterface $logger;
 
     /**
+     * @var CommentUtils|null Comment utilities
+     */
+    protected ?CommentUtils $commentUtils = null;
+
+    /**
      * Constructor
      *
      * @param LoggerInterface|null $logger Optional logger instance
@@ -92,6 +97,19 @@ class App
             $this->db = new SQLite($file, $schema);
         }
         return $this->db;
+    }
+
+    /**
+     * Get the comment utilities
+     *
+     * @return CommentUtils
+     */
+    public function commentUtils(): CommentUtils
+    {
+        if (!$this->commentUtils) {
+            $this->commentUtils = new CommentUtils($this);
+        }
+        return $this->commentUtils;
     }
 
     /**
