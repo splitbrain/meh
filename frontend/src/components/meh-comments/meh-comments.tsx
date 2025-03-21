@@ -51,6 +51,7 @@ export class MehComments {
     reject: 'Reject',
     delete: 'Delete',
     edit: 'Edit',
+    spam: 'Spam',
   };
 
   // Translation manager instance
@@ -171,6 +172,41 @@ export class MehComments {
   }
 
   /**
+   * Update a comment's status
+   *
+   * @param commentId The ID of the comment to update
+   * @param status The new status to set ('approved', 'pending', 'spam', 'deleted')
+   * @returns Promise that resolves when the status is updated
+   */
+  private async updateCommentStatus(commentId: number, status: string): Promise<void> {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await fetch(`${this.backend}/api/comment/${commentId}/${status}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || `Server error: ${response.status}`);
+      }
+
+      // Refresh comments list after successful status update
+      await this.fetchComments();
+    } catch (error) {
+      console.error(`Error updating comment status to ${status}:`, error);
+      // Could add error handling UI here
+    }
+  }
+
+  /**
    * Render admin actions for a comment
    */
   private renderAdminActions(comment: any) {
@@ -178,19 +214,42 @@ export class MehComments {
       return null;
     }
 
+    // Define handlers for each action
+    const handleApprove = (e: Event) => {
+      e.preventDefault();
+      this.updateCommentStatus(comment.id, 'approved');
+    };
+
+    const handleReject = (e: Event) => {
+      e.preventDefault();
+      this.updateCommentStatus(comment.id, 'pending');
+    };
+
+    const handleSpam = (e: Event) => {
+      e.preventDefault();
+      this.updateCommentStatus(comment.id, 'spam');
+    };
+
+    const handleDelete = (e: Event) => {
+      e.preventDefault();
+      if (confirm('Are you sure you want to delete this comment?')) {
+        this.updateCommentStatus(comment.id, 'deleted');
+      }
+    };
+
     return (
       <div class="admin-actions">
-        <a href="#" class="admin-action approve" title={this._('approve')}>
+        <a href="#" class="admin-action approve" title={this._('approve')} onClick={handleApprove}>
           {this._('approve')}
         </a>
-        <a href="#" class="admin-action reject" title={this._('reject')}>
+        <a href="#" class="admin-action reject" title={this._('reject')} onClick={handleReject}>
           {this._('reject')}
         </a>
-        <a href="#" class="admin-action delete" title={this._('delete')}>
+        <a href="#" class="admin-action delete" title={this._('delete')} onClick={handleDelete}>
           {this._('delete')}
         </a>
-        <a href="#" class="admin-action edit" title={this._('edit')}>
-          {this._('edit')}
+        <a href="#" class="admin-action spam" title={this._('spam')} onClick={handleSpam}>
+          Spam
         </a>
       </div>
     );
