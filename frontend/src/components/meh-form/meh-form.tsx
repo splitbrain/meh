@@ -42,6 +42,7 @@ export class MehForm {
   @State() author: string = '';
   @State() email: string = '';
   @State() website: string = '';
+  @State() commentStatus: 'pending' | 'approved' | null = null;
   // Reference to the form element
   private formElement?: HTMLFormElement;
 
@@ -61,7 +62,8 @@ export class MehForm {
     commentPlaceholder: 'Lorem Ipsum…',
     submitButton: 'Submit Comment',
     submittingButton: 'Submitting...',
-    successMessage: 'Thank you for your comment! It has been submitted for review.',
+    successMessagePending: 'Thank you for your comment! It has been submitted for review.',
+    successMessageApproved: 'Thank you for your comment! It has been published.',
     errorPrefix: 'An error occurred while submitting your comment:',
   };
 
@@ -162,6 +164,13 @@ export class MehForm {
         throw new Error(error.error?.message || `Server error: ${response.status}`);
       }
 
+      // Get the response data which includes the created comment
+      const data = await response.json();
+      const comment = data.response;
+
+      // Store the comment status
+      this.commentStatus = comment.status;
+
       // Save user data to localStorage
       this.saveUserDataToStorage(
         formValues.author as string,
@@ -176,10 +185,9 @@ export class MehForm {
       // Reload user data to update the form fields
       this.loadUserDataFromStorage();
 
-      // Dispatch refresh event to update comments list
-      // Only dispatch immediately if user is logged in (has token)
-      // Otherwise, the server will need to approve the comment first
-      if (token) {
+      // Dispatch refresh event to update comments list if the comment was approved
+      // or if the user is an admin (has token)
+      if (this.commentStatus === 'approved') {
         window.dispatchEvent(new CustomEvent('meh-refresh'));
       }
     } catch (error) {
@@ -244,7 +252,9 @@ export class MehForm {
 
           {this.status === 'success' && (
             <div class="success">
-              {this._('successMessage')}
+              {this.commentStatus === 'approved'
+                ? this._('successMessageApproved')
+                : this._('successMessagePending')}
             </div>
           )}
 
