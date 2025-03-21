@@ -22,10 +22,28 @@ class CommentListController extends Controller
             throw new HttpException('Post path is required', 400);
         }
 
-        $comments = $this->app->db()->queryAll(
-            'SELECT * FROM comments WHERE post = ? AND status = ? ORDER BY created_at ASC',
-            [$postPath, 'approved']
-        );
+        // Check if admin scope is present
+        $isAdmin = false;
+        try {
+            $this->app->checkScopes('admin');
+            $isAdmin = true;
+        } catch (\Exception $e) {
+            // Not an admin, will only show approved comments
+        }
+
+        if ($isAdmin) {
+            // Admin can see all comments regardless of status
+            $comments = $this->app->db()->queryAll(
+                'SELECT * FROM comments WHERE post = ? ORDER BY created_at ASC',
+                [$postPath]
+            );
+        } else {
+            // Regular users only see approved comments
+            $comments = $this->app->db()->queryAll(
+                'SELECT * FROM comments WHERE post = ? AND status = ? ORDER BY created_at ASC',
+                [$postPath, 'approved']
+            );
+        }
 
         $comments = array_map([$this, 'commentEnhance'], $comments);
 
