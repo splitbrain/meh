@@ -177,9 +177,10 @@ export class MehComments {
    *
    * @param commentId The ID of the comment to update
    * @param status The new status to set ('approved', 'pending', 'spam', 'deleted')
+   * @param commentElement The HTML element containing the comment to update
    * @returns Promise that resolves when the status is updated
    */
-  private async updateCommentStatus(commentId: number, status: string): Promise<void> {
+  private async updateCommentStatus(commentId: number, status: string, commentElement: HTMLElement): Promise<void> {
     try {
       const token = getAuthToken();
       if (!token) {
@@ -199,8 +200,37 @@ export class MehComments {
         throw new Error(error.error?.message || `Server error: ${response.status}`);
       }
 
-      // Refresh comments list after successful status update
-      await this.fetchComments();
+      // Get the updated comment data from the response
+      const data = await response.json();
+      const updatedComment = data.response;
+      
+      if (updatedComment) {
+        // If the status is 'deleted', remove the comment element
+        if (status === 'deleted') {
+          commentElement.remove();
+          
+          // If this was the last comment, show the "no comments" message
+          if (this.comments.length === 1) {
+            this.comments = [];
+          } else {
+            // Update the comments array by removing the deleted comment
+            this.comments = this.comments.filter(comment => comment.id !== commentId);
+          }
+        } else {
+          // Update the comment in our local state
+          this.comments = this.comments.map(comment => 
+            comment.id === commentId ? updatedComment : comment
+          );
+          
+          // Replace the comment element with the updated version
+          const parent = commentElement.parentNode;
+          if (parent) {
+            const newCommentElement = document.createElement('div');
+            newCommentElement.innerHTML = this.renderComment(updatedComment).toString();
+            parent.replaceChild(newCommentElement.firstChild, commentElement);
+          }
+        }
+      }
     } catch (error) {
       console.error(`Error updating comment status to ${status}:`, error);
       // Could add error handling UI here
@@ -218,23 +248,27 @@ export class MehComments {
     // Define handlers for each action
     const handleApprove = (e: Event) => {
       e.preventDefault();
-      this.updateCommentStatus(comment.id, 'approved');
+      const commentElement = (e.target as HTMLElement).closest('.comment') as HTMLElement;
+      this.updateCommentStatus(comment.id, 'approved', commentElement);
     };
 
     const handleReject = (e: Event) => {
       e.preventDefault();
-      this.updateCommentStatus(comment.id, 'pending');
+      const commentElement = (e.target as HTMLElement).closest('.comment') as HTMLElement;
+      this.updateCommentStatus(comment.id, 'pending', commentElement);
     };
 
     const handleSpam = (e: Event) => {
       e.preventDefault();
-      this.updateCommentStatus(comment.id, 'spam');
+      const commentElement = (e.target as HTMLElement).closest('.comment') as HTMLElement;
+      this.updateCommentStatus(comment.id, 'spam', commentElement);
     };
 
     const handleDelete = (e: Event) => {
       e.preventDefault();
       if (confirm(this._('confirmDelete'))) {
-        this.updateCommentStatus(comment.id, 'deleted');
+        const commentElement = (e.target as HTMLElement).closest('.comment') as HTMLElement;
+        this.updateCommentStatus(comment.id, 'deleted', commentElement);
       }
     };
 
