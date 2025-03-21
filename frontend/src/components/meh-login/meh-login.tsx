@@ -129,6 +129,9 @@ export class MehLogin {
     this.password = '';
     this.token = '';
     this.removeTokenFromStorage();
+    
+    // Dispatch refresh event to update comments list after logout
+    window.dispatchEvent(new CustomEvent('meh-refresh'));
   }
 
   private handleSubmit = async (event: Event) => {
@@ -164,6 +167,9 @@ export class MehLogin {
 
       // Store the token in localStorage
       this.saveTokenToStorage(this.token);
+      
+      // Dispatch refresh event to update comments list after login
+      window.dispatchEvent(new CustomEvent('meh-refresh'));
     } catch (error) {
       console.error('Login error:', error);
       this.error = error.message || 'Unknown error occurred';
