@@ -53,6 +53,18 @@
     > div.comment-content {
       grid-column: 2 / -1;
       grid-row: 3 / 4;
+    }
+
+    > div.admin-actions {
+      grid-column: 2 / -1;
+      grid-row: 4 / 5;
+
+      display: flex;
+      gap: var(--meh-spacing);
+      justify-content: flex-end;
+    }
+
+    > :last-child {
       border-bottom: 1px solid var(--border-color);
     }
   }

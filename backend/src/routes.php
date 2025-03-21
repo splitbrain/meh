@@ -17,12 +17,12 @@ function registerRoutes(AltoRouter $router): void
     $router->map('GET', '/comments', [CommentListController::class, 'bypost'], 'comments.bypost');
 
     $router->map('POST', '/comment', [CommentController::class, 'create'], 'comment.create');
-    $router->map('GET', '/comment/[i:id]', [CommentController::class, 'get'], 'comment.get');
+    $router->map('GET', '/comment/[i:id]', [CommentController::class, 'get', 'admin'], 'comment.get');
 
     // admin scope required
     $router->map('PATCH', '/comment/[i:id]', [CommentController::class, 'edit', 'admin'], 'comment.edit');
     $router->map('DELETE', '/comment/[i:id]', [CommentController::class, 'delete', 'admin'], 'comment.delete');
-    $router->map('PUT', '/comment/[i:id]/[s:status]', [CommentController::class, 'status', 'admin'], 'comment.status');
+    $router->map('PUT', '/comment/[i:id]/[a:status]', [CommentController::class, 'status', 'admin'], 'comment.status');
 
     // Authentication routes
     $router->map('POST', '/token/admin', [TokenController::class, 'admin'], 'token.admin');

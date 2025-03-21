@@ -32,10 +32,10 @@ class CommentListController extends Controller
         }
 
         if ($isAdmin) {
-            // Admin can see all comments regardless of status
+            // Admin can see all comments except deleted ones
             $comments = $this->app->db()->queryAll(
-                'SELECT * FROM comments WHERE post = ? ORDER BY created_at ASC',
-                [$postPath]
+                'SELECT * FROM comments WHERE post = ? AND status != ? ORDER BY created_at ASC',
+                [$postPath, 'deleted']
             );
         } else {
             // Regular users only see approved comments

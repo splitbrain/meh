@@ -52,6 +52,7 @@ export class MehComments {
     delete: 'Delete',
     edit: 'Edit',
     spam: 'Spam',
+    confirmDelete: 'Are you sure you want to delete this comment?',
   };
 
   // Translation manager instance
@@ -232,25 +233,31 @@ export class MehComments {
 
     const handleDelete = (e: Event) => {
       e.preventDefault();
-      if (confirm('Are you sure you want to delete this comment?')) {
+      if (confirm(this._('confirmDelete'))) {
         this.updateCommentStatus(comment.id, 'deleted');
       }
     };
 
     return (
       <div class="admin-actions">
-        <a href="#" class="admin-action approve" title={this._('approve')} onClick={handleApprove}>
-          {this._('approve')}
-        </a>
-        <a href="#" class="admin-action reject" title={this._('reject')} onClick={handleReject}>
-          {this._('reject')}
-        </a>
+        {comment.status !== 'approved' && (
+          <a href="#" class="admin-action approve" title={this._('approve')} onClick={handleApprove}>
+            {this._('approve')}
+          </a>
+        )}
+        {comment.status !== 'pending' && (
+          <a href="#" class="admin-action reject" title={this._('reject')} onClick={handleReject}>
+            {this._('reject')}
+          </a>
+        )}
         <a href="#" class="admin-action delete" title={this._('delete')} onClick={handleDelete}>
           {this._('delete')}
         </a>
-        <a href="#" class="admin-action spam" title={this._('spam')} onClick={handleSpam}>
-          Spam
-        </a>
+        {comment.status !== 'spam' && (
+          <a href="#" class="admin-action spam" title={this._('spam')} onClick={handleSpam}>
+            {this._('spam')}
+          </a>
+        )}
       </div>
     );
   }
