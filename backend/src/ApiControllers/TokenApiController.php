@@ -34,11 +34,11 @@ class TokenApiController extends ApiController
             throw new HttpException('Invalid password', 401);
         }
 
-        // Create token with admin scope
+        // Create token with admin and user scopes
         $payload = [
             'iat' => time(),
             'sub' => bin2hex(random_bytes(16)), // Add a random subject identifier
-            'scopes' => ['admin']
+            'scopes' => ['admin', 'user'] // Admin tokens should also have user scope
         ];
 
         $token = JWT::encode($payload, $this->app->conf('jwt_secret'), 'HS256');
