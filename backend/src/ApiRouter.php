@@ -24,7 +24,7 @@ class ApiRouter extends Router
 
         $this->alto->map('GET', '/[s:site]/comments', [CommentListApiController::class, 'bypost']);
 
-        $this->alto->map('POST', '/[s:site]/comment', [CommentApiController::class, 'create']);
+        $this->alto->map('POST', '/[s:site]/comment', [CommentApiController::class, 'create', 'user']);
         $this->alto->map('GET', '/[s:site]/comment/[i:id]', [CommentApiController::class, 'get', 'admin']);
 
         $this->alto->map('PATCH', '/[s:site]/comment/[i:id]', [CommentApiController::class, 'edit', 'admin']);
@@ -73,9 +73,9 @@ class ApiRouter extends Router
         // Get the controller and method
         [$controllerClass, $method, $scopes] = array_pad($match['target'], 3, null);
 
-        if ($scopes) {
-            // Check if the user has the required scopes
-            $app->checkScopes($scopes);
+        // Check if the user has the required scopes
+        if ($scopes && !$app->checkScopes($scopes)) {
+            throw new HttpException('Insufficient permissions', 403);
         }
 
         // Create controller instance and call the method

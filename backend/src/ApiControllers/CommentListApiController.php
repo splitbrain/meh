@@ -23,13 +23,7 @@ class CommentListApiController extends ApiController
         }
 
         // Check if admin scope is present
-        $isAdmin = false;
-        try {
-            $this->app->checkScopes('admin');
-            $isAdmin = true;
-        } catch (\Exception $e) {
-            // Not an admin, will only show approved comments
-        }
+        $isAdmin = $this->app->checkScopes('admin');
 
         if ($isAdmin) {
             // Admin can see all comments except deleted ones
@@ -45,9 +39,7 @@ class CommentListApiController extends ApiController
             );
         }
 
-        $comments = array_map([$this->app->commentUtils(), 'addAvatarUrl'], $comments);
-
-        return $comments;
+        return array_map([$this->app->commentUtils(), 'process'], $comments);
     }
 
 }

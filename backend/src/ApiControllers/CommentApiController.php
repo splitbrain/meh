@@ -5,6 +5,7 @@ namespace splitbrain\meh\ApiControllers;
 use Parsedown;
 use PHPMailer\PHPMailer\PHPMailer;
 use splitbrain\meh\ApiController;
+use splitbrain\meh\CommentUtils;
 use splitbrain\meh\HttpException;
 
 
@@ -29,25 +30,14 @@ class CommentApiController extends ApiController
             }
         }
 
-        // admin comments are immediately approved
-        try {
-            $this->app->checkScopes('admin');
-            $status = 'approved';
-        } catch (\Exception) {
-            $status = 'pending';
-        }
-
         $parsedown = new Parsedown();
         $parsedown->setSafeMode(true);
         $parsedown->setBreaksEnabled(true);
         $html = $parsedown->text($data['text']);
 
-        // Get the 'sub' from token payload if available
-        $user = null;
-        $tokenPayload = $this->app->getTokenPayload(false);
-        if ($tokenPayload && isset($tokenPayload->sub)) {
-            $user = $tokenPayload->sub;
-        }
+        // Get the 'sub' from token payload
+        $tokenPayload = $this->app->getTokenPayload();
+        $user = $tokenPayload->sub;
 
         $record = [
             'post' => $data['post'],
@@ -57,13 +47,15 @@ class CommentApiController extends ApiController
             'text' => $data['text'],
             'html' => $html,
             'ip' => $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '',
-            'status' => $status,
+            'status' => 'pending',
             'user' => $user,
         ];
 
+        $record['status'] = $this->app->commentUtils()->initialStatus($record, $this->app->checkScopes('admin'));
+
         $result = $this->app->db()->saveRecord('comments', $record);
         $this->sendNotification($result);
-        return $result;
+        return $this->app->commentUtils()->process($result);
     }
 
     /**
@@ -89,7 +81,7 @@ class CommentApiController extends ApiController
             throw new HttpException('Comment not found', 404);
         }
 
-        return $this->app->commentUtils()->addAvatarUrl($record);
+        return $this->app->commentUtils()->process($record);
     }
 
     /**
@@ -106,6 +98,8 @@ class CommentApiController extends ApiController
             throw new HttpException('Comment ID is required', 400);
         }
 
+        $data = $this->app->commentUtils()->dropUserID($data);
+
         $record = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $id);
 
         if (!$record) {
@@ -121,7 +115,7 @@ class CommentApiController extends ApiController
         // merge with existing record
         $record = array_merge($record, $data);
         $new = $this->app->db()->saveRecord('comments', $record);
-        return $this->app->commentUtils()->addAvatarUrl($new);
+        return $this->app->commentUtils()->process($new);
     }
 
     /**

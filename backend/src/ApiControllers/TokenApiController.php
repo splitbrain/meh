@@ -64,16 +64,19 @@ class TokenApiController extends ApiController
         ];
 
         // If there's a valid token, preserve its scope and subject
-        $existingPayload = $this->app->getTokenPayload(false);
-        if ($existingPayload) {
+        try {
+            $existingPayload = $this->app->getTokenPayload();
+
             // Preserve the existing scopes and subject
             if (isset($existingPayload->scopes)) {
                 $payload['scopes'] = $existingPayload->scopes;
             }
-            
+
             if (isset($existingPayload->sub)) {
                 $payload['sub'] = $existingPayload->sub;
             }
+        } catch (\Exception $ignored) {
+            // No valid token, issue a new one
         }
 
         $token = JWT::encode($payload, $this->app->conf('jwt_secret'), 'HS256');
