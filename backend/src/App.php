@@ -10,6 +10,9 @@ use splitbrain\phpsqlite\SQLite;
 
 class App
 {
+    /** @var string the site this app is running for */
+    protected string $site = 'meh';
+
     /**
      * @var SQLite|null Database connection
      */
@@ -33,10 +36,11 @@ class App
     /**
      * Constructor
      *
+     * @param string $site Site name
      * @param LoggerInterface|null $logger Optional logger instance
-     * @param array $config Optional configuration array to override environment variables
+     * @param bool $init If true, initialize a new database
      */
-    public function __construct(LoggerInterface|null $logger = null, array $config = [])
+    public function __construct(string $site = 'meh', LoggerInterface|null $logger = null, $init = false)
     {
         if ($logger instanceof LoggerInterface) {
             $this->logger = $logger;
@@ -44,43 +48,90 @@ class App
             $this->logger = new NullLogger();
         }
 
+        $this->config = array_merge(
+            $this->loadConfigFromDefaults(),
+            $this->loadConfigFromEnvironment(),
+        );
+
+        if(!preg_match('/^[a-z0-9_]+$/', $site)) {
+            throw new \Exception('Invalid site name');
+        }
+
+        $this->config['db_file'] = $this->config['db_path'] . '/' . $site . '.sqlite';
+
+        // unless init is set, we expect the database to exist, then load configs from it
+        if (!$init) {
+            if (!file_exists($this->config['db_file'])) {
+                throw new \Exception('No database for site found.');
+            }
+
+            $this->config = array_merge(
+                $this->config,
+                $this->loadConfigFromDatabase()
+            );
+        }
+    }
+
+    public function loadConfigFromDefaults(): array
+    {
+        return [
+            'db_path' => $this->resolveDBPath('data/'),
+            'jwt_secret' => '',
+            'admin_password' => '',
+            'site_url' => 'http://localhost:8000',
+            'mastodon_account' => '',
+            'mastodon_token' => '',
+            'gravatar_fallback' => 'initials',
+            'gravatar_rating' => 'g',
+            'notify_email' => '',
+            'smtp_host' => 'localhost',
+            'smtp_port' => 25,
+            'smtp_encryption' => '',
+            'smtp_user' => '',
+            'smtp_pass' => '',
+        ];
+    }
+
+    public function loadConfigFromDatabase(): array
+    {
+        $db = $this->db();
+        return $db->queryKeyValueList("SELECT conf, val FROM opt WHERE conf != 'dbversion'");
+    }
+
+    public function loadConfigFromEnvironment(): array
+    {
         // Load environment variables from .env file if it exists
         if (file_exists(__DIR__ . '/../../.env')) {
             $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
             $dotenv->load();
         }
 
-        // Set default configuration
-        $this->config = [
-            'db_path' => $_ENV['DB_PATH'] ?? 'data/meh.sqlite',
-            'db_schema' => __DIR__ . '/../db/',
-            'jwt_secret' => $_ENV['JWT_SECRET'] ?? 'not very secret', # FIXME we probably want a default only for testing
-            'admin_password' => $_ENV['ADMIN_PASSWORD'] ?? '',
-            'site_url' => $_ENV['SITE_URL'] ?? 'http://localhost:8000',
-            'mastodon_account' => $_ENV['MASTODON_ACCOUNT'] ?? '',
-            'mastodon_token' => $_ENV['MASTODON_TOKEN'] ?? '',
-            'gravatar_fallback' => $_ENV['GRAVATAR_FALLBACK'] ?? 'initials',
-            'gravatar_rating' => $_ENV['GRAVATAR_RATING'] ?? 'g',
-            'notify_email' => $_ENV['NOTIFY_EMAIL'] ?? '',
-            'smtp_host' => $_ENV['SMTP_HOST'] ?? 'localhost',
-            'smtp_port' => $_ENV['SMTP_PORT'] ?? 25,
-            'smtp_encryption' => $_ENV['SMTP_ENCRYPTION'] ?? '',
-            'smtp_user' => $_ENV['SMTP_USER'] ?? '',
-            'smtp_pass' => $_ENV['SMTP_PASS'] ?? '',
-        ];
-
-        // Override with any provided config
-        $this->config = array_merge($this->config, $config);
-
-        // Check if database path is absolute or relative
-        $dbdir = dirname((string)$this->config['db_path']);
-        if (!is_dir($dbdir) || !file_exists($dbdir)) {
-            $dbdir = __DIR__ . '/../../' . $dbdir;
-            if (is_dir($dbdir) && file_exists($dbdir)) {
-                $this->config['db_path'] = __DIR__ . '/../../' . $this->config['db_path'];
+        $config = [];
+        foreach (array_keys(self::loadConfigFromDefaults()) as $key) {
+            $ekey = strtoupper($key);
+            if (isset($_ENV[$ekey])) {
+                $config[$key] = $_ENV[$ekey];
             }
         }
 
+        if (isset($config['db_path'])) {
+            $config['db_path'] = $this->resolveDBPath($config['db_path']);
+        }
+
+        return $config;
+    }
+
+    public function resolveDBPath(string $path): string
+    {
+        $path = rtrim($path, '/');
+
+        if (!is_dir($path) || !file_exists($path)) {
+            $dbdir = __DIR__ . '/../../' . $path;
+            if (is_dir($dbdir) && file_exists($dbdir)) {
+                $path = $dbdir;
+            }
+        }
+        return $path;
     }
 
     /**
@@ -91,8 +142,8 @@ class App
     public function db(): SQLite
     {
         if (!$this->db) {
-            $file = $this->config['db_path'];
-            $schema = $this->config['db_schema'];
+            $file = $this->config['db_file'];
+            $schema = __DIR__ . '/../db/';
             $this->log()->info("Opening database $file");
             $this->db = new SQLite($file, $schema);
         }
