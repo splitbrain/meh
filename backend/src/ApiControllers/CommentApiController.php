@@ -1,14 +1,14 @@
 <?php
 
-namespace splitbrain\meh\Controllers;
+namespace splitbrain\meh\ApiControllers;
 
 use Parsedown;
 use PHPMailer\PHPMailer\PHPMailer;
-use splitbrain\meh\Controller;
+use splitbrain\meh\ApiController;
 use splitbrain\meh\HttpException;
 
 
-class CommentController extends Controller
+class CommentApiController extends ApiController
 {
 
 

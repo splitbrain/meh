@@ -1,12 +1,12 @@
 <?php
 
-namespace splitbrain\meh\Controllers;
+namespace splitbrain\meh\ApiControllers;
 
 use Firebase\JWT\JWT;
-use splitbrain\meh\Controller;
+use splitbrain\meh\ApiController;
 use splitbrain\meh\HttpException;
 
-class TokenController extends Controller
+class TokenApiController extends ApiController
 {
     /**
      * Issue a new admin token

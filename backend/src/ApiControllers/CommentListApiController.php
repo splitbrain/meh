@@ -1,11 +1,11 @@
 <?php
 
-namespace splitbrain\meh\Controllers;
+namespace splitbrain\meh\ApiControllers;
 
-use splitbrain\meh\Controller;
+use splitbrain\meh\ApiController;
 use splitbrain\meh\HttpException;
 
-class CommentListController extends Controller
+class CommentListApiController extends ApiController
 {
     /**
      * Get all comments for a post
