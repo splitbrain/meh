@@ -43,7 +43,8 @@ export class MehForm {
    */
   @Prop() customTranslations: string | Partial<typeof this.defaultTranslations> = '';
 
-  @State() status: 'loading' | 'idle' | 'submitting' | 'success' | 'error' = 'loading';
+  @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
+  @State() isLoading: boolean = true;
   @State() errorMessage: string = '';
   @State() author: string = '';
   @State() email: string = '';
@@ -164,8 +165,8 @@ export class MehForm {
     } catch (error) {
       console.error('Error refreshing token:', error);
     } finally {
-      // Set status to idle regardless of the result
-      this.status = 'idle';
+      // Set loading to false regardless of the result
+      this.isLoading = false;
     }
   }
 
@@ -249,17 +250,6 @@ export class MehForm {
   };
 
   render() {
-    // Show loading state while token is being refreshed
-    if (this.status === 'loading') {
-      return (
-        <div class="meh-form-container">
-          <slot name="styles"></slot>
-          <h3>{this._('formTitle')}</h3>
-          <div class="loading">Loading...</div>
-        </div>
-      );
-    }
-    
     return (
       <div class="meh-form-container">
         <slot name="styles"></slot>
@@ -327,7 +317,7 @@ export class MehForm {
           )}
 
           <div class="actions">
-            <button type="submit" disabled={this.status === 'submitting'}>
+            <button type="submit" disabled={this.status === 'submitting' || this.isLoading}>
               {this.status === 'submitting' ? this._('submittingButton') : this._('submitButton')}
             </button>
 
