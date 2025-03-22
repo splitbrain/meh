@@ -1,5 +1,5 @@
 import {Component, Prop, h, State} from '@stencil/core';
-import {TranslationManager, TOKEN_STORAGE_KEY} from '../../utils/utils';
+import {TranslationManager, TOKEN_STORAGE_KEY, isAdmin} from '../../utils/utils';
 
 @Component({
   tag: 'meh-login',
@@ -84,14 +84,15 @@ export class MehLogin {
   }
 
   /**
-   * Load the authentication token from localStorage
+   * Load the authentication token from localStorage and check admin status
    */
   private loadTokenFromStorage() {
     try {
       const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
       if (savedToken) {
         this.token = savedToken;
-        this.isLoggedIn = true;
+        // Use isAdmin() to check if the token has admin privileges
+        this.isLoggedIn = isAdmin();
       }
     } catch (error) {
       console.error('Failed to load token from localStorage:', error);
