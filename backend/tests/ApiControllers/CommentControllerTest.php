@@ -15,7 +15,7 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         parent::setUp();
         $this->controller = new CommentApiController($this->app, $this->createTokenPayload());
         $this->adminController = new CommentApiController(
-            $this->app, 
+            $this->app,
             $this->createTokenPayload(['admin', 'user'])
         );
     }
@@ -186,7 +186,7 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         $savedComment = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $commentId);
         $this->assertNull($savedComment);
     }
-    
+
     public function testCreateProcessesMarkdownToHtml(): void
     {
         $commentData = [
@@ -197,12 +197,12 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         ];
 
         $result = $this->controller->create($commentData);
-        
+
         // Check that HTML was properly generated from Markdown
         $this->assertStringContainsString('<h1>Heading</h1>', $result['html']);
         $this->assertStringContainsString('<p>Paragraph with <strong>bold</strong> text.</p>', $result['html']);
     }
-    
+
     public function testCreateSetsApprovedStatusForAdminComments(): void
     {
         $commentData = [
@@ -214,36 +214,31 @@ class CommentControllerTest extends AbstractApiControllerTestCase
 
         // Create comment as admin
         $result = $this->adminController->create($commentData);
-        
+
         // Check that status is approved
         $this->assertEquals('approved', $result['status']);
-        
+
         // Verify in database
         $savedComment = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $result['id']);
         $this->assertEquals('approved', $savedComment['status']);
     }
-    
+
     public function testCreateEnforcesRateLimiting(): void
     {
         // Create a specific user token with a recent timestamp
         // (90 seconds ago, which is valid for posting)
         $specificUser = $this->createTokenPayload(['user'], -90, 'rate-limited-user');
         $userController = new CommentApiController($this->app, $specificUser);
-        
-        // Create a comment with 'pending' status
-        $this->app->db()->exec(
-            'INSERT INTO comments (post, author, text, status, user, created_at) 
-             VALUES (?, ?, ?, ?, ?, ?)',
-            [
-                'test-post',
-                'Test Author',
-                'First comment',
-                'pending',
-                'rate-limited-user',
-                date('Y-m-d H:i:s')
-            ]
-        );
-        
+
+        // Try to post another comment - should fail due to pending comment limit
+        $commentData = [
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'email' => 'test@example.com',
+            'text' => 'First comment'
+        ];
+        $userController->create($commentData);
+
         // Try to post another comment - should fail due to pending comment limit
         $commentData = [
             'post' => 'test-post',
@@ -251,7 +246,7 @@ class CommentControllerTest extends AbstractApiControllerTestCase
             'email' => 'test@example.com',
             'text' => 'Second comment'
         ];
-        
+
         $this->expectException(HttpException::class);
         $this->expectExceptionMessage('{pending} Your previous comment is still pending approval');
         $userController->create($commentData);
