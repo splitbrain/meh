@@ -56,6 +56,20 @@ class ApiRouter extends Router
             throw new HttpException('Invalid site specified', 404);
         }
 
+        if ($app->conf('env') == 'dev') {
+            // Allow CORS for all origins in dev mode
+            header('Access-Control-Allow-Origin: *');
+        } else {
+            // Add CORS for site domain only
+            header('Access-Control-Allow-Origin: ' . $app->conf('site_url'));
+            header('Vary: Origin');
+
+            // check origin header
+            if (empty($_SERVER['HTTP_ORIGIN']) || $_SERVER['HTTP_ORIGIN'] !== $app->conf('site_url')) {
+                throw new HttpException('Invalid origin', 403);
+            }
+        }
+
         // Parse JSON body for non-GET requests
         $data = [];
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -74,13 +88,13 @@ class ApiRouter extends Router
 
         // Get the controller and method
         [$controllerClass, $method, $scopes] = array_pad($match['target'], 3, null);
-        if(!is_a($controllerClass, ApiController::class, true)) {
+        if (!is_a($controllerClass, ApiController::class, true)) {
             throw new HttpException('Invalid controller', 500);
         }
 
         // Validate the token if any
         try {
-            $tokenPayload = $this->getTokenPayload($this->app->conf('jwt_secret'));
+            $tokenPayload = $this->getTokenPayload($app->conf('jwt_secret'));
         } catch (HttpException $e) {
             if ($scopes) {
                 throw $e;

@@ -25,7 +25,8 @@ class FileRouter extends Router
 
     protected function onPreflight(): void
     {
-        // TODO: Implement onPreflight() method.
+        // Set CORS for all origins
+        header('Access-Control-Allow-Origin: *');
     }
 
     protected function onMatch(array $match): void

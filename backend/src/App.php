@@ -89,6 +89,7 @@ class App
             'smtp_encryption' => '',
             'smtp_user' => '',
             'smtp_pass' => '',
+            'env' => 'prod',
         ];
     }
 
