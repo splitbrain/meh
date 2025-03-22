@@ -8,11 +8,16 @@ use splitbrain\meh\HttpException;
 class CommentControllerTest extends AbstractApiControllerTestCase
 {
     private CommentApiController $controller;
+    private CommentApiController $adminController;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->controller = new CommentApiController($this->app, $this->createTokenPayload());
+        $this->adminController = new CommentApiController(
+            $this->app, 
+            $this->createTokenPayload(['admin', 'user'])
+        );
     }
 
 
@@ -180,5 +185,87 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         // Verify the comment was actually deleted from the database
         $savedComment = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $commentId);
         $this->assertNull($savedComment);
+    }
+    
+    public function testCreateProcessesMarkdownToHtml(): void
+    {
+        $commentData = [
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'email' => 'test@example.com',
+            'text' => "# Heading\n\nParagraph with **bold** text."
+        ];
+
+        $result = $this->controller->create($commentData);
+        
+        // Check that HTML was properly generated from Markdown
+        $this->assertStringContainsString('<h1>Heading</h1>', $result['html']);
+        $this->assertStringContainsString('<p>Paragraph with <strong>bold</strong> text.</p>', $result['html']);
+    }
+    
+    public function testCreateSetsApprovedStatusForAdminComments(): void
+    {
+        // Configure auto-approval for admins
+        $_ENV['ADMIN_AUTO_APPROVE'] = 'true';
+        
+        $commentData = [
+            'post' => 'test-post',
+            'author' => 'Admin Author',
+            'email' => 'admin@example.com',
+            'text' => 'This is an admin comment'
+        ];
+
+        // Create comment as admin
+        $result = $this->adminController->create($commentData);
+        
+        // Check that status is approved
+        $this->assertEquals('approved', $result['status']);
+        
+        // Verify in database
+        $savedComment = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $result['id']);
+        $this->assertEquals('approved', $savedComment['status']);
+    }
+    
+    public function testCreateEnforcesRateLimiting(): void
+    {
+        // Configure rate limiting
+        $_ENV['COMMENT_LIMIT'] = '2';
+        $_ENV['COMMENT_LIMIT_PERIOD'] = '3600'; // 1 hour
+        
+        // Create a specific user token
+        $specificUser = $this->createTokenPayload(['user'], -90, 'rate-limited-user');
+        $userController = new CommentApiController($this->app, $specificUser);
+        
+        // Post first comment - should succeed
+        $commentData1 = [
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'email' => 'test@example.com',
+            'text' => 'First comment'
+        ];
+        $result1 = $userController->create($commentData1);
+        $this->assertArrayHasKey('id', $result1);
+        
+        // Post second comment - should succeed
+        $commentData2 = [
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'email' => 'test@example.com',
+            'text' => 'Second comment'
+        ];
+        $result2 = $userController->create($commentData2);
+        $this->assertArrayHasKey('id', $result2);
+        
+        // Post third comment - should fail due to rate limit
+        $commentData3 = [
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'email' => 'test@example.com',
+            'text' => 'Third comment'
+        ];
+        
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('Rate limit exceeded');
+        $userController->create($commentData3);
     }
 }
