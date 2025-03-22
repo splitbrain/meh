@@ -32,6 +32,7 @@ class ApiRouter extends Router
         $this->alto->map('PUT', '/[s:site]/comment/[i:id]/[s:status]', [CommentApiController::class, 'status', 'admin']);
 
         $this->alto->map('POST', '/[s:site]/token/admin', [TokenApiController::class, 'admin']);
+        $this->alto->map('POST', '/[s:site]/token/refresh', [TokenApiController::class, 'refresh']);
     }
 
     /** @inheritdoc */
