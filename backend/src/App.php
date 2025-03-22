@@ -196,6 +196,37 @@ class App
     }
 
     /**
+     * Get the token payload from the Authorization header
+     *
+     * @param bool $throwOnError Whether to throw an exception if the token is invalid
+     * @return object|null The token payload or null if no valid token
+     * @throws HttpException If the token is invalid and $throwOnError is true
+     */
+    public function getTokenPayload(bool $throwOnError = true): ?object
+    {
+        // get bearer token
+        $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        if (!preg_match('/^Bearer (.+)$/', (string)$token, $matches)) {
+            if ($throwOnError) {
+                throw new HttpException('No valid token given', 401);
+            }
+            return null;
+        }
+        
+        $token = $matches[1];
+
+        // decode token
+        try {
+            return JWT::decode($token, new Key($this->conf('jwt_secret'), 'HS256'));
+        } catch (\Exception $e) {
+            if ($throwOnError) {
+                throw new HttpException('Invalid token', 401, $e);
+            }
+            return null;
+        }
+    }
+
+    /**
      * Check if the user has the required scopes
      *
      * @param string|string[] $required list of or single required scope(s)
@@ -203,25 +234,16 @@ class App
      */
     public function checkScopes(array|string $required): void
     {
-        // get bearer token
-        $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        if (preg_match('/^Bearer (.+)$/', (string)$token, $matches)) {
-            $token = $matches[1];
-        } else {
-            throw new HttpException('No valid token given', 401);
+        $payload = $this->getTokenPayload();
+        
+        // Check if scopes property exists
+        if (!isset($payload->scopes)) {
+            throw new HttpException('Token missing scopes', 401);
         }
-
-        // get scopes from token
-        $jwt = new JWT();
-        try {
-            $scopes = $jwt->decode($token, new Key($this->conf('jwt_secret'), 'HS256'))->scopes;
-        } catch (\Exception $e) {
-            throw new HttpException('Invalid token', 401, $e);
-        }
-
+        
         // check if required scopes are present
         foreach ((array)$required as $scope) {
-            if (!in_array($scope, $scopes)) {
+            if (!in_array($scope, $payload->scopes)) {
                 throw new HttpException('Missing required scope', 403);
             }
         }

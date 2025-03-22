@@ -57,7 +57,6 @@ class TokenApiController extends ApiController
      */
     public function refresh(array $data): array
     {
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         $payload = [
             'iat' => time(),
             'sub' => bin2hex(random_bytes(16)),
@@ -65,22 +64,15 @@ class TokenApiController extends ApiController
         ];
 
         // If there's a valid token, preserve its scope and subject
-        if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-            try {
-                $jwt = $matches[1];
-                $decoded = JWT::decode($jwt, new Key($this->app->conf('jwt_secret'), 'HS256'));
-                
-                // Preserve the existing scopes and subject
-                if (isset($decoded->scopes)) {
-                    $payload['scopes'] = $decoded->scopes;
-                }
-                
-                if (isset($decoded->sub)) {
-                    $payload['sub'] = $decoded->sub;
-                }
-            } catch (\Exception $e) {
-                // If token is invalid, we'll just issue a new user token
-                // No need to throw an exception
+        $existingPayload = $this->app->getTokenPayload(false);
+        if ($existingPayload) {
+            // Preserve the existing scopes and subject
+            if (isset($existingPayload->scopes)) {
+                $payload['scopes'] = $existingPayload->scopes;
+            }
+            
+            if (isset($existingPayload->sub)) {
+                $payload['sub'] = $existingPayload->sub;
             }
         }
 
