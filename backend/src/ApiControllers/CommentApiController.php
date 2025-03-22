@@ -36,8 +36,7 @@ class CommentApiController extends ApiController
         $html = $parsedown->text($data['text']);
 
         // Get the 'sub' from token payload
-        $tokenPayload = $this->app->getTokenPayload();
-        $user = $tokenPayload->sub;
+        $user = $this->tokenPayload->sub;
 
         $record = [
             'post' => $data['post'],
@@ -52,10 +51,10 @@ class CommentApiController extends ApiController
         ];
 
         // check post limits
-        $this->app->commentUtils()->checkPostLimit($record, (int)$tokenPayload->iat);
+        $this->app->commentUtils()->checkPostLimit($record, (int)$this->tokenPayload->iat);
 
         // determine initial status
-        $record['status'] = $this->app->commentUtils()->initialStatus($record, $this->app->checkScopes('admin'));
+        $record['status'] = $this->app->commentUtils()->initialStatus($record, $this->checkScopes('admin'));
 
         $result = $this->app->db()->saveRecord('comments', $record);
         $this->sendNotification($result);

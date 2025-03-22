@@ -4,6 +4,7 @@ namespace splitbrain\meh\ApiControllers;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Random\RandomException;
 use splitbrain\meh\ApiController;
 use splitbrain\meh\HttpException;
 
@@ -15,6 +16,8 @@ class TokenApiController extends ApiController
      * @param array $data Request data containing password
      * @return array The token data
      * @throws HttpException If password is missing or invalid
+     * @throws RandomException If random bytes cannot be generated (should not happen)
+     *
      */
     public function admin(array $data): array
     {
@@ -54,6 +57,7 @@ class TokenApiController extends ApiController
      *
      * @param array $data Request data
      * @return array The new token data
+     * @throws RandomException If random bytes cannot be generated (should not happen)
      */
     public function refresh(array $data): array
     {
@@ -65,7 +69,7 @@ class TokenApiController extends ApiController
 
         // If there's a valid token, preserve its scope and subject
         try {
-            $existingPayload = $this->app->getTokenPayload();
+            $existingPayload = $this->tokenPayload;
 
             // Preserve the existing scopes and subject
             if (isset($existingPayload->scopes)) {

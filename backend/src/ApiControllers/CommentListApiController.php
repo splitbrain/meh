@@ -23,7 +23,7 @@ class CommentListApiController extends ApiController
         }
 
         // Check if admin scope is present
-        $isAdmin = $this->app->checkScopes('admin');
+        $isAdmin = $this->checkScopes('admin');
 
         if ($isAdmin) {
             // Admin can see all comments except deleted ones

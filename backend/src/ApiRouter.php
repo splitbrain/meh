@@ -2,6 +2,8 @@
 
 namespace splitbrain\meh;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use splitbrain\meh\ApiControllers\CommentApiController;
 use splitbrain\meh\ApiControllers\CommentListApiController;
 use splitbrain\meh\ApiControllers\TokenApiController;
@@ -72,14 +74,30 @@ class ApiRouter extends Router
 
         // Get the controller and method
         [$controllerClass, $method, $scopes] = array_pad($match['target'], 3, null);
+        if(!is_a($controllerClass, ApiController::class, true)) {
+            throw new HttpException('Invalid controller', 500);
+        }
+
+        // Validate the token if any
+        try {
+            $tokenPayload = $this->getTokenPayload($this->app->conf('jwt_secret'));
+        } catch (HttpException $e) {
+            if ($scopes) {
+                throw $e;
+            } else {
+                $tokenPayload = null;
+            }
+        }
+
+        // Create the controller instance
+        $controller = new $controllerClass($app, $tokenPayload);
 
         // Check if the user has the required scopes
-        if ($scopes && !$app->checkScopes($scopes)) {
+        if (!$controller->checkScopes($scopes)) {
             throw new HttpException('Insufficient permissions', 403);
         }
 
-        // Create controller instance and call the method
-        $controller = new $controllerClass($app);
+        // Call the method
         $result = $controller->$method($data);
 
         // Return the result wrapped in a response object
@@ -109,5 +127,29 @@ class ApiRouter extends Router
                 // FIXME add info on previous exception if any
             ]
         ], JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Get the token payload from the Authorization header
+     *
+     * @return object The token payload
+     * @throws HttpException If the token is invalid
+     */
+    public function getTokenPayload($secret): object
+    {
+        // get bearer token
+        $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        if (!preg_match('/^Bearer (.+)$/', (string)$token, $matches)) {
+            throw new HttpException('No valid token given', 401);
+        }
+
+        $token = $matches[1];
+
+        // decode token
+        try {
+            return JWT::decode($token, new Key($secret, 'HS256'));
+        } catch (\Exception $e) {
+            throw new HttpException('Invalid token', 401, $e);
+        }
     }
 }

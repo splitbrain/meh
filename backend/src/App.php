@@ -195,55 +195,7 @@ class App
         $this->logger = $logger;
     }
 
-    /**
-     * Get the token payload from the Authorization header
-     *
-     * @return object The token payload
-     * @throws HttpException If the token is invalid
-     */
-    public function getTokenPayload(): object
-    {
-        // get bearer token
-        $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        if (!preg_match('/^Bearer (.+)$/', (string)$token, $matches)) {
-            throw new HttpException('No valid token given', 401);
-        }
 
-        $token = $matches[1];
 
-        // decode token
-        try {
-            return JWT::decode($token, new Key($this->conf('jwt_secret'), 'HS256'));
-        } catch (\Exception $e) {
-            throw new HttpException('Invalid token', 401, $e);
-        }
-    }
 
-    /**
-     * Check if the user has the required scopes
-     *
-     * @param string|string[] $required list of or single required scope(s)
-     * @return bool true if all required scopes are present
-     */
-    public function checkScopes(array|string $required): bool
-    {
-        try {
-            $payload = $this->getTokenPayload();
-        } catch (HttpException $ignored) {
-            return false;
-        }
-
-        // Check if scopes property exists
-        if (!isset($payload->scopes)) {
-            return false;
-        }
-
-        // check if required scopes are present
-        foreach ((array)$required as $scope) {
-            if (!in_array($scope, $payload->scopes)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
