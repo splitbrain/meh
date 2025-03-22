@@ -42,6 +42,13 @@ class CommentApiController extends ApiController
         $parsedown->setBreaksEnabled(true);
         $html = $parsedown->text($data['text']);
 
+        // Get the 'sub' from token payload if available
+        $user = null;
+        $tokenPayload = $this->app->getTokenPayload(false);
+        if ($tokenPayload && isset($tokenPayload->sub)) {
+            $user = $tokenPayload->sub;
+        }
+
         $record = [
             'post' => $data['post'],
             'author' => $data['author'],
@@ -51,6 +58,7 @@ class CommentApiController extends ApiController
             'html' => $html,
             'ip' => $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '',
             'status' => $status,
+            'user' => $user,
         ];
 
         $result = $this->app->db()->saveRecord('comments', $record);
