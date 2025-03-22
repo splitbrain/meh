@@ -26,6 +26,12 @@ export class MehForm {
   @Prop() backend: string = '';
 
   /**
+   * The site identifier to use
+   * If not provided, defaults to 'meh'
+   */
+  @Prop() site: string = 'meh';
+
+  /**
    * The language code for translations
    * If not provided, defaults to 'en'
    */
@@ -150,7 +156,7 @@ export class MehForm {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${this.backend}/api/comment`, {
+      const response = await fetch(`${this.backend}/api/${this.site}/comment`, {
         method: 'POST',
         headers,
         body: JSON.stringify({

@@ -23,6 +23,10 @@ export namespace Components {
           * The post path to fetch comments for If not provided, defaults to the current page path
          */
         "post": string;
+        /**
+          * The site identifier to use If not provided, defaults to 'meh'
+         */
+        "site": string;
     }
     interface MehForm {
         /**
@@ -41,6 +45,10 @@ export namespace Components {
           * The post path to associate the comment with If not provided, defaults to the current page path
          */
         "post": string;
+        /**
+          * The site identifier to use If not provided, defaults to 'meh'
+         */
+        "site": string;
     }
     interface MehLogin {
         /**
@@ -55,6 +63,10 @@ export namespace Components {
           * The language code for translations If not provided, defaults to 'en'
          */
         "language": string;
+        /**
+          * The site identifier to use If not provided, defaults to 'meh'
+         */
+        "site": string;
     }
 }
 declare global {
@@ -100,6 +112,10 @@ declare namespace LocalJSX {
           * The post path to fetch comments for If not provided, defaults to the current page path
          */
         "post"?: string;
+        /**
+          * The site identifier to use If not provided, defaults to 'meh'
+         */
+        "site"?: string;
     }
     interface MehForm {
         /**
@@ -118,6 +134,10 @@ declare namespace LocalJSX {
           * The post path to associate the comment with If not provided, defaults to the current page path
          */
         "post"?: string;
+        /**
+          * The site identifier to use If not provided, defaults to 'meh'
+         */
+        "site"?: string;
     }
     interface MehLogin {
         /**
@@ -132,6 +152,10 @@ declare namespace LocalJSX {
           * The language code for translations If not provided, defaults to 'en'
          */
         "language"?: string;
+        /**
+          * The site identifier to use If not provided, defaults to 'meh'
+         */
+        "site"?: string;
     }
     interface IntrinsicElements {
         "meh-comments": MehComments;

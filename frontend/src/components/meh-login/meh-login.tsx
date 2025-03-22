@@ -18,6 +18,12 @@ export class MehLogin {
   @Prop() backend: string = '';
 
   /**
+   * The site identifier to use
+   * If not provided, defaults to 'meh'
+   */
+  @Prop() site: string = 'meh';
+
+  /**
    * The language code for translations
    * If not provided, defaults to 'en'
    */
@@ -145,7 +151,7 @@ export class MehLogin {
     this.error = '';
 
     try {
-      const response = await fetch(`${this.backend}/api/token/admin`, {
+      const response = await fetch(`${this.backend}/api/${this.site}/token/admin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

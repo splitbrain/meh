@@ -25,6 +25,12 @@ export class MehComments {
   @Prop() backend: string = '';
 
   /**
+   * The site identifier to use
+   * If not provided, defaults to 'meh'
+   */
+  @Prop() site: string = 'meh';
+
+  /**
    * The language code for translations
    * If not provided, defaults to 'en'
    */
@@ -117,7 +123,7 @@ export class MehComments {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${this.backend}/api/comments?post=${encodeURIComponent(this.post)}`, {
+      const response = await fetch(`${this.backend}/api/${this.site}/comments?post=${encodeURIComponent(this.post)}`, {
         headers
       });
 
@@ -186,7 +192,7 @@ export class MehComments {
         throw new Error('Authentication required');
       }
 
-      const response = await fetch(`${this.backend}/api/comment/${commentId}/${status}`, {
+      const response = await fetch(`${this.backend}/api/${this.site}/comment/${commentId}/${status}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
