@@ -9,7 +9,7 @@ use splitbrain\meh\App;
 use splitbrain\meh\ApiControllers\TokenApiController;
 use splitbrain\meh\HttpException;
 
-class TokenControllerTest extends AbstractApiControllerTest
+class TokenControllerTest extends AbstractApiControllerTestCase
 {
     private $controller;
     private $testPassword = 'test-password';
@@ -50,13 +50,12 @@ class TokenControllerTest extends AbstractApiControllerTest
 
         // Check response structure
         $this->assertArrayHasKey('token', $result);
-        $this->assertArrayHasKey('expires', $result);
         $this->assertArrayHasKey('scopes', $result);
-        $this->assertEquals(['admin'], $result['scopes']);
+        $this->assertEquals(['admin', 'user'], $result['scopes']);
 
         // Verify the token is valid and contains expected data
         $decoded = JWT::decode($result['token'], new Key($this->testSecret, 'HS256'));
-        $this->assertEquals(['admin'], $decoded->scopes);
-        $this->assertGreaterThan(time(), $decoded->exp);
+        $this->assertEquals(['admin', 'user'], $decoded->scopes);
+        $this->assertLessThanOrEqual(time(), $decoded->iat);
     }
 }

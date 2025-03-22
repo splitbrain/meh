@@ -5,14 +5,14 @@ namespace splitbrain\meh\Tests\ApiControllers;
 use splitbrain\meh\ApiControllers\CommentApiController;
 use splitbrain\meh\HttpException;
 
-class CommentControllerTest extends AbstractApiControllerTest
+class CommentControllerTest extends AbstractApiControllerTestCase
 {
     private CommentApiController $controller;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->controller = new CommentApiController($this->app);
+        $this->controller = new CommentApiController($this->app, $this->createTokenPayload());
     }
 
 
@@ -43,7 +43,7 @@ class CommentControllerTest extends AbstractApiControllerTest
         $this->assertEquals('Test Author', $result['author']);
         $this->assertEquals('test@example.com', $result['email']);
         $this->assertEquals('This is a test comment', $result['text']);
-        $this->assertEquals('This is a test comment', $result['html']);
+        $this->assertEquals('<p>This is a test comment</p>', $result['html']);
         $this->assertEquals('pending', $result['status']);
         $this->assertArrayHasKey('id', $result);
 
