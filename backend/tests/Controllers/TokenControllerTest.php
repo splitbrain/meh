@@ -6,7 +6,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use PHPUnit\Framework\TestCase;
 use splitbrain\meh\App;
-use splitbrain\meh\Controllers\TokenController;
+use splitbrain\meh\ApiControllers\TokenApiController;
 use splitbrain\meh\HttpException;
 
 class TokenControllerTest extends TestCase
@@ -23,9 +23,9 @@ class TokenControllerTest extends TestCase
             'admin_password' => $this->testPassword,
             'jwt_secret' => $this->testSecret
         ]);
-        
+
         // Create the controller with the test App
-        $this->controller = new TokenController($this->app);
+        $this->controller = new TokenApiController($this->app);
     }
 
     public function testAdminRequiresPassword(): void

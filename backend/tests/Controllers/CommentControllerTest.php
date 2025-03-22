@@ -4,7 +4,7 @@ namespace splitbrain\meh\Tests\Controllers;
 
 use PHPUnit\Framework\TestCase;
 use splitbrain\meh\App;
-use splitbrain\meh\Controllers\CommentController;
+use splitbrain\meh\ApiControllers\CommentApiController;
 use splitbrain\meh\HttpException;
 
 class CommentControllerTest extends TestCase
@@ -27,7 +27,7 @@ class CommentControllerTest extends TestCase
         $this->app->db()->migrate();
 
         // Create the controller with the real App
-        $this->controller = new CommentController($this->app);
+        $this->controller = new CommentApiController($this->app);
 
     }
 
