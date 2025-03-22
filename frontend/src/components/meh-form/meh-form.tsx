@@ -43,7 +43,7 @@ export class MehForm {
    */
   @Prop() customTranslations: string | Partial<typeof this.defaultTranslations> = '';
 
-  @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
+  @State() status: 'loading' | 'idle' | 'submitting' | 'success' | 'error' = 'loading';
   @State() errorMessage: string = '';
   @State() author: string = '';
   @State() email: string = '';
@@ -108,6 +108,9 @@ export class MehForm {
 
     // Load saved user data from localStorage
     this.loadUserDataFromStorage();
+    
+    // Refresh token before allowing form submission
+    await this.refreshToken();
   }
 
   private loadUserDataFromStorage() {
@@ -121,6 +124,48 @@ export class MehForm {
       }
     } catch (error) {
       console.error('Failed to load user data from localStorage:', error);
+    }
+  }
+  
+  /**
+   * Refresh the authentication token by calling the token/refresh endpoint
+   */
+  private async refreshToken(): Promise<void> {
+    try {
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization header if token exists
+      const token = getAuthToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch(`${this.backend}/api/${this.site}/token/refresh`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({})
+      });
+      
+      if (!response.ok) {
+        console.warn('Failed to refresh token:', response.status);
+      } else {
+        const data = await response.json();
+        if (data.response && data.response.token) {
+          // Store the new token
+          try {
+            localStorage.setItem(TOKEN_STORAGE_KEY, data.response.token);
+          } catch (error) {
+            console.error('Failed to save token to localStorage:', error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+    } finally {
+      // Set status to idle regardless of the result
+      this.status = 'idle';
     }
   }
 
@@ -204,6 +249,17 @@ export class MehForm {
   };
 
   render() {
+    // Show loading state while token is being refreshed
+    if (this.status === 'loading') {
+      return (
+        <div class="meh-form-container">
+          <slot name="styles"></slot>
+          <h3>{this._('formTitle')}</h3>
+          <div class="loading">Loading...</div>
+        </div>
+      );
+    }
+    
     return (
       <div class="meh-form-container">
         <slot name="styles"></slot>
