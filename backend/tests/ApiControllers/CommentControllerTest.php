@@ -1,57 +1,20 @@
 <?php
 
-namespace splitbrain\meh\Tests\Controllers;
+namespace splitbrain\meh\Tests\ApiControllers;
 
-use PHPUnit\Framework\TestCase;
-use splitbrain\meh\App;
 use splitbrain\meh\ApiControllers\CommentApiController;
 use splitbrain\meh\HttpException;
 
-class CommentControllerTest extends TestCase
+class CommentControllerTest extends AbstractApiControllerTest
 {
-    private $app;
-    private $controller;
-    private $tempDbFile;
+    private CommentApiController $controller;
 
     protected function setUp(): void
     {
-        // Create a temporary database file
-        $this->tempDbFile = tempnam(sys_get_temp_dir(), 'meh_test_');
-
-        // Initialize the App with a configuration that uses the temporary database
-        $this->app = new App([
-            'db_path' => $this->tempDbFile,
-        ]);
-
-        // initialize the database
-        $this->app->db()->migrate();
-
-        // Create the controller with the real App
+        parent::setUp();
         $this->controller = new CommentApiController($this->app);
-
     }
 
-    protected function tearDown(): void
-    {
-        // Close database connection
-        unset($this->app);
-
-        // Remove the temporary database file
-        if (file_exists($this->tempDbFile)) {
-            unlink($this->tempDbFile);
-        }
-
-        // Also remove the -shm and -wal files that SQLite might create
-        $shmFile = $this->tempDbFile . '-shm';
-        if (file_exists($shmFile)) {
-            unlink($shmFile);
-        }
-
-        $walFile = $this->tempDbFile . '-wal';
-        if (file_exists($walFile)) {
-            unlink($walFile);
-        }
-    }
 
     public function testCreateRequiresRequiredFields(): void
     {

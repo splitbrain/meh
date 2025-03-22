@@ -1,6 +1,6 @@
 <?php
 
-namespace splitbrain\meh\Tests\Controllers;
+namespace splitbrain\meh\Tests\ApiControllers;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -9,20 +9,18 @@ use splitbrain\meh\App;
 use splitbrain\meh\ApiControllers\TokenApiController;
 use splitbrain\meh\HttpException;
 
-class TokenControllerTest extends TestCase
+class TokenControllerTest extends AbstractApiControllerTest
 {
-    private $app;
     private $controller;
     private $testPassword = 'test-password';
     private $testSecret = 'test-secret';
 
     protected function setUp(): void
     {
-        // Initialize the App with test configuration
-        $this->app = new App([
-            'admin_password' => $this->testPassword,
-            'jwt_secret' => $this->testSecret
-        ]);
+        $_ENV['ADMIN_PASSWORD'] = password_hash($this->testPassword, PASSWORD_DEFAULT);
+        $_ENV['JWT_SECRET'] = $this->testSecret;
+
+        parent::setUp();
 
         // Create the controller with the test App
         $this->controller = new TokenApiController($this->app);
