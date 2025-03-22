@@ -51,6 +51,10 @@ class CommentApiController extends ApiController
             'user' => $user,
         ];
 
+        // check post limits
+        $this->app->commentUtils()->checkPostLimit($record, (int)$tokenPayload->iat);
+
+        // determine initial status
         $record['status'] = $this->app->commentUtils()->initialStatus($record, $this->app->checkScopes('admin'));
 
         $result = $this->app->db()->saveRecord('comments', $record);
@@ -184,17 +188,17 @@ class CommentApiController extends ApiController
         $mailer = new PHPMailer(true);
         $mailer->isSMTP();
         $mailer->Debugoutput = $this->app->log();
-        $mailer->Host       = $this->app->conf('smtp_host');
-        $mailer->Port       = $this->app->conf('smtp_port');
-        if($this->app->conf('smtp_encryption') == 'ssl') {
+        $mailer->Host = $this->app->conf('smtp_host');
+        $mailer->Port = $this->app->conf('smtp_port');
+        if ($this->app->conf('smtp_encryption') == 'ssl') {
             $mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         } elseif ($this->app->conf('smtp_encryption') == 'tls') {
             $mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         }
-        if($this->app->conf('smtp_user')) {
-            $mailer->SMTPAuth   = true;
-            $mailer->Username   = $this->app->conf('smtp_user');
-            $mailer->Password   = $this->app->conf('smtp_password');
+        if ($this->app->conf('smtp_user')) {
+            $mailer->SMTPAuth = true;
+            $mailer->Username = $this->app->conf('smtp_user');
+            $mailer->Password = $this->app->conf('smtp_password');
         }
 
         $mailer->addAddress($this->app->conf('notify_email'));
