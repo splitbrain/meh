@@ -97,7 +97,7 @@ class CliController extends PSR3CLIv3
         $db = $this->getDatabase();
         $db->migrate();
 
-        if(!$this->app->conf('jwt_secret')) {
+        if(!$this->app->conf('jwt_secret') && !$db->getOpt('jwt_secret')) {
             $this->info("Generating new JWT secret");
             $this->config('jwt_secret', bin2hex(random_bytes(16)));
         }
