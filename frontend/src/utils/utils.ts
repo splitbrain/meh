@@ -7,7 +7,7 @@ interface MehJwtPayload extends JwtPayload {
 /**
  * Storage key for the auth token
  */
-export const TOKEN_STORAGE_KEY = 'meh_admin_token';
+export const TOKEN_STORAGE_KEY = 'meh-token';
 
 /**
  * Get the authentication token from localStorage if available
@@ -51,7 +51,6 @@ export function isAdmin(): boolean {
  *
  * @param dateString - The date string to format
  * @param language - The language code for localization (e.g., 'en', 'de')
- * @param fallbackFormatter - Optional function to use if formatting fails
  * @returns A localized relative time string
  */
 export function formatRelativeTime(

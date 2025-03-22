@@ -1,5 +1,5 @@
 import {Component, Prop, h, State, Element} from '@stencil/core';
-import { TranslationManager, getAuthToken } from '../../utils/utils';
+import { TranslationManager, getAuthToken, TOKEN_STORAGE_KEY } from '../../utils/utils';
 
 @Component({
   tag: 'meh-form',
@@ -109,7 +109,7 @@ export class MehForm {
 
     // Load saved user data from localStorage
     this.loadUserDataFromStorage();
-    
+
     // Refresh token before allowing form submission
     await this.refreshToken();
   }
@@ -127,7 +127,7 @@ export class MehForm {
       console.error('Failed to load user data from localStorage:', error);
     }
   }
-  
+
   /**
    * Refresh the authentication token by calling the token/refresh endpoint
    */
@@ -136,19 +136,19 @@ export class MehForm {
       const headers: HeadersInit = {
         'Content-Type': 'application/json'
       };
-      
+
       // Add authorization header if token exists
       const token = getAuthToken();
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      
+
       const response = await fetch(`${this.backend}/api/${this.site}/token/refresh`, {
         method: 'POST',
         headers,
         body: JSON.stringify({})
       });
-      
+
       if (!response.ok) {
         console.warn('Failed to refresh token:', response.status);
       } else {

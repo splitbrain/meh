@@ -1,5 +1,5 @@
 import {Component, Prop, h, State, Element} from '@stencil/core';
-import {TranslationManager, formatRelativeTime, getAuthToken} from '../../utils/utils';
+import {TranslationManager, formatRelativeTime, getAuthToken, isAdmin} from '../../utils/utils';
 
 @Component({
   tag: 'meh-comments',
@@ -172,13 +172,6 @@ export class MehComments {
   }
 
   /**
-   * Check if the current user is an admin
-   */
-  private isAdmin(): boolean {
-    return !!getAuthToken();
-  }
-
-  /**
    * Update a comment's status
    *
    * @param commentId The ID of the comment to update
@@ -230,7 +223,7 @@ export class MehComments {
    * Render admin actions for a comment
    */
   private renderAdminActions(comment: any) {
-    if (!this.isAdmin()) {
+    if (!isAdmin()) {
       return null;
     }
 
