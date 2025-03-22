@@ -145,8 +145,7 @@ class App
         if (!$this->db) {
             $file = $this->config['db_file'];
             $schema = __DIR__ . '/../db/';
-            $this->log()->info("Opening database $file");
-            $this->db = new SQLite($file, $schema);
+            $this->db = new SQLite($file, $schema, $this->log());
         }
         return $this->db;
     }

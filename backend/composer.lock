@@ -1031,16 +1031,16 @@
         },
         {
             "name": "splitbrain/php-sqlite",
-            "version": "1.0.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/splitbrain/php-sqlite.git",
-                "reference": "f90bc5821c652a5545a9842c73ec79afdf5965d0"
+                "reference": "6eda1bdb56cf34bdcdcf785a457228d9c417868a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/splitbrain/php-sqlite/zipball/f90bc5821c652a5545a9842c73ec79afdf5965d0",
-                "reference": "f90bc5821c652a5545a9842c73ec79afdf5965d0",
+                "url": "https://api.github.com/repos/splitbrain/php-sqlite/zipball/6eda1bdb56cf34bdcdcf785a457228d9c417868a",
+                "reference": "6eda1bdb56cf34bdcdcf785a457228d9c417868a",
                 "shasum": ""
             },
             "require": {
@@ -1070,9 +1070,9 @@
             "description": "A simple wrapper around pdo-sqlite with basic migration support and a few helper utils",
             "support": {
                 "issues": "https://github.com/splitbrain/php-sqlite/issues",
-                "source": "https://github.com/splitbrain/php-sqlite/tree/1.0.0"
+                "source": "https://github.com/splitbrain/php-sqlite/tree/1.1.1"
             },
-            "time": "2025-03-15T20:18:07+00:00"
+            "time": "2025-03-22T20:57:13+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
