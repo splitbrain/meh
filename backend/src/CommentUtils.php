@@ -60,8 +60,8 @@ class CommentUtils
      */
     public function dropUserID(array $comment): array
     {
-        if (isset($data['user'])) {
-            unset($data['user']);
+        if (isset($comment['user'])) {
+            unset($comment['user']);
         }
         return $comment;
     }

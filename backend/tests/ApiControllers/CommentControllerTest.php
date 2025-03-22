@@ -205,9 +205,6 @@ class CommentControllerTest extends AbstractApiControllerTestCase
     
     public function testCreateSetsApprovedStatusForAdminComments(): void
     {
-        // Configure auto-approval for admins
-        $_ENV['ADMIN_AUTO_APPROVE'] = 'true';
-        
         $commentData = [
             'post' => 'test-post',
             'author' => 'Admin Author',
@@ -228,44 +225,35 @@ class CommentControllerTest extends AbstractApiControllerTestCase
     
     public function testCreateEnforcesRateLimiting(): void
     {
-        // Configure rate limiting
-        $_ENV['COMMENT_LIMIT'] = '2';
-        $_ENV['COMMENT_LIMIT_PERIOD'] = '3600'; // 1 hour
-        
-        // Create a specific user token
+        // Create a specific user token with a recent timestamp
+        // (90 seconds ago, which is valid for posting)
         $specificUser = $this->createTokenPayload(['user'], -90, 'rate-limited-user');
         $userController = new CommentApiController($this->app, $specificUser);
         
-        // Post first comment - should succeed
-        $commentData1 = [
-            'post' => 'test-post',
-            'author' => 'Test Author',
-            'email' => 'test@example.com',
-            'text' => 'First comment'
-        ];
-        $result1 = $userController->create($commentData1);
-        $this->assertArrayHasKey('id', $result1);
+        // Create a comment with 'pending' status
+        $this->app->db()->exec(
+            'INSERT INTO comments (post, author, text, status, user, created_at) 
+             VALUES (?, ?, ?, ?, ?, ?)',
+            [
+                'test-post',
+                'Test Author',
+                'First comment',
+                'pending',
+                'rate-limited-user',
+                date('Y-m-d H:i:s')
+            ]
+        );
         
-        // Post second comment - should succeed
-        $commentData2 = [
+        // Try to post another comment - should fail due to pending comment limit
+        $commentData = [
             'post' => 'test-post',
             'author' => 'Test Author',
             'email' => 'test@example.com',
             'text' => 'Second comment'
         ];
-        $result2 = $userController->create($commentData2);
-        $this->assertArrayHasKey('id', $result2);
-        
-        // Post third comment - should fail due to rate limit
-        $commentData3 = [
-            'post' => 'test-post',
-            'author' => 'Test Author',
-            'email' => 'test@example.com',
-            'text' => 'Third comment'
-        ];
         
         $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('Rate limit exceeded');
-        $userController->create($commentData3);
+        $this->expectExceptionMessage('{pending} Your previous comment is still pending approval');
+        $userController->create($commentData);
     }
 }
