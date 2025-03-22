@@ -1,4 +1,9 @@
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode, JwtPayload } from "jwt-decode"
+
+// Define a custom interface that extends JwtPayload to include scopes
+interface MehJwtPayload extends JwtPayload {
+  scopes?: string[];
+}
 /**
  * Storage key for the auth token
  */
@@ -28,7 +33,7 @@ export function isAdmin(): boolean {
     const token = getAuthToken();
     if (!token) return false;
 
-    const decoded = jwtDecode(token);
+    const decoded = jwtDecode<MehJwtPayload>(token);
 
     // Check if the token has the admin scope
     return decoded &&
