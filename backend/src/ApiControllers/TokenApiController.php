@@ -36,6 +36,7 @@ class TokenApiController extends ApiController
         // Create token with admin scope
         $payload = [
             'iat' => time(),
+            'sub' => bin2hex(random_bytes(16)), // Add a random subject identifier
             'scopes' => ['admin']
         ];
 
