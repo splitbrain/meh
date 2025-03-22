@@ -18,6 +18,8 @@ export function getAuthToken(): string | null {
   }
 }
 
+import jwtDecode from 'jwt-decode';
+
 /**
  * Check if the current user has admin privileges
  * 
@@ -28,8 +30,6 @@ export function isAdmin(): boolean {
     const token = getAuthToken();
     if (!token) return false;
     
-    // Import is done dynamically to avoid issues with SSR
-    const jwtDecode = require('jwt-decode');
     const decoded = jwtDecode(token);
     
     // Check if the token has the admin scope
