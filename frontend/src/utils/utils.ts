@@ -19,6 +19,31 @@ export function getAuthToken(): string | null {
 }
 
 /**
+ * Check if the current user has admin privileges
+ * 
+ * @returns True if the user has admin scope, false otherwise
+ */
+export function isAdmin(): boolean {
+  try {
+    const token = getAuthToken();
+    if (!token) return false;
+    
+    // Import is done dynamically to avoid issues with SSR
+    const jwtDecode = require('jwt-decode');
+    const decoded = jwtDecode(token);
+    
+    // Check if the token has the admin scope
+    return decoded && 
+           decoded.scopes && 
+           Array.isArray(decoded.scopes) && 
+           decoded.scopes.includes('admin');
+  } catch (error) {
+    console.error('Failed to verify admin status:', error);
+    return false;
+  }
+}
+
+/**
  * Format a date as a relative time string (e.g., "5 days ago", "3 minutes ago")
  *
  * @param dateString - The date string to format
