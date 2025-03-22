@@ -1,4 +1,4 @@
-
+import { jwtDecode } from "jwt-decode"
 /**
  * Storage key for the auth token
  */
@@ -6,7 +6,7 @@ export const TOKEN_STORAGE_KEY = 'meh_admin_token';
 
 /**
  * Get the authentication token from localStorage if available
- * 
+ *
  * @returns The token string or null if not found
  */
 export function getAuthToken(): string | null {
@@ -18,24 +18,22 @@ export function getAuthToken(): string | null {
   }
 }
 
-import jwtDecode from 'jwt-decode';
-
 /**
  * Check if the current user has admin privileges
- * 
+ *
  * @returns True if the user has admin scope, false otherwise
  */
 export function isAdmin(): boolean {
   try {
     const token = getAuthToken();
     if (!token) return false;
-    
+
     const decoded = jwtDecode(token);
-    
+
     // Check if the token has the admin scope
-    return decoded && 
-           decoded.scopes && 
-           Array.isArray(decoded.scopes) && 
+    return decoded &&
+           decoded.scopes &&
+           Array.isArray(decoded.scopes) &&
            decoded.scopes.includes('admin');
   } catch (error) {
     console.error('Failed to verify admin status:', error);
