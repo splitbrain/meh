@@ -40,7 +40,6 @@ export class MehLogin {
   @State() loading: boolean = false;
   @State() error: string = '';
   @State() password: string = '';
-  @State() token: string = '';
 
 
   // Default English translations
@@ -79,46 +78,8 @@ export class MehLogin {
       this.translator.setTranslations(this.customTranslations);
     }
 
-    // Load token from localStorage if it exists
-    this.loadTokenFromStorage();
-  }
-
-  /**
-   * Load the authentication token from localStorage and check admin status
-   */
-  private loadTokenFromStorage() {
-    try {
-      const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
-      if (savedToken) {
-        this.token = savedToken;
-        // Use isAdmin() to check if the token has admin privileges
-        this.isLoggedIn = isAdmin();
-      }
-    } catch (error) {
-      console.error('Failed to load token from localStorage:', error);
-    }
-  }
-
-  /**
-   * Save the authentication token to localStorage
-   */
-  private saveTokenToStorage(token: string) {
-    try {
-      localStorage.setItem(TOKEN_STORAGE_KEY, token);
-    } catch (error) {
-      console.error('Failed to save token to localStorage:', error);
-    }
-  }
-
-  /**
-   * Remove the authentication token from localStorage
-   */
-  private removeTokenFromStorage() {
-    try {
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-    } catch (error) {
-      console.error('Failed to remove token from localStorage:', error);
-    }
+    // Check if user is already logged in as admin
+    this.isLoggedIn = isAdmin();
   }
 
   private togglePasswordField = () => {
@@ -131,12 +92,35 @@ export class MehLogin {
     this.password = input.value;
   }
 
-  private handleLogout = () => {
+  private handleLogout = async () => {
+    try {
+      // Remove the current token
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+      
+      // Get a new user token by calling refresh endpoint
+      const response = await fetch(`${this.backend}/api/${this.site}/token/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.response && data.response.token) {
+          // Store the new user token
+          localStorage.setItem(TOKEN_STORAGE_KEY, data.response.token);
+        }
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+    
+    // Update state
     this.isLoggedIn = false;
     this.password = '';
-    this.token = '';
-    this.removeTokenFromStorage();
-
+    
     // Dispatch refresh event to update comments list after logout
     window.dispatchEvent(new CustomEvent('meh-refresh'));
   }
@@ -166,14 +150,13 @@ export class MehLogin {
         throw new Error(data.error?.message || `Server error: ${response.status}`);
       }
 
-      // Successfully logged in
-      this.token = data.response.token;
+      // Store the token in localStorage
+      localStorage.setItem(TOKEN_STORAGE_KEY, data.response.token);
+      
+      // Update state
       this.isLoggedIn = true;
       this.showPasswordField = false;
       this.password = '';
-
-      // Store the token in localStorage
-      this.saveTokenToStorage(this.token);
 
       // Dispatch refresh event to update comments list after login
       window.dispatchEvent(new CustomEvent('meh-refresh'));
@@ -238,6 +221,9 @@ export class MehLogin {
 
 
   render() {
+    // Check admin status on each render to ensure it's current
+    this.isLoggedIn = isAdmin();
+    
     if (this.isLoggedIn) {
       return this.renderLogoutButton();
     } else if (this.showPasswordField) {
