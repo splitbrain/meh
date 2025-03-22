@@ -53,7 +53,7 @@ class App
             $this->loadConfigFromEnvironment(),
         );
 
-        if(!preg_match('/^[a-z0-9_]+$/', $site)) {
+        if(!preg_match('/^[a-z0-9_\-]+$/', $site)) {
             throw new \Exception('Invalid site name');
         }
 

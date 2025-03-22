@@ -29,7 +29,7 @@ class TokenController extends Controller
         }
 
         // Verify password
-        if (!hash_equals($adminPassword, $data['password'])) {
+        if (!password_verify($data['password'], $adminPassword)) {
             throw new HttpException('Invalid password', 401);
         }
 

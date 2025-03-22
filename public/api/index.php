@@ -2,17 +2,18 @@
 
 // Include routes file
 use splitbrain\meh\ErrorLogLogger;
+use splitbrain\meh\HttpException;
 
 require_once __DIR__ . '/../../backend/src/routes.php';
 
 // Load Composer's autoloader
 require_once __DIR__ . '/../../backend/vendor/autoload.php';
 
-// Create App instance with environment variables
-$app = new splitbrain\meh\App(new ErrorLogLogger('info'));
 
 // Create AltoRouter instance
 $router = new AltoRouter();
+
+$router->addMatchTypes(['s' => '[a-z0-9_\-]+']);
 
 // Set the base path if your app is not in the root directory
 $router->setBasePath('/api');
@@ -28,6 +29,15 @@ header('Content-Type: application/json');
 
 // Process the request
 if ($match) {
+    if(!isset($match['params']['site'])) {
+        throw new HttpException('No site specified', 400);
+    }
+    try {
+        $app = new splitbrain\meh\App($match['params']['site'], new ErrorLogLogger('info'));
+    } catch (\Exception $e) {
+        throw new HttpException('Invalid site specified', 404);
+    }
+
     // Parse JSON body for non-GET requests
     $data = [];
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -64,7 +74,7 @@ if ($match) {
     } catch (\Exception $e) {
         // Handle errors
         $code = 500;
-        if($e instanceof \splitbrain\meh\HttpException) {
+        if($e instanceof HttpException) {
             $code = $e->getCode();
         }
 
