@@ -3,6 +3,7 @@
 namespace splitbrain\meh\ApiControllers;
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use splitbrain\meh\ApiController;
 use splitbrain\meh\HttpException;
 
@@ -39,6 +40,49 @@ class TokenApiController extends ApiController
             'sub' => bin2hex(random_bytes(16)), // Add a random subject identifier
             'scopes' => ['admin']
         ];
+
+        $token = JWT::encode($payload, $this->app->conf('jwt_secret'), 'HS256');
+
+        return [
+            'token' => $token,
+            'scopes' => $payload['scopes']
+        ];
+    }
+
+    /**
+     * Refresh an existing token or issue a new user token
+     *
+     * @param array $data Request data
+     * @return array The new token data
+     */
+    public function refresh(array $data): array
+    {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        $payload = [
+            'iat' => time(),
+            'sub' => bin2hex(random_bytes(16)),
+            'scopes' => ['user']
+        ];
+
+        // If there's a valid token, preserve its scope and subject
+        if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+            try {
+                $jwt = $matches[1];
+                $decoded = JWT::decode($jwt, new Key($this->app->conf('jwt_secret'), 'HS256'));
+                
+                // Preserve the existing scopes and subject
+                if (isset($decoded->scopes)) {
+                    $payload['scopes'] = $decoded->scopes;
+                }
+                
+                if (isset($decoded->sub)) {
+                    $payload['sub'] = $decoded->sub;
+                }
+            } catch (\Exception $e) {
+                // If token is invalid, we'll just issue a new user token
+                // No need to throw an exception
+            }
+        }
 
         $token = JWT::encode($payload, $this->app->conf('jwt_secret'), 'HS256');
 
