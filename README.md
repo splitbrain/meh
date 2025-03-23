@@ -81,7 +81,7 @@ When Meh looks for a configuration value, it checks these sources in order:
 
 ### Managing Configuration
 
-Use the `meh config` command to view or modify configuration values:
+Use the `meh config` command to view or modify database configuration values:
 
 ```
 # View all configuration values and their sources
@@ -103,6 +103,59 @@ For multi-site setups, use the `--site` parameter:
 ./meh --site blog1 config site_url https://blog1.example.com
 ./meh --site blog2 config site_url https://blog2.example.com
 ```
+ 
+Configs set up via Environment always apply to all sites, while configs set up via the database are site-specific.
+
+## Mastodon Integration
+
+Meh includes built-in support for integrating with Mastodon, allowing you to import replies to your Mastodon posts as comments on your site.
+
+### Configuration
+
+To set up Mastodon integration:
+
+1. Configure your Mastodon account in your site settings:
+
+```
+./meh config mastodon_account "@yourusername@instance.social"
+```
+
+2. If you're using GoToSocial, even read access requires an API token. The easiest way to get one is to use the [Access Token Generator for Mastodon API](https://takahashim.github.io/mastodon-access-token/). You only need the `read` scope.
+
+```
+./meh config mastodon_token "your-api-token"
+```
+
+3. Set up a cron job to periodically fetch new posts and replies:
+
+```
+# Run every hour to check for new Mastodon posts and replies
+0 * * * * /path/to/meh mastodon
+```
+
+For multi-site setups you need to set up a `mastodon_account` config and cron job for each site. But you can have all sites use the same account.
+
+### How It Works
+
+The Mastodon integration:
+
+1. Fetches posts from your configured Mastodon account
+2. Identifies posts that link to your site
+3. Tracks these posts in the database
+4. Periodically checks for replies to these posts
+5. Imports replies as comments on the corresponding blog post
+
+This creates a seamless bridge between discussions on your blog and on the Fediverse.
+
+### Manual Import
+
+You can manually trigger the Mastodon import process at any time:
+
+```
+./meh mastodon
+```
+
+This is useful for testing or for an initial import of existing conversations.
 
 ## Components
 
