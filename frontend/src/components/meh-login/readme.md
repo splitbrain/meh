@@ -1,6 +1,36 @@
 # meh-login
 
+The `meh-login` component provides a simple login button for administrators to access moderation features. When clicked, it displays a password form that allows administrators to authenticate.
 
+## Basic Integration Example
+
+Here's how to add the login component to your website:
+
+```html
+<!-- Basic usage -->
+<meh-login
+  backend="https://comments.example.com"
+  site="myblog">
+</meh-login>
+```
+
+## Usage with meh-form
+
+Typically, you'll want to place the login button in the [meh-form](../meh-form/readme.md)'s action area:
+
+```html
+<meh-form
+  backend="https://comments.example.com"
+  post="/current-page"
+  site="myblog">
+  
+  <!-- The login button will appear next to the submit button -->
+  <meh-login
+    backend="https://comments.example.com"
+    site="myblog">
+  </meh-login>
+</meh-form>
+```
 
 <!-- Auto Generated Below -->
 
