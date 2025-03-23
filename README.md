@@ -18,6 +18,17 @@ A simple comment system for your static (or non-static) site.
 
 Point your Apache to the `public` directory and you're good to go.
 
+## Command Line Tool
+
+Meh comes with a command line tool that helps you manage your comment system. The `meh` command provides utilities for database management, configuration, and importing comments from other platforms.
+
+To see available commands:
+
+    ./meh
+
+
+
+
 ## Components
 
 * [meh-form](./frontend/src/components/meh-form/readme.md)
