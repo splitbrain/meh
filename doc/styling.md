@@ -1,0 +1,38 @@
+# Styling Meh Components
+
+Meh components are designed to be easily customizable through CSS variables. This allows you to match the components' appearance to your website's design without having to modify the component code.
+
+## Available CSS Variables
+
+All Meh components use a common set of CSS variables for consistent styling:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--meh-accent` | `#2196f3` | Primary accent color used for buttons, links, and highlights |
+| `--meh-background` | `#fefefe` | Background color for form elements and containers |
+| `--meh-foreground` | `#333` | Text color for content and labels |
+| `--meh-spacing` | `1em` | Base spacing unit used for margins and padding |
+| `--meh-border-radius` | `3px` | Border radius for buttons, inputs, and other elements |
+| `--meh-success` | `#4caf50` | Color used for success messages |
+| `--meh-error` | `#f44336` | Color used for error messages |
+
+> Note: Web components will inherit the surrounding's font and font-size settings by default. The components are designed to dynamically adjust to the surrounding font size. The Meh components will also dynamically adjust to the available width.
+
+
+## How to Customize
+
+You can override these variables using CSS to customize the appearance of all Meh components:
+
+```css
+/* In your website's CSS */
+:root {
+  --meh-accent: #ff6b6b;
+  --meh-background: #f8f9fa;
+  --meh-foreground: #212529;
+  --meh-spacing: 1.2rem;
+  --meh-border-radius: 4px;
+  --meh-success: #20c997;
+  --meh-error: #dc3545;
+}
+```
+
