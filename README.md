@@ -38,8 +38,5 @@ You can then use `http://localhost:8000/` as the base URL for all components.
 
 ## Client Setup and Usage (on your blog)
 
-
+* [Component Setup](doc/components.md)
 * [Comment Moderation](doc/moderation.md)
-* [meh-form](./frontend/src/components/meh-form/readme.md)
-* [meh-comments](./frontend/src/components/meh-comments/readme.md)
-* [meh-login](./frontend/src/components/meh-login/readme.md)
