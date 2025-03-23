@@ -64,9 +64,11 @@ class ApiRouter extends Router
             header('Access-Control-Allow-Origin: ' . $app->conf('site_url'));
             header('Vary: Origin');
 
-            // check origin header
-            if (empty($_SERVER['HTTP_ORIGIN']) || $_SERVER['HTTP_ORIGIN'] !== $app->conf('site_url')) {
-                throw new HttpException('Invalid origin', 403);
+            // check origin header on mutation requests
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'HEAD') {
+                if (($_SERVER['HTTP_ORIGIN'] ?? '') !== $app->conf('site_url')) {
+                    throw new HttpException('Invalid origin ' . ($_SERVER['HTTP_ORIGIN'] ?? ''), 403);
+                }
             }
         }
 
