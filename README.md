@@ -23,7 +23,7 @@ You can use this to get a development environment up and running quickly. This i
 
 You can then use `http://localhost:8000/` as the base URL for all components.
 
-## Server
+## Server Setup
 
 
 * [Command Line Tool](doc/cli.md)
@@ -36,7 +36,7 @@ You can then use `http://localhost:8000/` as the base URL for all components.
 * [Importing from Disqus](doc/disqus.md)
 
 
-## Client (your blog)
+## Client Setup (your blog)
 
 * [meh-form](./frontend/src/components/meh-form/readme.md)
 * [meh-comments](./frontend/src/components/meh-comments/readme.md)
