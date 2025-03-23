@@ -21,7 +21,7 @@ Typically, you'll want to place the login button in the [meh-form](../meh-form/r
 ```html
 <meh-form
   backend="https://comments.example.com"
-  post="/current-page"
+  post="/blog/2023/my-awesome-post"
   site="myblog">
   
   <!-- The login button will appear next to the submit button -->

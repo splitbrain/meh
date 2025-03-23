@@ -2,8 +2,20 @@
 
 The `meh-form` component provides the comment submission form for your website. It allows visitors to leave comments on your content with support for name, email, website, and comment text fields.
 
+## Basic Integration Example
 
+Here's how to add the comment form to your website:
 
+```html
+<!-- Basic usage -->
+<meh-form
+  backend="https://comments.example.com"
+  post="/blog/2023/my-awesome-post"
+  site="myblog">
+</meh-form>
+```
+
+Anything the component wraps around will be displayed as a child of the form. This is useful for adding the [admin login button](../meh-login/readme.md) or other actions.
 
 <!-- Auto Generated Below -->
 
