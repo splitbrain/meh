@@ -17,7 +17,7 @@ class TokenControllerTest extends AbstractApiControllerTestCase
 
     protected function setUp(): void
     {
-        $_ENV['ADMIN_PASSWORD'] = password_hash($this->testPassword, PASSWORD_DEFAULT);
+        $_ENV['ADMIN_PASSWORD'] = password_hash((string) $this->testPassword, PASSWORD_DEFAULT);
         $_ENV['JWT_SECRET'] = $this->testSecret;
 
         parent::setUp();

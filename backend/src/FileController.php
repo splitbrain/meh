@@ -38,19 +38,12 @@ class FileController
 
         $extension = pathinfo($file, PATHINFO_EXTENSION);
 
-        switch ($extension) {
-            case 'css':
-                header('Content-Type: text/css');
-                break;
-            case 'js':
-                header('Content-Type: application/javascript');
-                break;
-            case 'json':
-                header('Content-Type: application/json');
-                break;
-            default:
-                throw new HttpException('Invalid file type', 400);
-        }
+        match ($extension) {
+            'css' => header('Content-Type: text/css'),
+            'js' => header('Content-Type: application/javascript'),
+            'json' => header('Content-Type: application/json'),
+            default => throw new HttpException('Invalid file type', 400),
+        };
 
         readfile(self::DIST_PATH . '/' . $file);
     }
@@ -63,7 +56,7 @@ class FileController
     public function doc($file): void
     {
         // everything else should be already handle by the router match type
-        if(str_contains($file, '..') || str_starts_with($file, '.')) {
+        if(str_contains((string) $file, '..') || str_starts_with((string) $file, '.')) {
             throw new HttpException('Invalid file path', 400);
         }
 

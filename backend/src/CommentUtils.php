@@ -5,11 +5,8 @@ namespace splitbrain\meh;
 class CommentUtils
 {
 
-    protected App $app;
-
-    public function __construct(App $app)
+    public function __construct(protected App $app)
     {
-        $this->app = $app;
     }
 
     /**
@@ -33,16 +30,16 @@ class CommentUtils
     {
         if (empty($comment['avatar'])) {
             if (!empty($comment['email'])) {
-                $ident = strtolower(trim($comment['email']));
+                $ident = strtolower(trim((string) $comment['email']));
             } else {
-                $ident = strtolower(trim($comment['author']));
+                $ident = strtolower(trim((string) $comment['author']));
             }
 
             $gravatar = 'https://www.gravatar.com/avatar/' . md5($ident) . '?s=256';
-            $gravatar .= '&d=' . urlencode($this->app->conf('gravatar_fallback'));
+            $gravatar .= '&d=' . urlencode((string) $this->app->conf('gravatar_fallback'));
             $gravatar .= '&r=' . $this->app->conf('gravatar_rating');
             if ($this->app->conf('gravatar_fallback') == 'initials') {
-                $gravatar .= '&name=' . urlencode($comment['author']);
+                $gravatar .= '&name=' . urlencode((string) $comment['author']);
             }
 
             $comment['avatar_url'] = $gravatar;

@@ -72,15 +72,15 @@ class CommentListControllerTest extends AbstractApiControllerTestCase
     public function testBypostReturnsOnlyApprovedCommentsForRegularUsers(): void
     {
         $result = $this->controller->bypost(['post' => 'test-post']);
-        
+
         // Should only return approved comments
         $this->assertCount(2, $result);
-        
+
         // Check that all returned comments are approved
         foreach ($result as $comment) {
             $this->assertEquals('approved', $comment['status']);
         }
-        
+
         // Check that we got the right comments
         $authors = array_column($result, 'author');
         $this->assertContains('User 1', $authors);
@@ -93,10 +93,10 @@ class CommentListControllerTest extends AbstractApiControllerTestCase
     public function testBypostReturnsAllNonDeletedCommentsForAdmins(): void
     {
         $result = $this->adminController->bypost(['post' => 'test-post']);
-        
+
         // Should return approved, pending, and spam comments (but not deleted)
         $this->assertCount(4, $result);
-        
+
         // Check that we got the right comments
         $authors = array_column($result, 'author');
         $this->assertContains('User 1', $authors); // approved

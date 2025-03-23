@@ -46,7 +46,7 @@ class ErrorLogLogger extends AbstractLogger
 
         $message = "[$level] " . $this->interpolate((string)$message, $context);
         if (isset($context['exception']) && $context['exception'] instanceof \Exception) {
-            $message .= "\n" . get_class($context['exception']) . ': ' . $context['exception']->getMessage();
+            $message .= "\n" . $context['exception']::class . ': ' . $context['exception']->getMessage();
             $message .= "\n" . $context['exception']->getTraceAsString();
         }
 
@@ -61,10 +61,10 @@ class ErrorLogLogger extends AbstractLogger
     /**
      * Interpolates context values into the message placeholders.
      */
-    protected function interpolate($message, array $context = array()): string
+    protected function interpolate($message, array $context = []): string
     {
         // build a replacement array with braces around the context keys
-        $replace = array();
+        $replace = [];
         foreach ($context as $key => $val) {
             // check that the value can be cast to string
             if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {

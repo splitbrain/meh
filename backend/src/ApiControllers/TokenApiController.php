@@ -33,7 +33,7 @@ class TokenApiController extends ApiController
         }
 
         // Verify password
-        if (!password_verify($data['password'], $adminPassword)) {
+        if (!password_verify((string) $data['password'], (string) $adminPassword)) {
             throw new HttpException('Invalid password', 401);
         }
 
@@ -79,7 +79,7 @@ class TokenApiController extends ApiController
             if (isset($existingPayload->sub)) {
                 $payload['sub'] = $existingPayload->sub;
             }
-        } catch (\Exception $ignored) {
+        } catch (\Exception) {
             // No valid token, issue a new one
         }
 
