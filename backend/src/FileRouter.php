@@ -19,7 +19,7 @@ class FileRouter extends Router
         $this->alto->map('GET', '/meh/i18n/[f:file]', [FileController::class, 'i18n']);
 
 
-        $this->alto->map('GET', '/doc/frontend/src/components/[md:file]/readme.md', [FileController::class, 'doc']);
+        $this->alto->map('GET', '/frontend/src/components/[md:file]/readme.md', [FileController::class, 'doc']);
         $this->alto->map('GET', '/doc/[md:file]', [FileController::class, 'doc']);
     }
 

@@ -36,8 +36,10 @@ You can then use `http://localhost:8000/` as the base URL for all components.
 * [Importing from Disqus](doc/disqus.md)
 
 
-## Client Setup (your blog)
+## Client Setup and Usage (on your blog)
 
+
+* [Comment Moderation](doc/moderation.md)
 * [meh-form](./frontend/src/components/meh-form/readme.md)
 * [meh-comments](./frontend/src/components/meh-comments/readme.md)
 * [meh-login](./frontend/src/components/meh-login/readme.md)

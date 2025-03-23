@@ -11,14 +11,7 @@ class FileController
 
     public function home()
     {
-        header('Content-Type: text/html; charset=utf-8');
-        echo '<html lang="en"><head><title>Meh</title>';
-        echo '<link rel="stylesheet" href="https://unpkg.com/chota@latest">';
-        echo '</head><body><div class="container">';
-        echo '<h1>Welcome to Meh</h1>';
-        echo '<p>It\'s a comment system.</p>';
-        echo '<p>Check out the <a href="/doc/index">documentation</a>.</p>';
-        echo '</div></body></html>';
+        $this->doc('index');
     }
 
     /**
@@ -62,6 +55,9 @@ class FileController
         if (str_contains((string)$file, '..') || str_starts_with((string)$file, '.')) {
             throw new HttpException('Invalid file path', 400);
         }
+
+        // remove trailing .md
+        $file = preg_replace('/\.md$/', '', $file);
 
         if ($file === 'index') {
             $mdfile = self::README;
