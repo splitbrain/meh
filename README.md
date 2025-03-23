@@ -41,3 +41,4 @@ You can then use `http://localhost:8000/` as the base URL for all components.
 * [Component Setup](doc/components.md)
   * [Styling Components](doc/styling.md)
 * [Comment Moderation](doc/moderation.md)
+* [Customizing Translations](doc/translations.md)
