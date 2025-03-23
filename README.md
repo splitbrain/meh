@@ -1,8 +1,11 @@
 # Meh... another comment system
 
-## Features
-
-
+* simple, no-frills commenting system
+* self-hosted
+* multi-site support from a single installation
+* Mastodon integration
+* Disqus import
+* simple enough to understand and modify
 
 ## Overview
 
