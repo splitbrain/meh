@@ -8,7 +8,7 @@ Meh uses a layered configuration system that allows for flexible setup across mu
 
 3. **`.env` File**: For convenience, you can place environment variables in a `.env` file in the project root. The project contains a `.env.example` file that you can copy and modify.
 
-4. **Database Storage**: Site-specific configurations can stored in each site's database and take precedence over environment variables.
+4. **Database Storage**: Site-specific configurations can be stored in each site's database and take precedence over environment variables.
 
 ## Configuration Hierarchy
 
@@ -17,6 +17,11 @@ When Meh looks for a configuration value, it checks these sources in order:
 1. Default values (lowest priority)
 2. Environment variables / `.env` file
 3. Database values (highest priority)
+
+Note: the following options can only be set via the environment or `.env` file:
+
+* `db_path` -> `MEH_DB_PATH`
+* `env` -> `MEH_ENV` 
 
 ## Managing Configuration
 
