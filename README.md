@@ -32,6 +32,7 @@ You can then use `http://localhost:8000/` as the base URL for all components.
 * [Multi-site Support](doc/multisite.md)
 * [Mastodon Integration](doc/mastodon.md)
 * [Email Notifications](doc/smtp.md)
+* [Gravatar Integration](doc/gravatar.md)
 * [Importing from Disqus](doc/disqus.md)
 
 
