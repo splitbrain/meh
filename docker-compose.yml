@@ -1,0 +1,11 @@
+services:
+    meh:
+        build: .
+        container_name: meh
+        ports:
+            - "8000:80"
+        user: "1000:1000"
+        environment:
+            MEH_ENV: dev
+        volumes:
+            - ./data:/app/data
