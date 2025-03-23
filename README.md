@@ -27,6 +27,11 @@ To see available commands:
     ./meh
 
 
+All commands support the `--site` (or `-s`) parameter to specify which site to operate on. This is useful if you're managing multiple sites with the same Meh installation.
+
+    ./meh --site myblog config
+
+If not specified, the default site name "meh" will be used.
 
 
 ## Components
