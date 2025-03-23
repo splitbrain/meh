@@ -8,8 +8,8 @@
     RewriteRule ^ - [L]
     
     # Handle API requests
-    RewriteRule ^api(/.*)?$ api/index.php [L]
+    RewriteRule ^api(/.*)?$ api/index.php [QSA,L]
     
     # Handle all other requests with the main index.php
-    RewriteRule ^ index.php [L]
+    RewriteRule ^ index.php [QSA,L]
 </IfModule>
