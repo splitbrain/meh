@@ -2,6 +2,8 @@
 
 ## Features
 
+
+
 ## Overview
 
 ## Devel Quick Start
@@ -27,6 +29,7 @@ You can then use `http://localhost:8000/` as the base URL for all components.
 * [Command Line Tool](doc/cli.md)
 * [Database Setup and Upgrade](doc/migrate.md) 
 * [Configuration](doc/config.md)
+* [Multi-site Support](doc/multisite.md)
 * [Mastodon Integration](doc/mastodon.md)
 * [Importing from Disqus](doc/disqus.md)
 
