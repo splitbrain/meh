@@ -6,7 +6,7 @@
 * [x] Clean up the mastodon api client
 * [x] Add PSR Logging
 * [ ] fetch octodon comments and safely back them up
-* [ ] move disqus import code to a separate class
+* [x] move disqus import code to a separate class
 * [x] make the meh-form component actually create a comment successfully
 * [x] simplify the root level router
 * [x] add a home page and link to the demo?
@@ -24,7 +24,7 @@
 * [x] remove demo utils
 * [x] use translation manger in components
 * [x] have translation files in components and use copy to copy them to the distribution
-* [ ] add license
+* [x] add license
 * [x] check if we need to handle mastodon media attachments
 * [x] add login for admin
 * [x] show hidden comments when admin
@@ -37,8 +37,16 @@
 * [x] success message on comment send needs to reflect status
 * [x] fix tests
 * [ ] add more tests
-* [ ] htaccess for apache
+* [x] htaccess for apache
 * [ ] github actions for tests
-* [ ] docker image
+* [x] docker image
 * [ ] give info about mastodon reply in form view
-* [ ] write documentation
+* [x] write documentation
+* [ ] fix timezone issue
+* [ ] add meh-count component
+* [ ] add style parameter to all components
+* [ ] update translations
+* [ ] implement exception translations
+* [ ] auto deploay to server
+* [ ] publish
+* [ ] blog post
