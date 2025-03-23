@@ -28,6 +28,7 @@ You can then use `http://localhost:8000/` as the base URL for all components.
 * [Database Setup and Upgrade](doc/migrate.md) 
 * [Configuration](doc/config.md)
 * [Mastodon Integration](doc/mastodon.md)
+* [Importing from Disqus](doc/disqus.md)
 
 
 ## Client (your blog)
