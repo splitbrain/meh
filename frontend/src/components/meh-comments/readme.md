@@ -1,6 +1,25 @@
 # meh-comments
 
+The `meh-comments` component displays a list of comments for a specific post on your website. It handles loading, displaying, and moderating comments.
 
+## Basic Integration Example
+
+Here's how to add the comments list to your website:
+
+```html
+<!-- Basic usage -->
+<meh-comments
+  backend="https://comments.example.com"
+  post="/blog/2023/my-awesome-post"
+  site="myblog">
+</meh-comments>
+```
+
+## Administration
+
+Typically, the component will only display approved comments. To access moderation features, you can use the [meh-login](../meh-login/readme.md) component somewhere on your site to authenticate as an administrator. Once logged in, the component will display all comments, including pending and spam and provide options to moderate them.
+
+```html
 
 <!-- Auto Generated Below -->
 
