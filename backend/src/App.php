@@ -101,6 +101,9 @@ class App
 
     public function loadConfigFromEnvironment(): array
     {
+        // populate $_ENV even if it's not enabled in variables_order
+        $_ENV = getenv();
+
         // Load environment variables from .env file if it exists
         if (file_exists(__DIR__ . '/../../.env')) {
             $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
@@ -109,7 +112,7 @@ class App
 
         $config = [];
         foreach (array_keys(self::loadConfigFromDefaults()) as $key) {
-            $ekey = strtoupper($key);
+            $ekey = 'MEH_'.strtoupper($key);
             if (isset($_ENV[$ekey])) {
                 $config[$key] = $_ENV[$ekey];
             }
