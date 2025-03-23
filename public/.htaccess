@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # If the request is for an actual file or directory, don't rewrite
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    
+    # Handle API requests
+    RewriteRule ^api(/.*)?$ api/index.php [L]
+    
+    # Handle all other requests with the main index.php
+    RewriteRule ^ index.php [L]
+</IfModule>
