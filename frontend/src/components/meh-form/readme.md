@@ -1,6 +1,9 @@
 # meh-form
 
-A customizable comment form component with internationalization support.
+The `meh-form` component provides the comment submission form for your website. It allows visitors to leave comments on your content with support for name, email, website, and comment text fields.
+
+
+
 
 <!-- Auto Generated Below -->
 
