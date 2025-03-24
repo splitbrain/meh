@@ -50,8 +50,10 @@ class CommentApiController extends ApiController
             'user' => $user,
         ];
 
-        // check post limits
-        $this->app->commentUtils()->checkPostLimit($record, (int)$this->tokenPayload->iat);
+        // check post limits (except for admins)
+        if (!$this->checkScopes('admin')) {
+            $this->app->commentUtils()->checkPostLimit($record, (int)$this->tokenPayload->iat);
+        }
 
         // determine initial status
         $record['status'] = $this->app->commentUtils()->initialStatus($record, $this->checkScopes('admin'));
