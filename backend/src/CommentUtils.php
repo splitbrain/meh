@@ -17,16 +17,18 @@ class CommentUtils
      */
     public function process(array $comment)
     {
-        return $this->dropUserID($this->addAvatarUrl($comment));
+        $this->dropUserID($comment);
+        $this->addAvatarUrl($comment);
+        $this->addTimezone($comment);
+        return $comment;
     }
 
     /**
      * Ensure the comment has an avatar URL
      *
-     * @param array $comment original comment
-     * @return array comment with avatar_url added
+     * @param array $comment original comment, will be modified
      */
-    public function addAvatarUrl(array $comment): array
+    public function addAvatarUrl(array &$comment): void
     {
         if (empty($comment['avatar'])) {
             if (!empty($comment['email'])) {
@@ -46,21 +48,31 @@ class CommentUtils
         } else {
             $comment['avatar_url'] = $comment['avatar'];
         }
-        return $comment;
     }
 
     /**
      * Drop the user ID from a comment
      *
-     * @param array $comment original comment
-     * @return array comment without user ID
+     * @param array $comment original comment, will be modified
      */
-    public function dropUserID(array $comment): array
+    public function dropUserID(array &$comment): void
     {
         if (isset($comment['user'])) {
             unset($comment['user']);
         }
-        return $comment;
+    }
+
+    /**
+     * Add a timezone to a comment
+     *
+     * SQLite stores all timestamps in UTC, but we want to display them in the user's timezone
+     *
+     * @param array $comment original comment, will be modified
+     */
+    public function addTimezone(array &$comment): void
+    {
+        $dt = new \DateTimeImmutable($comment['created_at'], new \DateTimeZone('UTC'));
+        $comment['created_at'] = $dt->format(\DateTimeInterface::ATOM);
     }
 
     /**

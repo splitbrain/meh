@@ -42,7 +42,7 @@
 * [x] docker image
 * [ ] give info about mastodon reply in form view
 * [x] write documentation
-* [ ] fix timezone issue
+* [x] fix timezone issue
 * [ ] add meh-count component
 * [ ] add style parameter to all components
 * [ ] update translations

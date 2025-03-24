@@ -103,7 +103,7 @@ class CommentApiController extends ApiController
             throw new HttpException('Comment ID is required', 400);
         }
 
-        $data = $this->app->commentUtils()->dropUserID($data);
+        $this->app->commentUtils()->dropUserID($data);
 
         $record = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $id);
 
