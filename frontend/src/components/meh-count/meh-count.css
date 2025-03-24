@@ -1,0 +1,13 @@
+:host {
+  display: inline-block;
+}
+
+.meh-count {
+  &.loading {
+    opacity: 0.7;
+  }
+  
+  &.error {
+    color: var(--meh-error);
+  }
+}

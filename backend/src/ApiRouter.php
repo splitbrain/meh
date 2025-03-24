@@ -25,6 +25,7 @@ class ApiRouter extends Router
         //  We register  [Controller, method, scope] for each route
 
         $this->alto->map('GET', '/[s:site]/comments', [CommentListApiController::class, 'bypost']);
+        $this->alto->map('GET', '/[s:site]/comments-count', [CommentListApiController::class, 'count']);
 
         $this->alto->map('POST', '/[s:site]/comment', [CommentApiController::class, 'create', 'user']);
         $this->alto->map('GET', '/[s:site]/comment/[i:id]', [CommentApiController::class, 'get', 'admin']);

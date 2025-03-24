@@ -6,6 +6,7 @@ Meh provides the following components:
 
 * [meh-form](../frontend/src/components/meh-form/readme.md) - Comment submission form
 * [meh-comments](../frontend/src/components/meh-comments/readme.md) - Comment display
+* [meh-count](../frontend/src/components/meh-count/readme.md) - Comment count display
 * [meh-login](../frontend/src/components/meh-login/readme.md) - Admin login mechanism
 
 

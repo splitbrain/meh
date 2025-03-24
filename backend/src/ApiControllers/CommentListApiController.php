@@ -42,4 +42,24 @@ class CommentListApiController extends ApiController
         return array_map([$this->app->commentUtils(), 'process'], $comments);
     }
 
+    /**
+     * Count comments for a post
+     *
+     * @param array $data Request data
+     * @return int Number of comments
+     * @throws \Exception If post path is missing
+     */
+    public function count($data)
+    {
+        $postPath = $data['post'] ?? null;
+
+        if (!$postPath) {
+            throw new HttpException('Post path is required', 400);
+        }
+
+        return $this->app->db()->queryValue(
+            'SELECT COUNT(*) FROM comments WHERE post = ? AND status = ?',
+            [$postPath, 'approved']
+        );
+    }
 }
