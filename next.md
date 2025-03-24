@@ -43,10 +43,10 @@
 * [ ] give info about mastodon reply in form view
 * [x] write documentation
 * [x] fix timezone issue
-* [ ] add meh-count component
+* [x] add meh-count component
 * [ ] add style parameter to all components
 * [ ] update translations
 * [ ] implement exception translations
-* [ ] auto deploay to server
+* [ ] auto deploy to server
 * [ ] publish
 * [ ] blog post

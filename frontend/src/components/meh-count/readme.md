@@ -15,7 +15,7 @@ Here's how to add the comment count to your website:
 </meh-count>
 ```
 
-This will display text like "5 comments" or "No comments" depending on the count.
+This will display text like "5 comments" or "No comments" depending on the count. Using the `numonly` property will display only the number, e.g. "5".
 
 ## Usage in Blog Post Lists
 
