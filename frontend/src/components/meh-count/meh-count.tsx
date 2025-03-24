@@ -40,6 +40,11 @@ export class MehCount {
    */
   @Prop() customTranslations: string | Partial<typeof this.defaultTranslations> = '';
 
+  /**
+   * When set to true, only the number will be displayed without any text
+   */
+  @Prop() numonly: boolean = false;
+
   @State() count: number = 0;
   @State() loading: boolean = true;
   @State() error: string = '';
@@ -138,7 +143,9 @@ export class MehCount {
    * Format the comment count with the appropriate translation
    */
   private formatCount(): string {
-    if (this.count === 0) {
+    if (this.numonly) {
+      return this.count.toString();
+    } else if (this.count === 0) {
       return this._('noComments');
     } else if (this.count === 1) {
       return this._('oneComment');
