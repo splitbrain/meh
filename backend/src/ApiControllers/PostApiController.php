@@ -31,6 +31,6 @@ class PostApiController extends ApiController
             throw new HttpException('Post not found', 404);
         }
 
-        return $post['mastodon_url'];
+        return $post;
     }
 }

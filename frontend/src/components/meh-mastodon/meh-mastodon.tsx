@@ -1,5 +1,5 @@
-import {Component, Prop, h, State} from '@stencil/core';
-import {TranslationManager, getAuthToken} from '../../utils/utils';
+import {Component, h, Prop, State} from '@stencil/core';
+import {getAuthToken, TranslationManager} from '../../utils/utils';
 
 @Component({
   tag: 'meh-mastodon',
@@ -42,13 +42,10 @@ export class MehMastodon {
 
   @State() mastodonUrl: string = '';
   @State() loading: boolean = true;
-  @State() error: string = '';
 
   // Default English translations that also define the translation structure
   private defaultTranslations = {
-    discussOnMastodon: 'Discuss on Mastodon',
-    loadingMastodon: 'Loading Mastodon link...',
-    errorLoading: 'Error loading Mastodon link',
+    discussOnMastodon: 'Discuss on Mastodon'
   };
 
   // Translation manager instance
@@ -89,7 +86,6 @@ export class MehMastodon {
 
   private async fetchMastodonUrl() {
     this.loading = true;
-    this.error = '';
 
     try {
       // Prepare headers
@@ -116,27 +112,20 @@ export class MehMastodon {
       this.mastodonUrl = data.response || '';
     } catch (error) {
       console.error('Error fetching Mastodon URL:', error);
-      this.error = error.message || 'Unknown error occurred';
     } finally {
       this.loading = false;
     }
   }
 
   render() {
-    if (this.loading) {
-      return <span class="loading">{this._('loadingMastodon')}</span>;
-    } else if (this.error) {
-      return <span class="error" title={this.error}>{this._('errorLoading')}</span>;
-    } else if (this.mastodonUrl) {
+    if (this.mastodonUrl) {
       return (
-        <a 
-          href={this.mastodonUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <a
+          href={this.mastodonUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           class="mastodon-link"
-        >
-          {this._('discussOnMastodon')}
-        </a>
+        >{this._('discussOnMastodon')}</a>
       );
     } else {
       // If no Mastodon URL is found, render nothing

@@ -8,6 +8,7 @@ Meh provides the following components:
 * [meh-comments](../frontend/src/components/meh-comments/readme.md) - Comment display
 * [meh-count](../frontend/src/components/meh-count/readme.md) - Comment count display
 * [meh-login](../frontend/src/components/meh-login/readme.md) - Admin login mechanism
+* [meh-mastodon](../frontend/src/components/meh-mastodon/readme.md) - Link to Mastodon post
 
 
 ## Loading the Components
@@ -101,6 +102,13 @@ Here's a complete example of integrating all components into a blog post:
       backend="https://comments.example.com"
       post="/blog/2023/my-awesome-post"
       site="myblog">
+
+      <!-- Add link to Mastodon post inside the form-->
+      <meh-mastodon
+          backend="https://comments.example.com"
+          post="/blog/2023/my-awesome-post"
+          site="myblog">
+      </meh-mastodon>
       
       <!-- Add login button inside the form -->
       <meh-login
@@ -108,6 +116,14 @@ Here's a complete example of integrating all components into a blog post:
         site="myblog">
       </meh-login>
     </meh-form>
+    
+    <!-- Comment count -->
+    <h2>
+      <meh-count backend="https://comments.example.com"
+                 post="/blog/2023/my-awesome-post"
+                 site="myblog">
+      </meh-count>
+    </h2>
     
     <!-- Comments list -->
     <meh-comments

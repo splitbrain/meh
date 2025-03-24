@@ -34,5 +34,6 @@ form {
     flex-direction: row;
     gap: var(--meh-spacing);
     justify-content: space-between;
+    align-items: flex-start
   }
 }

@@ -17,23 +17,22 @@ Here's how to add the Mastodon link to your website:
 
 This will display a "Discuss on Mastodon" link if a Mastodon post referencing your page is found. If no Mastodon post is found, the component will not render anything.
 
-## Usage in Blog Posts
-
-A common use case is to show the Mastodon discussion link at the end of blog posts:
-
-```html
-<article>
-  <h1>My Awesome Blog Post</h1>
-  <div class="content">
-    <!-- Blog content here -->
-  </div>
-  
-  <footer>
-    <div class="social-links">
-      <meh-mastodon backend="https://comments.example.com"></meh-mastodon>
-    </div>
-  </footer>
-</article>
-```
+You can also add this inside the [meh-form](../meh-form/readme.md) component to show the Mastodon link right in the comment form.
 
 <!-- Auto Generated Below -->
+
+
+## Properties
+
+| Property             | Attribute             | Description                                                                                                                            | Type                                        | Default     |
+| -------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------- |
+| `backend`            | `backend`             | The base URL for where the meh system is hosted If not provided, defaults to same origin                                               | `string`                                    | `''`        |
+| `customTranslations` | `custom-translations` | Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly | `string \| { discussOnMastodon?: string; }` | `''`        |
+| `language`           | `language`            | The language code for translations If not provided, defaults to 'en'                                                                   | `string`                                    | `'en'`      |
+| `post`               | `post`                | The post path to fetch Mastodon link for If not provided, defaults to the current page path                                            | `string`                                    | `undefined` |
+| `site`               | `site`                | The site identifier to use If not provided, defaults to 'meh'                                                                          | `string`                                    | `'meh'`     |
+
+
+----------------------------------------------
+
+*Built with [StencilJS](https://stenciljs.com/)*

@@ -94,6 +94,28 @@ export namespace Components {
          */
         "site": string;
     }
+    interface MehMastodon {
+        /**
+          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+         */
+        "backend": string;
+        /**
+          * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+         */
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        /**
+          * The language code for translations If not provided, defaults to 'en'
+         */
+        "language": string;
+        /**
+          * The post path to fetch Mastodon link for If not provided, defaults to the current page path
+         */
+        "post": string;
+        /**
+          * The site identifier to use If not provided, defaults to 'meh'
+         */
+        "site": string;
+    }
 }
 declare global {
     interface HTMLMehCommentsElement extends Components.MehComments, HTMLStencilElement {
@@ -120,11 +142,18 @@ declare global {
         prototype: HTMLMehLoginElement;
         new (): HTMLMehLoginElement;
     };
+    interface HTMLMehMastodonElement extends Components.MehMastodon, HTMLStencilElement {
+    }
+    var HTMLMehMastodonElement: {
+        prototype: HTMLMehMastodonElement;
+        new (): HTMLMehMastodonElement;
+    };
     interface HTMLElementTagNameMap {
         "meh-comments": HTMLMehCommentsElement;
         "meh-count": HTMLMehCountElement;
         "meh-form": HTMLMehFormElement;
         "meh-login": HTMLMehLoginElement;
+        "meh-mastodon": HTMLMehMastodonElement;
     }
 }
 declare namespace LocalJSX {
@@ -216,11 +245,34 @@ declare namespace LocalJSX {
          */
         "site"?: string;
     }
+    interface MehMastodon {
+        /**
+          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+         */
+        "backend"?: string;
+        /**
+          * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+         */
+        "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
+        /**
+          * The language code for translations If not provided, defaults to 'en'
+         */
+        "language"?: string;
+        /**
+          * The post path to fetch Mastodon link for If not provided, defaults to the current page path
+         */
+        "post"?: string;
+        /**
+          * The site identifier to use If not provided, defaults to 'meh'
+         */
+        "site"?: string;
+    }
     interface IntrinsicElements {
         "meh-comments": MehComments;
         "meh-count": MehCount;
         "meh-form": MehForm;
         "meh-login": MehLogin;
+        "meh-mastodon": MehMastodon;
     }
 }
 export { LocalJSX as JSX };
@@ -231,6 +283,7 @@ declare module "@stencil/core" {
             "meh-count": LocalJSX.MehCount & JSXBase.HTMLAttributes<HTMLMehCountElement>;
             "meh-form": LocalJSX.MehForm & JSXBase.HTMLAttributes<HTMLMehFormElement>;
             "meh-login": LocalJSX.MehLogin & JSXBase.HTMLAttributes<HTMLMehLoginElement>;
+            "meh-mastodon": LocalJSX.MehMastodon & JSXBase.HTMLAttributes<HTMLMehMastodonElement>;
         }
     }
 }

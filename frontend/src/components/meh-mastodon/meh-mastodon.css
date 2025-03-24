@@ -1,5 +1,7 @@
 :host {
   display: inline-block;
+
+  --link-color: var(--meh-accent);
 }
 
 .mastodon-link {
@@ -14,12 +16,11 @@
   text-decoration: underline;
 }
 
-.loading {
-  opacity: 0.7;
-  font-size: 0.9em;
-}
+a {
+  color: var(--link-color);
+  text-decoration-color: var(--border-color);
 
-.error {
-  color: var(--meh-error);
-  font-size: 0.9em;
+  &:hover, &:focus, &:active {
+    text-decoration-color: var(--link-color);
+  }
 }
