@@ -92,17 +92,7 @@ export class MehCount {
 
     // Fetch comment count
     await this.fetchCommentCount();
-
-    // Add event listener for refresh events
-    window.addEventListener('meh-refresh', this.handleRefreshEvent);
   }
-
-  /**
-   * Handle the meh-refresh custom event
-   */
-  private handleRefreshEvent = async () => {
-    await this.fetchCommentCount();
-  };
 
   private async fetchCommentCount() {
     this.loading = true;
@@ -154,12 +144,6 @@ export class MehCount {
     }
   }
 
-  /**
-   * Clean up event listeners when component is removed
-   */
-  disconnectedCallback() {
-    window.removeEventListener('meh-refresh', this.handleRefreshEvent);
-  }
 
   render() {
     if (this.loading) {
