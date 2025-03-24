@@ -6,6 +6,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use splitbrain\meh\ApiControllers\CommentApiController;
 use splitbrain\meh\ApiControllers\CommentListApiController;
+use splitbrain\meh\ApiControllers\PostApiController;
 use splitbrain\meh\ApiControllers\TokenApiController;
 
 class ApiRouter extends Router
@@ -26,6 +27,8 @@ class ApiRouter extends Router
 
         $this->alto->map('GET', '/[s:site]/comments', [CommentListApiController::class, 'bypost']);
         $this->alto->map('GET', '/[s:site]/comments-count', [CommentListApiController::class, 'count']);
+
+        $this->alto->map('GET', '/[s:site]/mastodon-url', [PostApiController::class, 'mastodonUrl']);
 
         $this->alto->map('POST', '/[s:site]/comment', [CommentApiController::class, 'create', 'user']);
         $this->alto->map('GET', '/[s:site]/comment/[i:id]', [CommentApiController::class, 'get', 'admin']);
