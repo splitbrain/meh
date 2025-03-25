@@ -14,6 +14,12 @@ class FileController
         $this->doc('index');
     }
 
+    public function logo()
+    {
+        header('Content-Type: image/svg+xml');
+        readfile(__DIR__ . '/../../meh.svg');
+    }
+
     /**
      * Serve a file from the dist directory
      *

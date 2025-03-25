@@ -14,6 +14,7 @@ class FileRouter extends Router
     protected function registerRoutes(): void
     {
         $this->alto->map('GET', '/', [FileController::class, 'home']);
+        $this->alto->map('GET', '/meh.svg', [FileController::class, 'logo']);
 
         $this->alto->map('GET', '/meh/[f:file]', [FileController::class, 'dist']);
         $this->alto->map('GET', '/meh/i18n/[f:file]', [FileController::class, 'i18n']);
