@@ -204,6 +204,33 @@ export class TranslationManager<T extends Record<string, string>> {
   }
 
   /**
+   * Process a template string with a key in curly braces
+   * If the key exists in translations, returns the translation
+   * Otherwise returns the text after the key
+   * 
+   * @param template - Template string in format "{key} fallback text"
+   * @returns The translated string if key exists, or fallback text
+   */
+  processTemplate(template: string): string {
+    // Match pattern {key} followed by optional text
+    const match = template.match(/^\{([^}]+)\}(.*)$/);
+    
+    if (!match) {
+      return template; // Not a template format, return as is
+    }
+    
+    const [, key, fallbackText] = match;
+    
+    // Check if key exists in translations
+    if (key in this.translations) {
+      return this.translations[key as keyof T] as string;
+    }
+    
+    // Return fallback text (trimming leading space if present)
+    return fallbackText.trim();
+  }
+
+  /**
    * Set translations from an object or JSON string
    * Merges with existing translations
    *
