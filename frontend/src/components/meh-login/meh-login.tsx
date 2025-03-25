@@ -216,7 +216,7 @@ export class MehLogin {
         <button type="submit" disabled={this.loading}>
           {this._('submit')}
         </button>
-        {this.error && <div class="error">{this._('loginError')} {this.error}</div>}
+        {this.error && <div class="error">{this._('loginError')} {this._(this.error)}</div>}
       </form>
     );
   }

@@ -294,7 +294,7 @@ export class MehForm {
 
           {this.status === 'error' && (
             <div class="error">
-              {this._('errorPrefix')} {this.errorMessage}
+              {this._('errorPrefix')} {this._(this.errorMessage)}
             </div>
           )}
 

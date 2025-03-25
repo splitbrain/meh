@@ -152,7 +152,7 @@ export class MehComments {
    * Render error message
    */
   private renderError() {
-    return <div class="error">{this._('errorLoading')} {this.error}</div>;
+    return <div class="error">{this._('errorLoading')} {this._(this.error)}</div>;
   }
 
   /**
