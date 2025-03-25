@@ -56,8 +56,6 @@ export class MehComments {
     noComments: 'No comments yet. Be the first to comment!',
     loadingComments: 'Loading comments...',
     errorLoading: 'Error loading comments:',
-    postedOn: 'Posted on',
-    by: 'by',
     approve: 'Approve',
     reject: 'Reject',
     delete: 'Delete',

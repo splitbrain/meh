@@ -54,6 +54,9 @@ export class MehLogin {
     password: 'Admin Password',
     submit: 'Submit',
     loginError: 'Login failed:',
+    nopass: 'No password provided',
+    noadmin: 'There is no admin set up for this site',
+    badpass: 'Incorrect password'
   };
 
   // Translation manager instance
@@ -101,7 +104,7 @@ export class MehLogin {
     try {
       // Remove the current token
       localStorage.removeItem(TOKEN_STORAGE_KEY);
-      
+
       // Get a new user token by calling refresh endpoint
       const response = await makeApiRequest<{ token: string }>(
         this.backend,
@@ -113,7 +116,7 @@ export class MehLogin {
           includeToken: false
         }
       );
-      
+
       if (response && response.token) {
         // Store the new user token
         localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
@@ -121,11 +124,11 @@ export class MehLogin {
     } catch (error) {
       console.error('Error during logout:', error);
     }
-    
+
     // Update state
     this.isLoggedIn = false;
     this.password = '';
-    
+
     // Dispatch refresh event to update comments list after logout
     window.dispatchEvent(new CustomEvent('meh-refresh'));
   }
@@ -154,7 +157,7 @@ export class MehLogin {
 
       // Store the token in localStorage
       localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
-      
+
       // Update state
       this.isLoggedIn = true;
       this.showPasswordField = false;
@@ -212,6 +215,7 @@ export class MehLogin {
           onInput={this.handlePasswordChange}
           placeholder={this._('password')}
           disabled={this.loading}
+          required={true}
         />
         <button type="submit" disabled={this.loading}>
           {this._('submit')}
@@ -225,14 +229,14 @@ export class MehLogin {
   render() {
     // Check admin status on each render to ensure it's current
     this.isLoggedIn = isAdmin();
-    
+
     const elements = [];
-    
+
     // Add external stylesheet if provided
     if (this.externalStyles) {
       elements.push(<link rel="stylesheet" href={this.externalStyles} />);
     }
-    
+
     // Add the appropriate content based on component state
     if (this.isLoggedIn) {
       elements.push(this.renderLogoutButton());
@@ -241,7 +245,7 @@ export class MehLogin {
     } else {
       elements.push(this.renderLoginButton());
     }
-    
+
     return elements;
   }
 }

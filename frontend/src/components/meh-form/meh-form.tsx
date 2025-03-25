@@ -63,7 +63,6 @@ export class MehForm {
 
   // Default English translations that also define the translation structure
   private defaultTranslations = {
-    formTitle: 'Leave a Comment',
     nameLabel: 'Your Name',
     namePlaceholder: 'Jane Doe',
     emailLabel: 'Your Email Address',
@@ -71,11 +70,14 @@ export class MehForm {
     websiteLabel: 'Your Website',
     websitePlaceholder: 'https://example.com/~jane',
     commentLabel: 'Your Comment',
-    commentPlaceholder: 'Lorem Ipsum…',
+    commentPlaceholder: 'Your text here. You may use Markdown for formatting.',
     submitButton: 'Submit Comment',
     submittingButton: 'Submitting...',
     successMessagePending: 'Thank you for your comment! It has been submitted for review.',
     successMessageApproved: 'Thank you for your comment! It has been published.',
+    toosoon: 'You posted really fast. Did you even read the article?',
+    toolate: 'Sorry, you took too long to post your comment. Please reload and try again.',
+    pending: 'Your previous comment is still pending approval. You will need to wait for it to be approved before posting another.',
   };
 
   // Translation manager instance
