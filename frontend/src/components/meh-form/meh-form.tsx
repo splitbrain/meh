@@ -252,10 +252,6 @@ export class MehForm {
   render() {
     return (
       <div class="meh-form-container">
-        <slot name="styles"></slot>
-
-        <h3>{this._('formTitle')}</h3>
-
         <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
           <div class="userdata">
             <label class="required">
