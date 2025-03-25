@@ -1,14 +1,16 @@
 # ![Meh Logo](meh.svg) Meh…
 ## …another comment system
 
+Meh…
 
-
-* simple, no-frills commenting system
-* self-hosted
-* multi-site support from a single installation
-* Mastodon integration
-* Disqus import
-* simple enough to understand and modify
+* …is a simple, no-frills commenting system
+* …is self-hosted
+* …has multi-site support from a single installation
+* …has multi-language support
+* …has Mastodon integration
+* …has Disqus import
+* …is simple enough to understand and modify
+* …made by [splitbrain](https://www.splitbrain.org)
 
 ## Overview
 

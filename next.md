@@ -5,7 +5,7 @@
 * [x] Use guzzle in the mastodon api client
 * [x] Clean up the mastodon api client
 * [x] Add PSR Logging
-* [ ] fetch octodon comments and safely back them up
+* [x] fetch octodon comments and safely back them up
 * [x] move disqus import code to a separate class
 * [x] make the meh-form component actually create a comment successfully
 * [x] simplify the root level router
@@ -32,7 +32,7 @@
 * [x] auto-approve comments from users with previous approved comments
 * [x] use https://www.npmjs.com/package/jwt-decode to decide if user is admin or simply save two tokens?
 * [x] add DEV environment variable
-* [ ] add option to set log level
+* [x] add option to set log level
 * [x] do not reset form on comment send
 * [x] success message on comment send needs to reflect status
 * [x] fix tests
@@ -40,13 +40,18 @@
 * [x] htaccess for apache
 * [ ] github actions for tests
 * [x] docker image
-* [ ] give info about mastodon reply in form view
+* [x] give info about mastodon reply in form view
 * [x] write documentation
 * [x] fix timezone issue
 * [x] add meh-count component
-* [ ] add style parameter to all components
-* [ ] update translations
-* [ ] implement exception translations
+* [x] add style parameter to all components
+* [x] extract API call to a utility function
+* [x] update translations
+* [x] autobuild and publish docker image
+* [x] implement exception translations
+* [x] have an awesome logo
 * [ ] auto deploy to server
+* [ ] hide spam comments after a while
+* [ ] set up on splitbrain 
 * [ ] publish
 * [ ] blog post
