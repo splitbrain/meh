@@ -45,6 +45,11 @@ export class MehCount {
    */
   @Prop() numonly: boolean = false;
 
+  /**
+   * URL to an external stylesheet to be injected into the shadow DOM
+   */
+  @Prop() externalStyles: string = '';
+
   @State() count: number = 0;
   @State() loading: boolean = true;
   @State() error: string = '';
@@ -146,12 +151,30 @@ export class MehCount {
 
 
   render() {
+    const externalStylesheet = this.externalStyles ? 
+      <link rel="stylesheet" href={this.externalStyles} /> : null;
+      
     if (this.loading) {
-      return <span class="loading">{this._('loadingComments')}</span>;
+      return (
+        <div>
+          {externalStylesheet}
+          <span class="loading">{this._('loadingComments')}</span>
+        </div>
+      );
     } else if (this.error) {
-      return <span class="error" title={this.error}>{this._('errorLoading')}</span>;
+      return (
+        <div>
+          {externalStylesheet}
+          <span class="error" title={this.error}>{this._('errorLoading')}</span>
+        </div>
+      );
     } else {
-      return <span>{this.formatCount()}</span>;
+      return (
+        <div>
+          {externalStylesheet}
+          <span>{this.formatCount()}</span>
+        </div>
+      );
     }
   }
 }

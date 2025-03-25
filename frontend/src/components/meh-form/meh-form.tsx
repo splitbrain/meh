@@ -43,6 +43,11 @@ export class MehForm {
    */
   @Prop() customTranslations: string | Partial<typeof this.defaultTranslations> = '';
 
+  /**
+   * URL to an external stylesheet to be injected into the shadow DOM
+   */
+  @Prop() externalStyles: string = '';
+
   @State() status: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
   @State() isLoading: boolean = true;
   @State() errorMessage: string = '';
@@ -252,6 +257,7 @@ export class MehForm {
   render() {
     return (
       <div class="meh-form-container">
+        {this.externalStyles && <link rel="stylesheet" href={this.externalStyles} />}
         <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
           <div class="userdata">
             <label class="required">

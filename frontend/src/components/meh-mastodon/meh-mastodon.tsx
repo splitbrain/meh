@@ -40,6 +40,11 @@ export class MehMastodon {
    */
   @Prop() customTranslations: string | Partial<typeof this.defaultTranslations> = '';
 
+  /**
+   * URL to an external stylesheet to be injected into the shadow DOM
+   */
+  @Prop() externalStyles: string = '';
+
   @State() mastodonUrl: string = '';
   @State() loading: boolean = true;
 
@@ -120,12 +125,15 @@ export class MehMastodon {
   render() {
     if (this.mastodonUrl) {
       return (
-        <a
-          href={this.mastodonUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mastodon-link"
-        >{this._('discussOnMastodon')}</a>
+        <div>
+          {this.externalStyles && <link rel="stylesheet" href={this.externalStyles} />}
+          <a
+            href={this.mastodonUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mastodon-link"
+          >{this._('discussOnMastodon')}</a>
+        </div>
       );
     } else {
       // If no Mastodon URL is found, render nothing

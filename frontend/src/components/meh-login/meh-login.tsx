@@ -35,6 +35,11 @@ export class MehLogin {
    */
   @Prop() customTranslations: string | Partial<typeof this.defaultTranslations> = '';
 
+  /**
+   * URL to an external stylesheet to be injected into the shadow DOM
+   */
+  @Prop() externalStyles: string = '';
+
   @State() showPasswordField: boolean = false;
   @State() isLoggedIn: boolean = false;
   @State() loading: boolean = false;
@@ -224,12 +229,30 @@ export class MehLogin {
     // Check admin status on each render to ensure it's current
     this.isLoggedIn = isAdmin();
     
+    const externalStylesheet = this.externalStyles ? 
+      <link rel="stylesheet" href={this.externalStyles} /> : null;
+      
     if (this.isLoggedIn) {
-      return this.renderLogoutButton();
+      return (
+        <div>
+          {externalStylesheet}
+          {this.renderLogoutButton()}
+        </div>
+      );
     } else if (this.showPasswordField) {
-      return this.renderPasswordForm();
+      return (
+        <div>
+          {externalStylesheet}
+          {this.renderPasswordForm()}
+        </div>
+      );
     } else {
-      return this.renderLoginButton();
+      return (
+        <div>
+          {externalStylesheet}
+          {this.renderLoginButton()}
+        </div>
+      );
     }
   }
 }

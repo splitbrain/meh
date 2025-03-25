@@ -42,6 +42,11 @@ export class MehComments {
    */
   @Prop() customTranslations: string | Partial<typeof this.defaultTranslations> = '';
 
+  /**
+   * URL to an external stylesheet to be injected into the shadow DOM
+   */
+  @Prop() externalStyles: string = '';
+
   @State() comments: any[] = [];
   @State() loading: boolean = true;
   @State() error: string = '';
@@ -325,14 +330,37 @@ export class MehComments {
    * Main render method
    */
   render() {
+    const externalStylesheet = this.externalStyles ? 
+      <link rel="stylesheet" href={this.externalStyles} /> : null;
+      
     if (this.loading) {
-      return this.renderLoading();
+      return (
+        <div>
+          {externalStylesheet}
+          {this.renderLoading()}
+        </div>
+      );
     } else if (this.error) {
-      return this.renderError();
+      return (
+        <div>
+          {externalStylesheet}
+          {this.renderError()}
+        </div>
+      );
     } else if (this.comments.length === 0) {
-      return this.renderNoComments();
+      return (
+        <div>
+          {externalStylesheet}
+          {this.renderNoComments()}
+        </div>
+      );
     } else {
-      return this.renderCommentsList();
+      return (
+        <div>
+          {externalStylesheet}
+          {this.renderCommentsList()}
+        </div>
+      );
     }
   }
 }
