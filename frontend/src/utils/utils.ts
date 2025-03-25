@@ -194,40 +194,36 @@ export class TranslationManager<T extends Record<string, string>> {
   }
 
   /**
-   * Get a translated string for a given key
+   * Get a translated string for a given key or process a template string
    *
-   * @param key - The translation key to look up
-   * @returns The translated string or the key itself if not found
+   * If the input is a template string with format "{key} fallback text",
+   * it will return the translation for the key if it exists,
+   * otherwise it returns the fallback text.
+   *
+   * If the input is not a template, treats the whole string as a translation key.
+   *
+   * @param key - The translation key or template string
+   * @returns The translated string, fallback text, or the key itself if not found
    */
-  get<K extends keyof T>(key: K): string {
-    return (this.translations[key] as string) || String(key);
-  }
-
-  /**
-   * Process a template string with a key in curly braces
-   * If the key exists in translations, returns the translation
-   * Otherwise returns the text after the key
-   * 
-   * @param template - Template string in format "{key} fallback text"
-   * @returns The translated string if key exists, or fallback text
-   */
-  processTemplate(template: string): string {
-    // Match pattern {key} followed by optional text
-    const match = template.match(/^\{([^}]+)\}(.*)$/);
+  get<K extends keyof T | string>(key: K): string {
+    // Check if this is a template string with {key} format
+    const match = String(key).match(/^\{([^}]+)\}(.*)$/);
     
-    if (!match) {
-      return template; // Not a template format, return as is
+    if (match) {
+      // Template format found
+      const [, templateKey, fallbackText] = match;
+      
+      // Check if key exists in translations
+      if (templateKey in this.translations) {
+        return this.translations[templateKey as keyof T] as string;
+      }
+      
+      // Return fallback text (trimming leading space if present)
+      return fallbackText.trim();
     }
     
-    const [, key, fallbackText] = match;
-    
-    // Check if key exists in translations
-    if (key in this.translations) {
-      return this.translations[key as keyof T] as string;
-    }
-    
-    // Return fallback text (trimming leading space if present)
-    return fallbackText.trim();
+    // Not a template format, treat as regular key
+    return (this.translations[key as keyof T] as string) || String(key);
   }
 
   /**
