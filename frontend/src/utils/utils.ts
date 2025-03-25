@@ -55,13 +55,24 @@ export async function makeApiRequest<T = any>(
     headers
   };
 
-  // Add body for non-GET requests if provided
-  if (method !== 'GET' && body !== undefined) {
+  // Build the URL
+  let url = `${backend}/api/${site}/${endpoint}`;
+  
+  // For GET requests, convert body to query parameters
+  if (method === 'GET' && body !== undefined) {
+    const params = new URLSearchParams();
+    Object.entries(body).forEach(([key, value]) => {
+      params.append(key, String(value));
+    });
+    url += `?${params.toString()}`;
+  } 
+  // For non-GET requests, add body as JSON
+  else if (method !== 'GET' && body !== undefined) {
     requestOptions.body = JSON.stringify(body);
   }
 
   // Make the request
-  const response = await fetch(`${backend}/api/${site}/${endpoint}`, requestOptions);
+  const response = await fetch(url, requestOptions);
 
   // Parse the response
   const data = await response.json();

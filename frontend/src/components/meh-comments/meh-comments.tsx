@@ -120,7 +120,10 @@ export class MehComments {
       this.comments = await makeApiRequest<any[]>(
         this.backend,
         this.site,
-        `comments?post=${encodeURIComponent(this.post)}`
+        'comments',
+        {
+          body: { post: this.post }
+        }
       );
     } catch (error) {
       console.error('Error fetching comments:', error);

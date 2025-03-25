@@ -107,7 +107,10 @@ export class MehCount {
       this.count = await makeApiRequest<number>(
         this.backend,
         this.site,
-        `comments-count?post=${encodeURIComponent(this.post)}`
+        'comments-count',
+        {
+          body: { post: this.post }
+        }
       );
     } catch (error) {
       console.error('Error fetching comment count:', error);

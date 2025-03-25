@@ -96,7 +96,10 @@ export class MehMastodon {
       this.mastodonUrl = await makeApiRequest<string>(
         this.backend,
         this.site,
-        `mastodon-url?post=${encodeURIComponent(this.post)}`
+        'mastodon-url',
+        {
+          body: { post: this.post }
+        }
       );
     } catch (error) {
       console.error('Error fetching Mastodon URL:', error);
