@@ -1,0 +1,10 @@
+{
+  "login": "Iniciar sesión",
+  "logout": "Cerrar sesión",
+  "password": "Contraseña de administrador",
+  "submit": "Enviar",
+  "loginError": "Error de inicio de sesión:",
+  "nopass": "No se proporcionó contraseña",
+  "noadmin": "No hay administrador configurado para este sitio",
+  "badpass": "Contraseña incorrecta"
+}
