@@ -36,3 +36,11 @@ You can override these variables using CSS to customize the appearance of all Me
 }
 ```
 
+## More Customization
+
+If customizing via the given CSS variables is not enough, you can also use the `externalStyles` attribute on the Meh components to inject a stylesheet directly into the component's Shadow DOM. This allows you to apply custom styles directly to the component's internal elements.
+
+```html
+<meh-form externalStyles="path/to/custom.css"></meh-form>
+```
+
