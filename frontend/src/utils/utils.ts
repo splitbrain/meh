@@ -1,9 +1,80 @@
-import { jwtDecode, JwtPayload } from "jwt-decode"
+import {jwtDecode, JwtPayload} from "jwt-decode"
 
 // Define a custom interface that extends JwtPayload to include scopes
 interface MehJwtPayload extends JwtPayload {
   scopes?: string[];
 }
+
+/**
+ * Options for the API request
+ */
+export interface ApiRequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  body?: any;
+  includeToken?: boolean;
+}
+
+/**
+ * Make an API request to the meh backend
+ *
+ * @param backend - The base URL for the backend
+ * @param site - The site identifier
+ * @param endpoint - The API endpoint to call
+ * @param options - Request options (method, body, etc.)
+ * @returns Promise resolving to the parsed response data
+ * @throws Error with message from the API if the request fails
+ */
+export async function makeApiRequest<T = any>(
+  backend: string,
+  site: string,
+  endpoint: string,
+  options: ApiRequestOptions = {}
+): Promise<T> {
+  const {
+    method = 'GET',
+    body = undefined,
+    includeToken = true
+  } = options;
+
+  // Prepare headers
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json'
+  };
+
+  // Add authorization header if token exists and includeToken is true
+  if (includeToken) {
+    const token = getAuthToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+
+  // Prepare request options
+  const requestOptions: RequestInit = {
+    method,
+    headers
+  };
+
+  // Add body for non-GET requests if provided
+  if (method !== 'GET' && body !== undefined) {
+    requestOptions.body = JSON.stringify(body);
+  }
+
+  // Make the request
+  const response = await fetch(`${backend}/api/${site}/${endpoint}`, requestOptions);
+
+  // Parse the response
+  const data = await response.json();
+
+  // Handle error responses
+  if (!response.ok) {
+    throw new Error(data.error?.message || `Server error: ${response.status}`);
+  }
+
+  // Return the response data
+  return data.response;
+}
+
 /**
  * Storage key for the auth token
  */
@@ -37,9 +108,9 @@ export function isAdmin(): boolean {
 
     // Check if the token has the admin scope
     return decoded &&
-           decoded.scopes &&
-           Array.isArray(decoded.scopes) &&
-           decoded.scopes.includes('admin');
+      decoded.scopes &&
+      Array.isArray(decoded.scopes) &&
+      decoded.scopes.includes('admin');
   } catch (error) {
     console.error('Failed to verify admin status:', error);
     return false;
@@ -63,13 +134,13 @@ export function formatRelativeTime(
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
     // Define time units and their values in seconds
-    const units: {unit: Intl.RelativeTimeFormatUnit, seconds: number}[] = [
-      { unit: 'year', seconds: 31536000 },
-      { unit: 'month', seconds: 2592000 },
-      { unit: 'day', seconds: 86400 },
-      { unit: 'hour', seconds: 3600 },
-      { unit: 'minute', seconds: 60 },
-      { unit: 'second', seconds: 1 }
+    const units: { unit: Intl.RelativeTimeFormatUnit, seconds: number }[] = [
+      {unit: 'year', seconds: 31536000},
+      {unit: 'month', seconds: 2592000},
+      {unit: 'day', seconds: 86400},
+      {unit: 'hour', seconds: 3600},
+      {unit: 'minute', seconds: 60},
+      {unit: 'second', seconds: 1}
     ];
 
     // Find the appropriate unit
@@ -77,13 +148,13 @@ export function formatRelativeTime(
       const value = Math.floor(diffInSeconds / seconds);
       if (value >= 1) {
         // Use Intl.RelativeTimeFormat for localized relative time
-        const rtf = new Intl.RelativeTimeFormat(language, { numeric: 'auto' });
+        const rtf = new Intl.RelativeTimeFormat(language, {numeric: 'auto'});
         return rtf.format(-value, unit);
       }
     }
 
     // If we get here, it's just now
-    const rtf = new Intl.RelativeTimeFormat(language, { numeric: 'auto' });
+    const rtf = new Intl.RelativeTimeFormat(language, {numeric: 'auto'});
     return rtf.format(0, 'second');
   } catch (e) {
     console.error('Error formatting relative time:', e);
@@ -108,7 +179,7 @@ export class TranslationManager<T extends Record<string, string>> {
    * @param defaultTranslations - The default translations to use as initial values
    */
   constructor(defaultTranslations: T) {
-    this.translations = { ...defaultTranslations };
+    this.translations = {...defaultTranslations};
   }
 
   /**

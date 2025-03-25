@@ -1,5 +1,5 @@
-import {Component, Prop, h, State, Element} from '@stencil/core';
-import {TranslationManager, formatRelativeTime, getAuthToken, isAdmin} from '../../utils/utils';
+import {Component, Element, h, Prop, State} from '@stencil/core';
+import {formatRelativeTime, isAdmin, makeApiRequest, TranslationManager} from '../../utils/utils';
 
 @Component({
   tag: 'meh-comments',
@@ -117,28 +117,11 @@ export class MehComments {
     this.error = '';
 
     try {
-      // Prepare headers
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json'
-      };
-
-      // Add authorization header if token exists
-      const token = getAuthToken();
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${this.backend}/api/${this.site}/comments?post=${encodeURIComponent(this.post)}`, {
-        headers
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || `Server error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      this.comments = data.response || [];
+      this.comments = await makeApiRequest<any[]>(
+        this.backend,
+        this.site,
+        `comments?post=${encodeURIComponent(this.post)}`
+      );
     } catch (error) {
       console.error('Error fetching comments:', error);
       this.error = error.message || 'Unknown error occurred';
@@ -185,38 +168,21 @@ export class MehComments {
    */
   private async updateCommentStatus(commentId: number, status: string): Promise<void> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('Authentication required');
-      }
+      const updatedComment = await makeApiRequest(
+        this.backend,
+        this.site,
+        `comment/${commentId}/${status}`,
+        {method: 'PUT'}
+      );
 
-      const response = await fetch(`${this.backend}/api/${this.site}/comment/${commentId}/${status}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || `Server error: ${response.status}`);
-      }
-
-      // Get the updated comment data from the response
-      const data = await response.json();
-      const updatedComment = data.response;
-
-      if (updatedComment) {
-        if (status === 'deleted') {
-          // Remove the comment from our state
-          this.comments = this.comments.filter(comment => comment.id !== commentId);
-        } else {
-          // Update the comment in our local state
-          this.comments = this.comments.map(comment =>
-            comment.id === commentId ? updatedComment : comment
-          );
-        }
+      if (status === 'deleted') {
+        // Remove the comment from our state
+        this.comments = this.comments.filter(comment => comment.id !== commentId);
+      } else {
+        // Update the comment in our local state
+        this.comments = this.comments.map(comment =>
+          comment.id === commentId ? updatedComment : comment
+        );
       }
     } catch (error) {
       console.error(`Error updating comment status to ${status}:`, error);
@@ -331,12 +297,12 @@ export class MehComments {
    */
   render() {
     const elements = [];
-    
+
     // Add external stylesheet if provided
     if (this.externalStyles) {
-      elements.push(<link rel="stylesheet" href={this.externalStyles} />);
+      elements.push(<link rel="stylesheet" href={this.externalStyles}/>);
     }
-    
+
     // Add the appropriate content based on component state
     if (this.loading) {
       elements.push(this.renderLoading());
@@ -347,7 +313,7 @@ export class MehComments {
     } else {
       elements.push(this.renderCommentsList());
     }
-    
+
     return elements;
   }
 }

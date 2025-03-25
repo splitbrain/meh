@@ -1,5 +1,5 @@
 import {Component, Prop, h, State, Element} from '@stencil/core';
-import { TranslationManager, getAuthToken, TOKEN_STORAGE_KEY } from '../../utils/utils';
+import { TranslationManager, TOKEN_STORAGE_KEY, makeApiRequest } from '../../utils/utils';
 
 @Component({
   tag: 'meh-form',
@@ -138,33 +138,22 @@ export class MehForm {
    */
   private async refreshToken(): Promise<void> {
     try {
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json'
-      };
-
-      // Add authorization header if token exists
-      const token = getAuthToken();
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${this.backend}/api/${this.site}/token/refresh`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({})
-      });
-
-      if (!response.ok) {
-        console.warn('Failed to refresh token:', response.status);
-      } else {
-        const data = await response.json();
-        if (data.response && data.response.token) {
-          // Store the new token
-          try {
-            localStorage.setItem(TOKEN_STORAGE_KEY, data.response.token);
-          } catch (error) {
-            console.error('Failed to save token to localStorage:', error);
-          }
+      const response = await makeApiRequest<{ token: string }>(
+        this.backend,
+        this.site,
+        'token/refresh',
+        {
+          method: 'POST',
+          body: {}
+        }
+      );
+      
+      if (response && response.token) {
+        // Store the new token
+        try {
+          localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
+        } catch (error) {
+          console.error('Failed to save token to localStorage:', error);
         }
       }
     } catch (error) {
@@ -196,34 +185,19 @@ export class MehForm {
     this.errorMessage = '';
 
     try {
-      // Prepare headers
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json'
-      };
-
-      // Add authorization header if token exists
-      const token = getAuthToken();
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${this.backend}/api/${this.site}/comment`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          post: this.post,
-          ...formValues
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || `Server error: ${response.status}`);
-      }
-
-      // Get the response data which includes the created comment
-      const data = await response.json();
-      const comment = data.response;
+      // Submit the comment
+      const comment = await makeApiRequest(
+        this.backend,
+        this.site,
+        'comment',
+        {
+          method: 'POST',
+          body: {
+            post: this.post,
+            ...formValues
+          }
+        }
+      );
 
       // Store the comment status
       this.commentStatus = comment.status;

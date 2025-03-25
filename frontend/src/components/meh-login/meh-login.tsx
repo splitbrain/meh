@@ -1,5 +1,5 @@
 import {Component, Prop, h, State} from '@stencil/core';
-import {TranslationManager, TOKEN_STORAGE_KEY, isAdmin} from '../../utils/utils';
+import {TranslationManager, TOKEN_STORAGE_KEY, isAdmin, makeApiRequest} from '../../utils/utils';
 
 @Component({
   tag: 'meh-login',
@@ -103,20 +103,20 @@ export class MehLogin {
       localStorage.removeItem(TOKEN_STORAGE_KEY);
       
       // Get a new user token by calling refresh endpoint
-      const response = await fetch(`${this.backend}/api/${this.site}/token/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({})
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.response && data.response.token) {
-          // Store the new user token
-          localStorage.setItem(TOKEN_STORAGE_KEY, data.response.token);
+      const response = await makeApiRequest<{ token: string }>(
+        this.backend,
+        this.site,
+        'token/refresh',
+        {
+          method: 'POST',
+          body: {},
+          includeToken: false
         }
+      );
+      
+      if (response && response.token) {
+        // Store the new user token
+        localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
       }
     } catch (error) {
       console.error('Error during logout:', error);
@@ -141,22 +141,19 @@ export class MehLogin {
     this.error = '';
 
     try {
-      const response = await fetch(`${this.backend}/api/${this.site}/token/admin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({password: this.password}),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || `Server error: ${response.status}`);
-      }
+      const response = await makeApiRequest<{ token: string }>(
+        this.backend,
+        this.site,
+        'token/admin',
+        {
+          method: 'POST',
+          body: { password: this.password },
+          includeToken: false
+        }
+      );
 
       // Store the token in localStorage
-      localStorage.setItem(TOKEN_STORAGE_KEY, data.response.token);
+      localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
       
       // Update state
       this.isLoggedIn = true;

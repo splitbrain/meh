@@ -1,5 +1,5 @@
 import {Component, Prop, h, State} from '@stencil/core';
-import {TranslationManager, getAuthToken} from '../../utils/utils';
+import {TranslationManager, makeApiRequest} from '../../utils/utils';
 
 @Component({
   tag: 'meh-count',
@@ -104,28 +104,11 @@ export class MehCount {
     this.error = '';
 
     try {
-      // Prepare headers
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json'
-      };
-
-      // Add authorization header if token exists
-      const token = getAuthToken();
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${this.backend}/api/${this.site}/comments-count?post=${encodeURIComponent(this.post)}`, {
-        headers
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || `Server error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      this.count = data.response || 0;
+      this.count = await makeApiRequest<number>(
+        this.backend,
+        this.site,
+        `comments-count?post=${encodeURIComponent(this.post)}`
+      );
     } catch (error) {
       console.error('Error fetching comment count:', error);
       this.error = error.message || 'Unknown error occurred';
