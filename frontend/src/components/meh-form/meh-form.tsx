@@ -83,7 +83,7 @@ export class MehForm {
   private translator: TranslationManager<typeof this.defaultTranslations>;
 
   // Shorthand method for translations
-  private _(key: keyof typeof this.defaultTranslations): string {
+  private _(key: keyof typeof this.defaultTranslations | string): string {
     return this.translator.get(key);
   }
 
