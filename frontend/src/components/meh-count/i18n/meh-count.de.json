@@ -3,5 +3,5 @@
   "oneComment": "1 Kommentar",
   "multipleComments": "{count} Kommentare",
   "loadingComments": "Wird geladen...",
-  "errorLoading": "Fehler beim Laden der Kommentaranzahl"
+  "errorLoading": "?"
 }

@@ -3,5 +3,8 @@
   "logout": "Abmelden",
   "password": "Admin-Passwort",
   "submit": "Absenden",
-  "loginError": "Anmeldung fehlgeschlagen:"
+  "loginError": "Anmeldung fehlgeschlagen:",
+  "nopass": "Kein Passwort angegeben",
+  "noadmin": "Für diese Seite ist kein Administrator eingerichtet",
+  "badpass": "Falsches Passwort"
 }

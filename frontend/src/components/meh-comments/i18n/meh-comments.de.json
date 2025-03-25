@@ -1,13 +1,11 @@
 {
-  "commentsTitle": "Kommentare",
   "noComments": "Noch keine Kommentare. Sei der Erste, der kommentiert!",
   "loadingComments": "Kommentare werden geladen...",
   "errorLoading": "Fehler beim Laden der Kommentare:",
-  "postedOn": "Gepostet am",
-  "by": "von",
   "approve": "Genehmigen",
   "reject": "Ablehnen",
   "delete": "Löschen",
   "edit": "Bearbeiten",
-  "spam": "Spam"
+  "spam": "Spam",
+  "confirmDelete": "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?"
 }
