@@ -119,12 +119,12 @@ class CommentUtils
     public function checkPostLimit(array $comment, int $iat): void
     {
         // we issue a new token on form load. Users should not post immediately
-        if ((time() - $iat) < 60) {
-            throw new HttpException('{toosoon} You posted really fast. Did you even read the article?', 503);
+        if ((time() - $iat) < 30) {
+            throw new HttpException('`toosoon` You posted really fast. Did you even read the article?', 503);
         }
         // if they idle too long, we want them to get a new token
         if ((time() - $iat) > 60 * 60 * 2) {
-            throw new HttpException('{toolate} Sorry you waited too long. Please reload and try again', 503);
+            throw new HttpException('`toolate` Sorry you waited too long. Please reload and try again', 503);
         }
 
         // if there is a pending comment by this user, don't allow another one
@@ -135,7 +135,7 @@ class CommentUtils
                 $user
             );
             if ($last == 'pending') {
-                throw new HttpException('{pending} Your previous comment is still pending approval', 503);
+                throw new HttpException('`pending` Your previous comment is still pending approval', 503);
             }
         }
 
@@ -145,7 +145,7 @@ class CommentUtils
             $comment['ip']
         );
         if ($last == 'pending') {
-            throw new HttpException('{pending} Your previous comment is still pending approval', 503);
+            throw new HttpException('`pending` Your previous comment is still pending approval', 503);
         }
     }
 

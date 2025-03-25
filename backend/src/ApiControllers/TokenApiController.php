@@ -23,18 +23,18 @@ class TokenApiController extends ApiController
     {
         // Check if password is provided
         if (empty($data['password'])) {
-            throw new HttpException('Password is required', 400);
+            throw new HttpException('`nopass` Password is required', 400);
         }
 
         // Get admin password from environment
         $adminPassword = $this->app->conf('admin_password');
         if (empty($adminPassword)) {
-            throw new HttpException('Admin password not configured', 500);
+            throw new HttpException('`noadmin` Admin password not configured', 500);
         }
 
         // Verify password
         if (!password_verify((string) $data['password'], (string) $adminPassword)) {
-            throw new HttpException('Invalid password', 401);
+            throw new HttpException('`badpass` Invalid password', 401);
         }
 
         // Create token with admin and user scopes

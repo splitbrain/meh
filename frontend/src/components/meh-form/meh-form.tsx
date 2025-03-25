@@ -76,7 +76,6 @@ export class MehForm {
     submittingButton: 'Submitting...',
     successMessagePending: 'Thank you for your comment! It has been submitted for review.',
     successMessageApproved: 'Thank you for your comment! It has been published.',
-    errorPrefix: 'An error occurred while submitting your comment:',
   };
 
   // Translation manager instance
@@ -147,7 +146,7 @@ export class MehForm {
           body: {}
         }
       );
-      
+
       if (response && response.token) {
         // Store the new token
         try {
@@ -230,12 +229,12 @@ export class MehForm {
 
   render() {
     const elements = [];
-    
+
     // Add external stylesheet if provided
     if (this.externalStyles) {
       elements.push(<link rel="stylesheet" href={this.externalStyles} />);
     }
-    
+
     elements.push(
       <div class="meh-form-container">
         <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
@@ -294,7 +293,7 @@ export class MehForm {
 
           {this.status === 'error' && (
             <div class="error">
-              {this._('errorPrefix')} {this._(this.errorMessage)}
+              {this._(this.errorMessage)}
             </div>
           )}
 
@@ -308,7 +307,7 @@ export class MehForm {
         </form>
       </div>
     );
-    
+
     return elements;
   }
 }

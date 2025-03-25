@@ -196,7 +196,7 @@ export class TranslationManager<T extends Record<string, string>> {
   /**
    * Get a translated string for a given key or process a template string
    *
-   * If the input is a template string with format "{key} fallback text",
+   * If the input is a template string with format "`key` fallback text",
    * it will return the translation for the key if it exists,
    * otherwise it returns the fallback text.
    *
@@ -206,8 +206,8 @@ export class TranslationManager<T extends Record<string, string>> {
    * @returns The translated string, fallback text, or the key itself if not found
    */
   get<K extends keyof T | string>(key: K): string {
-    // Check if this is a template string with {key} format
-    const match = String(key).match(/^\{([^}]+)\}(.*)$/);
+    // Check if this is a template string with `key` format
+    const match = String(key).match(/^`([^`]+)`(.*)$/);
     
     if (match) {
       // Template format found

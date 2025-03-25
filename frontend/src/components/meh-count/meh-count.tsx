@@ -60,7 +60,7 @@ export class MehCount {
     oneComment: '1 comment',
     multipleComments: '{count} comments',
     loadingComments: 'Loading...',
-    errorLoading: 'Error loading comment count',
+    errorLoading: '?',
   };
 
   // Translation manager instance
@@ -138,21 +138,21 @@ export class MehCount {
 
   render() {
     const elements = [];
-    
+
     // Add external stylesheet if provided
     if (this.externalStyles) {
       elements.push(<link rel="stylesheet" href={this.externalStyles} />);
     }
-    
+
     // Add the appropriate content based on component state
     if (this.loading) {
       elements.push(<span class="loading">{this._('loadingComments')}</span>);
     } else if (this.error) {
-      elements.push(<span class="error" title={this.error}>{this._('errorLoading')}</span>);
+      elements.push(<span class="error" title={this._(this.error)}>{this._('errorLoading')}</span>);
     } else {
       elements.push(<span>{this.formatCount()}</span>);
     }
-    
+
     return elements;
   }
 }
