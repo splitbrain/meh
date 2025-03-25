@@ -1,6 +1,7 @@
 # we ignore everything, then whitelist the directories and files we want to include
 # see https://stackoverflow.com/a/70871674
 /**
+!/doc
 !/public
 !/backend
 !/frontend/dist/meh
