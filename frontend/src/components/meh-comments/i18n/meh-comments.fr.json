@@ -1,0 +1,11 @@
+{
+  "noComments": "Pas encore de commentaires. Soyez le premier à commenter !",
+  "loadingComments": "Chargement des commentaires...",
+  "errorLoading": "Erreur lors du chargement des commentaires :",
+  "approve": "Approuver",
+  "reject": "Rejeter",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "spam": "Spam",
+  "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce commentaire ?"
+}

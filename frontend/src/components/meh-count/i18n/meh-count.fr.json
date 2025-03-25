@@ -1,0 +1,7 @@
+{
+  "noComments": "Aucun commentaire",
+  "oneComment": "1 commentaire",
+  "multipleComments": "{count} commentaires",
+  "loadingComments": "Chargement...",
+  "errorLoading": "?"
+}

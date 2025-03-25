@@ -1,0 +1,10 @@
+{
+  "login": "Connexion",
+  "logout": "Déconnexion",
+  "password": "Mot de passe administrateur",
+  "submit": "Envoyer",
+  "loginError": "Échec de la connexion :",
+  "nopass": "Aucun mot de passe fourni",
+  "noadmin": "Aucun administrateur n'est configuré pour ce site",
+  "badpass": "Mot de passe incorrect"
+}
