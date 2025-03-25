@@ -30,10 +30,10 @@ class CliController extends PSR3CLIv3
 
         $options->registerCommand(
             'config',
-            "Show or edit configuration values.\n".
-            "Configuration can come from defaults, the environment (or .env file) or from the database. ".
-            "If no arguments are given a table with all set options is shown.\n".
-            "Use the <key> and <value> arguments to set a new value in the database. ".
+            "Show or edit configuration values.\n" .
+            "Configuration can come from defaults, the environment (or .env file) or from the database. " .
+            "If no arguments are given a table with all set options is shown.\n" .
+            "Use the <key> and <value> arguments to set a new value in the database. " .
             "Use an empty string as value to delete a key."
         );
         $options->registerArgument('key', 'The configuration key to show or edit', false, 'config');
@@ -97,7 +97,7 @@ class CliController extends PSR3CLIv3
         $db = $this->getDatabase();
         $db->migrate();
 
-        if(!$this->app->conf('jwt_secret') && !$db->getOpt('jwt_secret')) {
+        if (!$this->app->conf('jwt_secret') && !$db->getOpt('jwt_secret')) {
             $this->info("Generating new JWT secret");
             $this->config('jwt_secret', bin2hex(random_bytes(16)));
         }
@@ -116,13 +116,17 @@ class CliController extends PSR3CLIv3
         if (!in_array($key, $allowed)) {
             throw new Exception("Unknown configuration key: $key", 1);
         }
+        $disallowed = ['db_path', 'env'];
+        if (in_array($key, $disallowed)) {
+            throw new Exception("$key may only be set via environment", 1);
+        }
 
         $db = $this->app->db();
         if ($value !== null) {
             if ($value === '') {
                 $db->exec('DELETE FROM opt WHERE conf = ?', [$key]);
             } else {
-                if($key === 'admin_password') {
+                if ($key === 'admin_password') {
                     $value = password_hash($value, PASSWORD_DEFAULT);
                 }
 

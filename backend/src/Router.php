@@ -64,4 +64,14 @@ abstract class Router
             $this->onError($e);
         }
     }
+
+    /**
+     * Check if the environment is development
+     *
+     * @return bool
+     */
+    public function isDev(): bool
+    {
+        return $_ENV['MEH_ENV'] === 'dev';
+    }
 }

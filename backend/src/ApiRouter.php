@@ -55,7 +55,7 @@ class ApiRouter extends Router
             throw new HttpException('No site specified', 400);
         }
         try {
-            $app = new App($match['params']['site'], new ErrorLogLogger('info'));
+            $app = new App($match['params']['site'], new ErrorLogLogger($this->isDev() ? 'debug' : 'warning'));
         } catch (\Exception $e) {
             throw new HttpException('Invalid site specified', 404);
         }
@@ -143,8 +143,7 @@ class ApiRouter extends Router
             'error' => [
                 'message' => $e->getMessage(),
                 'code' => $e->getCode() ?: 1,
-                'trace' => $e->getTrace() // FIXME make configurable
-                // FIXME add info on previous exception if any
+                'trace' => $this->isDev() ? $e->getTrace() : null
             ]
         ], JSON_PRETTY_PRINT);
     }
