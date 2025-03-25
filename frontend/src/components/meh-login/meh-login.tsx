@@ -229,30 +229,22 @@ export class MehLogin {
     // Check admin status on each render to ensure it's current
     this.isLoggedIn = isAdmin();
     
-    const externalStylesheet = this.externalStyles ? 
-      <link rel="stylesheet" href={this.externalStyles} /> : null;
-      
-    if (this.isLoggedIn) {
-      return (
-        <div>
-          {externalStylesheet}
-          {this.renderLogoutButton()}
-        </div>
-      );
-    } else if (this.showPasswordField) {
-      return (
-        <div>
-          {externalStylesheet}
-          {this.renderPasswordForm()}
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          {externalStylesheet}
-          {this.renderLoginButton()}
-        </div>
-      );
+    const elements = [];
+    
+    // Add external stylesheet if provided
+    if (this.externalStyles) {
+      elements.push(<link rel="stylesheet" href={this.externalStyles} />);
     }
+    
+    // Add the appropriate content based on component state
+    if (this.isLoggedIn) {
+      elements.push(this.renderLogoutButton());
+    } else if (this.showPasswordField) {
+      elements.push(this.renderPasswordForm());
+    } else {
+      elements.push(this.renderLoginButton());
+    }
+    
+    return elements;
   }
 }

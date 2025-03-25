@@ -330,37 +330,24 @@ export class MehComments {
    * Main render method
    */
   render() {
-    const externalStylesheet = this.externalStyles ? 
-      <link rel="stylesheet" href={this.externalStyles} /> : null;
-      
-    if (this.loading) {
-      return (
-        <div>
-          {externalStylesheet}
-          {this.renderLoading()}
-        </div>
-      );
-    } else if (this.error) {
-      return (
-        <div>
-          {externalStylesheet}
-          {this.renderError()}
-        </div>
-      );
-    } else if (this.comments.length === 0) {
-      return (
-        <div>
-          {externalStylesheet}
-          {this.renderNoComments()}
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          {externalStylesheet}
-          {this.renderCommentsList()}
-        </div>
-      );
+    const elements = [];
+    
+    // Add external stylesheet if provided
+    if (this.externalStyles) {
+      elements.push(<link rel="stylesheet" href={this.externalStyles} />);
     }
+    
+    // Add the appropriate content based on component state
+    if (this.loading) {
+      elements.push(this.renderLoading());
+    } else if (this.error) {
+      elements.push(this.renderError());
+    } else if (this.comments.length === 0) {
+      elements.push(this.renderNoComments());
+    } else {
+      elements.push(this.renderCommentsList());
+    }
+    
+    return elements;
   }
 }

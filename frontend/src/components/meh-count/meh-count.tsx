@@ -151,30 +151,22 @@ export class MehCount {
 
 
   render() {
-    const externalStylesheet = this.externalStyles ? 
-      <link rel="stylesheet" href={this.externalStyles} /> : null;
-      
-    if (this.loading) {
-      return (
-        <div>
-          {externalStylesheet}
-          <span class="loading">{this._('loadingComments')}</span>
-        </div>
-      );
-    } else if (this.error) {
-      return (
-        <div>
-          {externalStylesheet}
-          <span class="error" title={this.error}>{this._('errorLoading')}</span>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          {externalStylesheet}
-          <span>{this.formatCount()}</span>
-        </div>
-      );
+    const elements = [];
+    
+    // Add external stylesheet if provided
+    if (this.externalStyles) {
+      elements.push(<link rel="stylesheet" href={this.externalStyles} />);
     }
+    
+    // Add the appropriate content based on component state
+    if (this.loading) {
+      elements.push(<span class="loading">{this._('loadingComments')}</span>);
+    } else if (this.error) {
+      elements.push(<span class="error" title={this.error}>{this._('errorLoading')}</span>);
+    } else {
+      elements.push(<span>{this.formatCount()}</span>);
+    }
+    
+    return elements;
   }
 }

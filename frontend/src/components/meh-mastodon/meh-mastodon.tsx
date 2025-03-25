@@ -123,21 +123,28 @@ export class MehMastodon {
   }
 
   render() {
-    if (this.mastodonUrl) {
-      return (
-        <div>
-          {this.externalStyles && <link rel="stylesheet" href={this.externalStyles} />}
-          <a
-            href={this.mastodonUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="mastodon-link"
-          >{this._('discussOnMastodon')}</a>
-        </div>
-      );
-    } else {
+    if (!this.mastodonUrl) {
       // If no Mastodon URL is found, render nothing
       return null;
     }
+    
+    const elements = [];
+    
+    // Add external stylesheet if provided
+    if (this.externalStyles) {
+      elements.push(<link rel="stylesheet" href={this.externalStyles} />);
+    }
+    
+    // Add the Mastodon link
+    elements.push(
+      <a
+        href={this.mastodonUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mastodon-link"
+      >{this._('discussOnMastodon')}</a>
+    );
+    
+    return elements;
   }
 }

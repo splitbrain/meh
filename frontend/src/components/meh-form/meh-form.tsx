@@ -255,9 +255,15 @@ export class MehForm {
   };
 
   render() {
-    return (
+    const elements = [];
+    
+    // Add external stylesheet if provided
+    if (this.externalStyles) {
+      elements.push(<link rel="stylesheet" href={this.externalStyles} />);
+    }
+    
+    elements.push(
       <div class="meh-form-container">
-        {this.externalStyles && <link rel="stylesheet" href={this.externalStyles} />}
         <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
           <div class="userdata">
             <label class="required">
@@ -328,5 +334,7 @@ export class MehForm {
         </form>
       </div>
     );
+    
+    return elements;
   }
 }
