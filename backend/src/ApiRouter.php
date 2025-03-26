@@ -24,7 +24,6 @@ class ApiRouter extends Router
     protected function registerRoutes(): void
     {
         //  We register  [Controller, method, scope] for each route
-
         $this->alto->map('GET', '/[s:site]/comments', [CommentListApiController::class, 'bypost']);
         $this->alto->map('GET', '/[s:site]/comments-count', [CommentListApiController::class, 'count']);
 
@@ -46,6 +45,19 @@ class ApiRouter extends Router
     {
         // Set JSON content type for all responses
         header('Content-Type: application/json');
+
+        // Allow CORS for all origins (we check the origin header later)
+        header('Access-Control-Allow-Origin: *');
+
+        // On CORS preflight requests, return the allowed methods and headers
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            // Handle preflight requests
+            header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE');
+            header('Access-Control-Allow-Headers: Authorization, Content-Type');
+            header('Access-Control-Max-Age: 86400');
+            http_response_code(200);
+            exit;
+        }
     }
 
     /** @inheritdoc */
@@ -60,14 +72,7 @@ class ApiRouter extends Router
             throw new HttpException('Invalid site specified', 404);
         }
 
-        if ($app->conf('env') == 'dev') {
-            // Allow CORS for all origins in dev mode
-            header('Access-Control-Allow-Origin: *');
-        } else {
-            // Add CORS for site domain only
-            header('Access-Control-Allow-Origin: ' . $app->conf('site_url'));
-            header('Vary: Origin');
-
+        if ($app->conf('env') != 'dev') {
             // check origin header on mutation requests
             if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'HEAD') {
                 if (($_SERVER['HTTP_ORIGIN'] ?? '') !== $app->conf('site_url')) {
