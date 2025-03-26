@@ -72,6 +72,6 @@ abstract class Router
      */
     public function isDev(): bool
     {
-        return $_ENV['MEH_ENV'] === 'dev';
+        return ($_ENV['MEH_ENV'] ?? '') === 'dev';
     }
 }
