@@ -23,8 +23,8 @@ class PostApiController extends ApiController
         }
 
         $post = $this->app->db()->queryValue(
-            'SELECT url FROM mastodon_threads WHERE post = ? ORDER BY created_at DESC LIMIT 1',
-            [$postPath]
+            'SELECT url FROM mastodon_threads WHERE post = ? AND account = ? ORDER BY created_at DESC LIMIT 1',
+            [$postPath, $this->app->conf('mastodon_account', '')]
         );
 
         if (!$post) {
