@@ -28,55 +28,70 @@ Once the scripts are loaded, you can use the components as HTML tags:
 ```html
 
 <!-- Add a comment form -->
-<meh-form backend="https://comments.example.com">
+<meh-form>
+    <!-- Add a Mastodon link -->
+    <meh-mastodon></meh-mastodon>
     <!-- Add an admin login button -->
-    <meh-login backend="https://comments.example.com"></meh-login>
+    <meh-login></meh-login>
 </meh-form>
 <!-- Display comments -->
-<meh-comments backend="https://comments.example.com">
-</meh-comments>
+<meh-comments></meh-comments>
 ```
+
+Of course, you can surround the components with any other HTML you like. The components will be inserted into the page at the location of the tags.
 
 ## Common Properties
 
 All Meh components share these common properties:
 
-* `backend`
+### `backend`
 
-  The URL where your Meh backend is hosted. This should be the base URL of your Meh installation. Each of the components will need at least this property to work.
-  ```html
-  <meh-comments backend="https://comments.example.com"></meh-comments>
-  ```
+The URL where your Meh backend is hosted. This should be the base URL of your Meh installation.
+ 
+```html
+<meh-comments backend="https://comments.example.com"></meh-comments>
+```
 
-* `site`
+The components should be able to detect this themselves from the script URL, but you can specify it explicitly if needed.
 
-  The site identifier for multi-site setups. This corresponds to the site name you configured in your Meh installation.
+### `site`
 
-  ```html
-  <meh-comments site="myblog"></meh-comments>
-  ```
+The site identifier for multi-site setups. This corresponds to the site name you configured in your Meh installation.
 
-  If not specified, it defaults to "meh".
+```html
+<meh-comments site="myblog"></meh-comments>
+```
 
-* `post`
+If not specified, it defaults to "meh".
 
-  * For `meh-comments` and `meh-form`, this specifies which post the comments belong to. It should be a unique identifier for the page, typically the URL path.
+### `post`
 
-  ```html
-  <meh-comments post="/blog/2023/my-awesome-post"></meh-comments>
-  ```
+This specifies which post the comments belong to. It should be a unique identifier for the page, typically the URL path.
 
-  If not specified, it defaults to the current page's path. This default should work for most use cases.
+```html
+<meh-comments post="/blog/2023/my-awesome-post"></meh-comments>
+```
 
-* `language`
+If not specified, it defaults to the current page's path. This default should work for most use cases.
 
-  The language code for translations. Meh supports multiple languages through translation files.
+### `language`
 
-  ```html
-  <meh-comments language="de"></meh-comments>
-  ```
+The language code for translations. Meh supports multiple languages through translation files.
 
-  If not specified, it defaults to "en" (English).
+```html
+<meh-comments language="de"></meh-comments>
+```
+
+If not specified, it defaults to "en" (English).
+
+### `customTranslations`
+
+See the [Translations](translations.md) documentation for more information.
+
+### `externalStyles`
+
+See the [Styling Components](styling.md) documentation for more information.
+
 
 ## Complete Example
 
