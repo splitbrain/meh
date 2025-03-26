@@ -1,26 +1,15 @@
 :host {
   display: inline-block;
-
-  --link-color: var(--meh-accent);
-}
-
-.mastodon-link {
-  display: inline-flex;
-  align-items: center;
-  color: var(--meh-accent);
-  text-decoration: none;
-  font-size: 0.9em;
-}
-
-.mastodon-link:hover {
-  text-decoration: underline;
 }
 
 a {
-  color: var(--link-color);
-  text-decoration-color: var(--border-color);
+  display: inline-flex;
+  align-items: center;
+
+  color: var(--meh-link-color);
+  text-decoration-color: color-mix(in srgb, var(--meh-link-color), transparent 80%);
 
   &:hover, &:focus, &:active {
-    text-decoration-color: var(--link-color);
+    text-decoration-color: var(--meh-link-deco-color);
   }
 }

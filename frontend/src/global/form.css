@@ -37,11 +37,11 @@ input, textarea, button {
 }
 
 button {
-  background-color: color-mix(in srgb, var(--meh-accent), var(--meh-background) 80%);
+  background-color: var(--meh-button-background);
   color: var(--meh-foreground);
   fill: var(--meh-foreground);
 
   &:hover {
-    background-color: color-mix(in srgb, var(--meh-accent), var(--meh-background) 60%);
+    background-color: color-mix(in srgb, var(--meh-button-background), var(--meh-foreground) 10%);
   }
 }

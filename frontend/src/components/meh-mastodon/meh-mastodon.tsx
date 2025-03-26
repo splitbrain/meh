@@ -125,7 +125,6 @@ export class MehMastodon {
         href={this.mastodonUrl}
         target="_blank"
         rel="noopener noreferrer"
-        class="mastodon-link"
       >{this._('discussOnMastodon')}</a>
     );
 

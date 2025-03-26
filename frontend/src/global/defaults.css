@@ -12,6 +12,12 @@
   --meh-success: var(--meh-default-success, #4caf50);
   --meh-error: var(--meh-default-error, #f44336);
 
+  /* Derived Colors */
+  --meh-link-color: var(--meh-default-link-color, var(--meh-accent));
+  --meh-link-deco-color: var(--meh-default-link-deco-color, var(--meh-link-color));
+  --meh-border-color: var(--meh-default-border-color, color-mix(in srgb, var(--meh-foreground), transparent 90%));
+  --meh-button-background: var(--meh-default-button-background, color-mix(in srgb, var(--meh-accent), var(--meh-background) 80%));
+
   display: block;
 
   * {
