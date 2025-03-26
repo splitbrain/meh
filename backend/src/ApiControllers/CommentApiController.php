@@ -202,6 +202,17 @@ class CommentApiController extends ApiController
             $mailer->Password = $this->app->conf('smtp_password');
         }
 
+        if((bool) $this->app->conf('smtp_verify') === false) {
+            $mailer->SMTPOptions = [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                ]
+            ];
+        }
+
+
         $mailer->addAddress($this->app->conf('notify_email'));
         $mailer->setFrom($this->app->conf('notify_email'), 'Meh');
 

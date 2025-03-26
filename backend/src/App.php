@@ -87,6 +87,7 @@ class App
             'smtp_host' => 'localhost',
             'smtp_port' => 25,
             'smtp_encryption' => '',
+            'smtp_verify' => 1,
             'smtp_user' => '',
             'smtp_pass' => '',
             'env' => 'prod',
