@@ -1,5 +1,5 @@
 import {Component, Element, h, Prop, State} from '@stencil/core';
-import {formatRelativeTime, isAdmin, makeApiRequest, TranslationManager} from '../../utils/utils';
+import {formatRelativeTime, isAdmin, makeApiRequest, TranslationManager, detectBackendUrl} from '../../utils/utils';
 
 @Component({
   tag: 'meh-comments',
@@ -20,7 +20,7 @@ export class MehComments {
 
   /**
    * The base URL for where the meh system is hosted
-   * If not provided, defaults to same origin
+   * If not provided, attempts to detect from script tag
    */
   @Prop() backend: string = '';
 
@@ -78,10 +78,8 @@ export class MehComments {
       this.post = window.location.pathname;
     }
 
-    // remove trailing slash from backend URL
-    if (this.backend.endsWith('/')) {
-      this.backend = this.backend.slice(0, -1);
-    }
+    // Process the backend URL (clean or detect)
+    this.backend = detectBackendUrl(this.backend);
 
     // Initialize the TranslationManager with default translations
     this.translator = new TranslationManager(this.defaultTranslations);

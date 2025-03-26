@@ -1,5 +1,5 @@
 import {Component, Prop, h, State, Element} from '@stencil/core';
-import { TranslationManager, TOKEN_STORAGE_KEY, makeApiRequest } from '../../utils/utils';
+import { TranslationManager, TOKEN_STORAGE_KEY, makeApiRequest, detectBackendUrl } from '../../utils/utils';
 
 @Component({
   tag: 'meh-form',
@@ -21,7 +21,7 @@ export class MehForm {
 
   /**
    * The base URL for where the meh system is hosted
-   * If not provided, defaults to same origin
+   * If not provided, attempts to detect from script tag
    */
   @Prop() backend: string = '';
 
@@ -95,10 +95,8 @@ export class MehForm {
       this.post = window.location.pathname;
     }
 
-    // remove trailing slash from backend URL
-    if (this.backend.endsWith('/')) {
-      this.backend = this.backend.slice(0, -1);
-    }
+    // Process the backend URL (clean or detect)
+    this.backend = detectBackendUrl(this.backend);
 
     // Initialize the TranslationManager with default translations
     this.translator = new TranslationManager(this.defaultTranslations);

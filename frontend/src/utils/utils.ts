@@ -1,5 +1,49 @@
 import {jwtDecode, JwtPayload} from "jwt-decode"
 
+/**
+ * Process the backend URL:
+ * - If a URL is provided, clean it (remove trailing slash)
+ * - If no URL is provided, attempt to detect it from the script tag
+ *
+ * @param backendUrl - The backend URL provided by the component, if any
+ * @returns The processed backend URL
+ */
+export function detectBackendUrl(backendUrl: string = ''): string {
+  // If a backend URL is provided, just clean it
+  if (backendUrl) {
+    // Remove trailing slash if present
+    return backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
+  }
+
+  // Otherwise, try to detect it from the script tag
+  try {
+    // Find the script tag that loaded meh.esm.js
+    const scriptTags = document.querySelectorAll('script[src*="meh.esm.js"]');
+    if (scriptTags.length === 0) return '';
+
+    // Get the src attribute of the first matching script tag
+    const scriptSrc = scriptTags[0].getAttribute('src');
+    if (!scriptSrc) return '';
+
+    // Extract the base path from the script src
+    const urlObj = new URL(scriptSrc, window.location.href);
+    const pathParts = urlObj.pathname.split('/');
+
+    // Remove the filename and 'meh' directory from the path
+    pathParts.pop(); // Remove 'meh.esm.js'
+    if (pathParts[pathParts.length - 1] === 'meh') {
+      pathParts.pop(); // Remove 'meh' directory
+    }
+
+    // Construct the backend URL with protocol, hostname, and port if present
+    const port = urlObj.port ? `:${urlObj.port}` : '';
+    return `${urlObj.protocol}//${urlObj.hostname}${port}${pathParts.join('/')}`;
+  } catch (error) {
+    console.error('Error detecting backend URL:', error);
+    return '';
+  }
+}
+
 // Define a custom interface that extends JwtPayload to include scopes
 interface MehJwtPayload extends JwtPayload {
   scopes?: string[];
@@ -57,7 +101,7 @@ export async function makeApiRequest<T = any>(
 
   // Build the URL
   let url = `${backend}/api/${site}/${endpoint}`;
-  
+
   // For GET requests, convert body to query parameters
   if (method === 'GET' && body !== undefined) {
     const params = new URLSearchParams();
@@ -65,7 +109,7 @@ export async function makeApiRequest<T = any>(
       params.append(key, String(value));
     });
     url += `?${params.toString()}`;
-  } 
+  }
   // For non-GET requests, add body as JSON
   else if (method !== 'GET' && body !== undefined) {
     requestOptions.body = JSON.stringify(body);
@@ -208,20 +252,20 @@ export class TranslationManager<T extends Record<string, string>> {
   get<K extends keyof T | string>(key: K): string {
     // Check if this is a template string with `key` format
     const match = String(key).match(/^`([^`]+)`(.*)$/);
-    
+
     if (match) {
       // Template format found
       const [, templateKey, fallbackText] = match;
-      
+
       // Check if key exists in translations
       if (templateKey in this.translations) {
         return this.translations[templateKey as keyof T] as string;
       }
-      
+
       // Return fallback text (trimming leading space if present)
       return fallbackText.trim();
     }
-    
+
     // Not a template format, treat as regular key
     return (this.translations[key as keyof T] as string) || String(key);
   }
