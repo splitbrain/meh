@@ -92,4 +92,10 @@
     gap: var(--meh-spacing);
     flex-wrap: wrap;
   }
+
+  blockquote {
+    border-left: 2px solid var(--meh-border-color);
+    padding-left: var(--meh-spacing);
+    margin-left: 0;
+  }
 }
