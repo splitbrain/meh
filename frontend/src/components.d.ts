@@ -8,13 +8,17 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface MehComments {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -30,13 +34,17 @@ export namespace Components {
     }
     interface MehCount {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -56,13 +64,17 @@ export namespace Components {
     }
     interface MehForm {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -78,13 +90,17 @@ export namespace Components {
     }
     interface MehLogin {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -96,13 +112,17 @@ export namespace Components {
     }
     interface MehMastodon {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -159,13 +179,17 @@ declare global {
 declare namespace LocalJSX {
     interface MehComments {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -181,13 +205,17 @@ declare namespace LocalJSX {
     }
     interface MehCount {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -207,13 +235,17 @@ declare namespace LocalJSX {
     }
     interface MehForm {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -229,13 +261,17 @@ declare namespace LocalJSX {
     }
     interface MehLogin {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */
@@ -247,13 +283,17 @@ declare namespace LocalJSX {
     }
     interface MehMastodon {
         /**
-          * The base URL for where the meh system is hosted If not provided, defaults to same origin
+          * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
+        /**
+          * URL to an external stylesheet to be injected into the shadow DOM
+         */
+        "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
          */

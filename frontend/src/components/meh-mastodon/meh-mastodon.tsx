@@ -20,7 +20,7 @@ export class MehMastodon {
    * The base URL for where the meh system is hosted
    * If not provided, attempts to detect from script tag
    */
-  @Prop() backend: string = '';
+  @Prop({ mutable: true }) backend: string = '';
 
   /**
    * The site identifier to use
@@ -111,14 +111,14 @@ export class MehMastodon {
       // If no Mastodon URL is found, render nothing
       return null;
     }
-    
+
     const elements = [];
-    
+
     // Add external stylesheet if provided
     if (this.externalStyles) {
       elements.push(<link rel="stylesheet" href={this.externalStyles} />);
     }
-    
+
     // Add the Mastodon link
     elements.push(
       <a
@@ -128,7 +128,7 @@ export class MehMastodon {
         class="mastodon-link"
       >{this._('discussOnMastodon')}</a>
     );
-    
+
     return elements;
   }
 }

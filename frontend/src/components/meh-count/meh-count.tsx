@@ -20,7 +20,7 @@ export class MehCount {
    * The base URL for where the meh system is hosted
    * If not provided, attempts to detect from script tag
    */
-  @Prop() backend: string = '';
+  @Prop({ mutable: true }) backend: string = '';
 
   /**
    * The site identifier to use
