@@ -15,7 +15,7 @@ All Meh components use a common set of CSS variables for consistent styling:
 | `--meh-default-spacing`           | `1em`                   | Base spacing unit used for margins and padding               |
 | `--meh-default-border-radius`     | `3px`                   | Border radius for buttons, inputs, and other elements        |
 | `--meh-default-success`           | `#4caf50`               | Color used for success messages                              |
-| `--meh-default-error`             | `#f44336`               | Color used for error messages                                |
+| `--meh-default-error`             | `#d32f2f`               | Color used for error messages                                |
 | `--meh-default-link-color`        | derived from accent     | Color used for links                                         |
 | `--meh-default-link-deco-color`   | derived from link-color | Color used for link underlines                               |
 | `--meh-default-border-color`      | derived from foreground | Color used for borders                                       |

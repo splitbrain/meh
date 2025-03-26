@@ -10,7 +10,7 @@
 
   /* Status colors */
   --meh-success: var(--meh-default-success, #4caf50);
-  --meh-error: var(--meh-default-error, #f44336);
+  --meh-error: var(--meh-default-error, #d32f2f);
 
   /* Derived Colors */
   --meh-link-color: var(--meh-default-link-color, var(--meh-accent));
