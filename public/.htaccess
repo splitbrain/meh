@@ -2,6 +2,9 @@
     RewriteEngine On
     RewriteBase /
 
+    # Pass Authorization Header to PHP
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
     # If the request is for an actual file or directory, don't rewrite
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
