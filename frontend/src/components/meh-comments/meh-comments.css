@@ -66,6 +66,33 @@
     }
   }
 
+  .comment.highlighted {
+    animation: highlight-pulse 3s;
+  }
+  
+  @keyframes highlight-pulse {
+    0% { background-color: transparent; }
+    20% { background-color: rgba(255, 255, 100, 0.3); }
+    100% { background-color: transparent; }
+  }
+  
+  .parent-link {
+    font-size: 0.85em;
+    margin-bottom: 0.5em;
+    color: #666;
+    grid-column: 2 / -1;
+    grid-row: 3 / 4;
+  }
+  
+  .parent-link a {
+    color: #0066cc;
+    text-decoration: none;
+  }
+  
+  .parent-link a:hover {
+    text-decoration: underline;
+  }
+
   /* General styles - needs to cover some arbitrary content elements */
 
   a {

@@ -339,37 +339,6 @@ export class MehComments {
     window.removeEventListener('meh-refresh', this.handleRefreshEvent);
   }
 
-  /**
-   * CSS styles for the component
-   */
-  private getStyles() {
-    return `
-      .comment.highlighted {
-        animation: highlight-pulse 3s;
-      }
-      
-      @keyframes highlight-pulse {
-        0% { background-color: transparent; }
-        20% { background-color: rgba(255, 255, 100, 0.3); }
-        100% { background-color: transparent; }
-      }
-      
-      .parent-link {
-        font-size: 0.85em;
-        margin-bottom: 0.5em;
-        color: #666;
-      }
-      
-      .parent-link a {
-        color: #0066cc;
-        text-decoration: none;
-      }
-      
-      .parent-link a:hover {
-        text-decoration: underline;
-      }
-    `;
-  }
 
   /**
    * Main render method
@@ -382,8 +351,6 @@ export class MehComments {
       elements.push(<link rel="stylesheet" href={this.externalStyles}/>);
     }
     
-    // Add our custom styles
-    elements.push(<style>{this.getStyles()}</style>);
 
     // Add the appropriate content based on component state
     if (this.loading) {
