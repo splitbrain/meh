@@ -58,18 +58,26 @@ class DisqusImporter
             return 0;
         }
 
-        // Count imported comments
-        $count = 0;
+        // get all posts
+        $posts = $this->xml->xpath('//disqus:post');
 
-        // Import all comments in a single pass
-        foreach ($this->xml->xpath('//disqus:post') as $post) {
+        $all = count($posts);
+        $successful = 0;
+        $processed = 0;
+
+        // process each post
+        foreach ($posts as $post) {
             if ($this->processPost($post)) {
-                $count++;
+                $successful++;
+            }
+            $processed++;
+            if ($processed % 100 === 0) {
+                $this->logger->info("Processed $processed of $all comments");
             }
         }
 
-        $this->logger->info("Successfully imported $count comments");
-        return $count;
+        $this->logger->info("Imported $successful of $all comments");
+        return $successful;
     }
 
     /**
@@ -122,10 +130,10 @@ class DisqusImporter
 
         // Extract comment data
         $commentData = $this->extractCommentData($post, $postPath);
-        
+
         // Look up parent ID if there's a parent_disqus_id
-        if (!empty($commentData['parent_disqus_id']) && isset($this->idMapping[$commentData['parent_disqus_id']])) {
-            $commentData['parent'] = $this->idMapping[$commentData['parent_disqus_id']];
+        if (!empty($commentData['parent_disqus_id'])) {
+            $commentData['parent'] = $this->idMapping[$commentData['parent_disqus_id']] ?? null;
         } else {
             $commentData['parent'] = null;
         }
