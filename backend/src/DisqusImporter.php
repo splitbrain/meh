@@ -115,6 +115,13 @@ class DisqusImporter
      */
     protected function processPost(\SimpleXMLElement $post): bool
     {
+        // Skip spam or deleted comments
+        if ((isset($post->isSpam) && (string)$post->isSpam === 'true') ||
+            (isset($post->isDeleted) && (string)$post->isDeleted === 'true')) {
+            $this->logger->debug("Skipping spam or deleted comment");
+            return false;
+        }
+
         // Get thread information
         $postPath = $this->getPostPath($post);
         if (empty($postPath)) {
@@ -195,8 +202,6 @@ class DisqusImporter
         $html = (string)$post->message;
         $text = strip_tags($html);
 
-        // Determine status
-        $status = $this->determineStatus($post);
 
         // Extract creation date
         $createdAt = isset($post->createdAt) ? (string)$post->createdAt : date('Y-m-d H:i:s');
@@ -215,28 +220,11 @@ class DisqusImporter
             'website' => $authorWebsite,
             'text' => $text,
             'html' => $html,
-            'status' => $status,
+            'status' => 'approved', // we only import approved comments
             'created_at' => $createdAt,
             'disqus_id' => (string)$post->attributes('dsq', true)->id,
             'parent_disqus_id' => $parentDisqusId
         ];
-    }
-
-    /**
-     * Determine the status of a comment
-     *
-     * @param \SimpleXMLElement $post The post element
-     * @return string The status (approved, spam, or deleted)
-     */
-    protected function determineStatus(\SimpleXMLElement $post): string
-    {
-        $status = 'approved';
-        if (isset($post->isSpam) && (string)$post->isSpam === 'true') {
-            $status = 'spam';
-        } elseif (isset($post->isDeleted) && (string)$post->isDeleted === 'true') {
-            $status = 'deleted';
-        }
-        return $status;
     }
 
     /**
