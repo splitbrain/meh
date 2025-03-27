@@ -50,6 +50,7 @@ export class MehComments {
   @State() comments: any[] = [];
   @State() loading: boolean = true;
   @State() error: string = '';
+  @State() highlightedCommentId: number | null = null;
 
   // Default English translations that also define the translation structure
   private defaultTranslations = {
@@ -62,6 +63,7 @@ export class MehComments {
     edit: 'Edit',
     spam: 'Spam',
     confirmDelete: 'Are you sure you want to delete this comment?',
+    inReplyTo: 'In reply to',
   };
 
   // Translation manager instance
@@ -245,11 +247,46 @@ export class MehComments {
   }
 
   /**
+   * Scroll to a specific comment by ID
+   */
+  private scrollToComment = (commentId: number, e?: Event) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
+    // Find the comment element by its ID
+    const commentElement = this.el.shadowRoot.querySelector(`li[data-comment-id="${commentId}"]`);
+    
+    if (commentElement) {
+      // Temporarily highlight the comment
+      this.highlightedCommentId = commentId;
+      
+      // Scroll the comment into view
+      commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Remove the highlight after a delay
+      setTimeout(() => {
+        this.highlightedCommentId = null;
+      }, 3000);
+    }
+  };
+
+  /**
+   * Find a parent comment by ID
+   */
+  private findParentComment(parentId: number) {
+    return this.comments.find(comment => comment.id === parentId);
+  }
+
+  /**
    * Render a single comment
    */
   private renderComment(comment: any) {
+    const isHighlighted = this.highlightedCommentId === comment.id;
+    const highlightClass = isHighlighted ? 'highlighted' : '';
+    
     return (
-      <li class={`comment status-${comment.status}`} key={comment.id}>
+      <li class={`comment status-${comment.status} ${highlightClass}`} key={comment.id} data-comment-id={comment.id}>
         <img src={comment.avatar_url} alt="Avatar" class="avatar"/>
         <strong class="author">
           {comment.website ? (
@@ -267,6 +304,17 @@ export class MehComments {
         >
           {this.formatRelativeTime(comment.created_at)}
         </time>
+        {comment.parent && (
+          <div class="parent-link">
+            {this._('inReplyTo')}{' '}
+            <a href="#" onClick={(e) => this.scrollToComment(comment.parent, e)}>
+              {(() => {
+                const parentComment = this.findParentComment(comment.parent);
+                return parentComment ? parentComment.author : `#${comment.parent}`;
+              })()}
+            </a>
+          </div>
+        )}
         <div class="comment-content" innerHTML={comment.html}></div>
         {this.renderAdminActions(comment)}
       </li>
@@ -292,6 +340,38 @@ export class MehComments {
   }
 
   /**
+   * CSS styles for the component
+   */
+  private getStyles() {
+    return `
+      .comment.highlighted {
+        animation: highlight-pulse 3s;
+      }
+      
+      @keyframes highlight-pulse {
+        0% { background-color: transparent; }
+        20% { background-color: rgba(255, 255, 100, 0.3); }
+        100% { background-color: transparent; }
+      }
+      
+      .parent-link {
+        font-size: 0.85em;
+        margin-bottom: 0.5em;
+        color: #666;
+      }
+      
+      .parent-link a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+      
+      .parent-link a:hover {
+        text-decoration: underline;
+      }
+    `;
+  }
+
+  /**
    * Main render method
    */
   render() {
@@ -301,6 +381,9 @@ export class MehComments {
     if (this.externalStyles) {
       elements.push(<link rel="stylesheet" href={this.externalStyles}/>);
     }
+    
+    // Add our custom styles
+    elements.push(<style>{this.getStyles()}</style>);
 
     // Add the appropriate content based on component state
     if (this.loading) {
