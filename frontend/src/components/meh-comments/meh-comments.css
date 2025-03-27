@@ -18,10 +18,16 @@
     grid-template-columns: var(--avatar-size) 1fr;
     grid-template-rows: auto auto auto;
     grid-column-gap: var(--meh-spacing);
+    transition: background-color 1.5s ease;
 
     opacity: 0.5;
     &.status-approved {
       opacity: 1;
+    }
+
+    &.highlighted {
+      background-color: color-mix(in srgb, var(--meh-accent), transparent 80%);
+      transition: none;
     }
 
     > img.avatar {
@@ -35,9 +41,17 @@
 
     }
 
-    > strong.author {
+    > .comment-user {
       grid-column: 2 / -1;
       grid-row: 1 / 2;
+
+      display: flex;
+      gap: calc(var(--meh-spacing) / 2);
+      align-items: baseline;
+
+      .parent-link {
+        font-size: 0.85em;
+      }
     }
 
     > time {
@@ -64,33 +78,6 @@
     > :last-child {
       border-bottom: 1px solid var(--meh-border-color);
     }
-  }
-
-  .comment.highlighted {
-    animation: highlight-pulse 3s;
-  }
-  
-  @keyframes highlight-pulse {
-    0% { background-color: transparent; }
-    20% { background-color: rgba(255, 255, 100, 0.3); }
-    100% { background-color: transparent; }
-  }
-  
-  .parent-link {
-    font-size: 0.85em;
-    margin-bottom: 0.5em;
-    color: #666;
-    grid-column: 2 / -1;
-    grid-row: 3 / 4;
-  }
-  
-  .parent-link a {
-    color: #0066cc;
-    text-decoration: none;
-  }
-  
-  .parent-link a:hover {
-    text-decoration: underline;
   }
 
   /* General styles - needs to cover some arbitrary content elements */
@@ -126,3 +113,4 @@
     margin-left: 0;
   }
 }
+

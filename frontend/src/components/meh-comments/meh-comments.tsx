@@ -50,7 +50,6 @@ export class MehComments {
   @State() comments: any[] = [];
   @State() loading: boolean = true;
   @State() error: string = '';
-  @State() highlightedCommentId: number | null = null;
 
   // Default English translations that also define the translation structure
   private defaultTranslations = {
@@ -63,7 +62,7 @@ export class MehComments {
     edit: 'Edit',
     spam: 'Spam',
     confirmDelete: 'Are you sure you want to delete this comment?',
-    inReplyTo: 'In reply to',
+    inReplyTo: 'in reply to',
   };
 
   // Translation manager instance
@@ -253,21 +252,20 @@ export class MehComments {
     if (e) {
       e.preventDefault();
     }
-    
+
     // Find the comment element by its ID
     const commentElement = this.el.shadowRoot.querySelector(`li[data-comment-id="${commentId}"]`);
-    
+
     if (commentElement) {
-      // Temporarily highlight the comment
-      this.highlightedCommentId = commentId;
-      
+      commentElement.classList.add('highlighted');
+
       // Scroll the comment into view
       commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
+
       // Remove the highlight after a delay
       setTimeout(() => {
-        this.highlightedCommentId = null;
-      }, 3000);
+        commentElement.classList.remove('highlighted');
+      }, 100);
     }
   };
 
@@ -282,21 +280,31 @@ export class MehComments {
    * Render a single comment
    */
   private renderComment(comment: any) {
-    const isHighlighted = this.highlightedCommentId === comment.id;
-    const highlightClass = isHighlighted ? 'highlighted' : '';
-    
     return (
-      <li class={`comment status-${comment.status} ${highlightClass}`} key={comment.id} data-comment-id={comment.id}>
+      <li class={`comment status-${comment.status}`} key={comment.id} data-comment-id={comment.id}>
         <img src={comment.avatar_url} alt="Avatar" class="avatar"/>
-        <strong class="author">
-          {comment.website ? (
-            <a href={comment.website} target="_blank" rel="noopener noreferrer">
-              {comment.author}
-            </a>
-          ) : (
-            comment.author
+        <div class="comment-user">
+          <strong class="author">
+            {comment.website ? (
+              <a href={comment.website} target="_blank" rel="noopener noreferrer">
+                {comment.author}
+              </a>
+            ) : (
+              comment.author
+            )}
+          </strong>
+          {comment.parent && (
+            <span class="parent-link">
+              {this._('inReplyTo')}{' '}
+              <a href="#" onClick={(e) => this.scrollToComment(comment.parent, e)}>
+                {(() => {
+                  const parentComment = this.findParentComment(comment.parent);
+                  return parentComment ? parentComment.author : `#${comment.parent}`;
+                })()}
+              </a>
+            </span>
           )}
-        </strong>
+        </div>
         <time
           class="date"
           dateTime={new Date(comment.created_at).toISOString()}
@@ -304,18 +312,7 @@ export class MehComments {
         >
           {this.formatRelativeTime(comment.created_at)}
         </time>
-        {comment.parent && (
-          <div class="parent-link">
-            {this._('inReplyTo')}{' '}
-            <a href="#" onClick={(e) => this.scrollToComment(comment.parent, e)}>
-              {(() => {
-                const parentComment = this.findParentComment(comment.parent);
-                return parentComment ? parentComment.author : `#${comment.parent}`;
-              })()}
-            </a>
-          </div>
-        )}
-        <div class="comment-content" innerHTML={comment.html}></div>
+                <div class="comment-content" innerHTML={comment.html}></div>
         {this.renderAdminActions(comment)}
       </li>
     );
@@ -350,7 +347,7 @@ export class MehComments {
     if (this.externalStyles) {
       elements.push(<link rel="stylesheet" href={this.externalStyles}/>);
     }
-    
+
 
     // Add the appropriate content based on component state
     if (this.loading) {
