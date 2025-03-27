@@ -60,7 +60,7 @@ class CliController extends PSR3CLIv3
             return 0;
         }
 
-        $this->app = new App($site, $this, ($options->getCmd() === 'migrate'));
+        $this->app = new App($site, $this, str_starts_with($options->getCmd(), 'migrate'));
 
         switch ($options->getCmd()) {
             case 'migrate':
@@ -101,6 +101,7 @@ class CliController extends PSR3CLIv3
     {
         $this->app = new App($site, $this, true);
         $db = $this->app->db();
+        $db->migrate();
 
         if (!$this->app->conf('jwt_secret') && !$db->getOpt('jwt_secret')) {
             $this->info("Generating new JWT secret");
