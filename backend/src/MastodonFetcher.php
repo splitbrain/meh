@@ -3,9 +3,7 @@
 namespace splitbrain\meh;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
-use splitbrain\phpcli\CLI;
 
 /**
  * Class to handle fetching and processing posts from Mastodon
@@ -417,6 +415,7 @@ class MastodonFetcher
         $avatarUrl = $reply->account->avatar_static ?? $reply->account->avatar_static ?? '';
         $account = $this->formatAccount($reply->account->acct, $instance);
         $author = $reply->account->display_name ?? $account;
+        $replyto = $reply->in_reply_to_id ? $this->getPostCommentId($reply->in_reply_to_id) : null;
 
         if ($reply->media_attachments) {
             $html .= '<div class="media-attachments">';
@@ -436,9 +435,9 @@ class MastodonFetcher
             // Insert into comments table
             $commentId = $db->exec(
                 'INSERT INTO comments 
-                (post, author, email, website, text, html, status, created_at, avatar) 
+                (post, author, email, website, text, html, status, created_at, avatar, parent)
                 VALUES 
-                (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 [
                     $thread['post'],
                     $author,
@@ -448,14 +447,15 @@ class MastodonFetcher
                     $html,
                     'approved',
                     date('Y-m-d H:i:s', strtotime($reply->created_at)),
-                    $avatarUrl
+                    $avatarUrl,
+                    $replyto
                 ]
             );
 
             // Record this reply in the mastodon_posts table
             $db->query(
                 'INSERT INTO mastodon_posts (id, thread_id, comment_id) VALUES (?, ?, ?)',
-                [$reply->id, $thread['id'], $commentId ]
+                [$reply->id, $thread['id'], $commentId]
             );
 
             $this->app->log()->notice("Imported reply from " . $reply->account->acct . ": " . $reply->url);
@@ -464,6 +464,19 @@ class MastodonFetcher
             $this->app->log()->error("Error importing reply: " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Get the comment ID for a mastodon post
+     */
+    protected function getPostCommentId(string $postid)
+    {
+        $db = $this->app->db();
+        $result = $db->queryRecord(
+            'SELECT comment_id FROM mastodon_posts WHERE id = ?',
+            [$postid]
+        );
+        return $result['comment_id'] ?? null;
     }
 
     /**
