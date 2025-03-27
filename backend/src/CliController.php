@@ -25,7 +25,12 @@ class CliController extends PSR3CLIv3
 
         $options->registerCommand(
             'migrate',
-            'Initialize or upgrade the database structure. Needs to be run on updates or to initialize new sites.'
+            'Initialize or upgrade the database structure. Needs to be run to initialize new sites.'
+        );
+
+        $options->registerCommand(
+            'migrate-all',
+            'Upgrade the database structure for all existing sites. Should be run after updating the code.'
         );
 
         $options->registerCommand(
@@ -59,7 +64,10 @@ class CliController extends PSR3CLIv3
 
         switch ($options->getCmd()) {
             case 'migrate':
-                $this->migrateDatabase();
+                $this->migrateSite($site);
+                break;
+            case 'migrate-all':
+                $this->migrateAll();
                 break;
             case 'config':
                 $key = $options->getArgs()[0] ?? null;
@@ -83,23 +91,35 @@ class CliController extends PSR3CLIv3
     }
 
     /**
-     * Get the database connection
+     * Initialize or upgrade the database structure
      *
-     * @return SQLite
+     * @param string $site
+     * @return void
+     * @throws \Random\RandomException
      */
-    protected function getDatabase()
+    protected function migrateSite(string $site): void
     {
-        return $this->app->db();
-    }
-
-    protected function migrateDatabase()
-    {
-        $db = $this->getDatabase();
-        $db->migrate();
+        $this->app = new App($site, $this, true);
+        $db = $this->app->db();
 
         if (!$this->app->conf('jwt_secret') && !$db->getOpt('jwt_secret')) {
             $this->info("Generating new JWT secret");
             $this->config('jwt_secret', bin2hex(random_bytes(16)));
+        }
+    }
+
+    /**
+     * Upgrade the database structure for all existing sites
+     *
+     * @return void
+     */
+    protected function migrateAll(): void
+    {
+        $dbpath = $this->app->conf('db_path');
+        $sites = glob("$dbpath/*.sqlite");
+        foreach ($sites as $site) {
+            $site = basename($site, '.sqlite');
+            $this->migrateSite($site);
         }
     }
 
