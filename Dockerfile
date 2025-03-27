@@ -10,3 +10,7 @@ VOLUME /app/data
 WORKDIR /app
 # see .dockerignore for what is not copied
 COPY . /app/
+
+# Set up the entrypoint script
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["apache2-foreground"]
