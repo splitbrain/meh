@@ -401,8 +401,8 @@ class MastodonFetcher
     protected function processAndImportReply(object $reply, array $thread, string $instance): bool
     {
         // Skip if already imported
-        if ($this->isReplyImported($reply->uri)) {
-            $this->app->log()->info("Reply already imported: " . $reply->url);
+        if ($this->isReplyImported($reply->id)) {
+            $this->app->log()->info("Reply already imported: " . $reply->id);
             return false;
         }
 
@@ -454,8 +454,8 @@ class MastodonFetcher
 
             // Record this reply in the mastodon_posts table
             $db->query(
-                'INSERT INTO mastodon_posts (uri, comment_id) VALUES (?, ?)',
-                [$reply->uri, $commentId]
+                'INSERT INTO mastodon_posts (id, thread_id, comment_id) VALUES (?, ?, ?)',
+                [$reply->id, $thread['id'], $commentId ]
             );
 
             $this->app->log()->notice("Imported reply from " . $reply->account->acct . ": " . $reply->url);
@@ -486,17 +486,17 @@ class MastodonFetcher
     /**
      * Check if a reply has already been imported
      *
-     * @param string $uri The URI of the reply
+     * @param string $id The mastodon id of the reply
      * @return bool True if already imported, false otherwise
      */
-    protected function isReplyImported(string $uri): bool
+    protected function isReplyImported(string $id): bool
     {
         $db = $this->app->db();
 
         try {
             $result = $db->queryRecord(
-                'SELECT uri FROM mastodon_posts WHERE uri = ?',
-                [$uri]
+                'SELECT id FROM mastodon_posts WHERE id = ?',
+                [$id]
             );
 
             return !empty($result);
