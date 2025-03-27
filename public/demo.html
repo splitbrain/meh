@@ -3,22 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-    <title>Stencil Component Starter</title>
+    <title>Test Playground</title>
 
     <script type="module" src="meh/meh.esm.js"></script>
   </head>
   <body>
 
+    <p>This is not really a demo, but my personal test page. Do editing it.</p>
 
-    <meh-form post="/blog/example-post" language="de">
-      <meh-mastodon site="splitbrain" post="/blog/2025-03/12-mastodon_to_gotosocial_migration" language="de"></meh-mastodon>
-      <meh-login language="de"></meh-login>
+
+    <meh-form site="splitbrain" post="/blog/2025-03/26-meh_another_comment_system" language="de">
+      <meh-mastodon site="splitbrain" post="/blog/2025-03/26-meh_another_comment_system" language="de"></meh-mastodon>
+      <meh-login site="splitbrain" language="de"></meh-login>
     </meh-form>
 
     <p>
-      <meh-count post="/blog/example-post" language="de"></meh-count>
+      <meh-count site="splitbrain" post="/blog/2025-03/26-meh_another_comment_system" language="de"></meh-count>
     </p>
 
-    <meh-comments post="/blog/example-post" language="de"></meh-comments>
+    <meh-comments site="splitbrain" post="/blog/2025-03/26-meh_another_comment_system" language="de"></meh-comments>
   </body>
 </html>
