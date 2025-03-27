@@ -61,15 +61,12 @@ class DisqusImporter
         // Count imported comments
         $count = 0;
 
-        // First pass: import all comments and build ID mapping
+        // Import all comments in a single pass
         foreach ($this->xml->xpath('//disqus:post') as $post) {
             if ($this->processPost($post)) {
                 $count++;
             }
         }
-
-        // Second pass: update parent relationships
-        $this->updateParentRelationships();
 
         $this->logger->info("Successfully imported $count comments");
         return $count;
@@ -125,6 +122,13 @@ class DisqusImporter
 
         // Extract comment data
         $commentData = $this->extractCommentData($post, $postPath);
+        
+        // Look up parent ID if there's a parent_disqus_id
+        if (!empty($commentData['parent_disqus_id']) && isset($this->idMapping[$commentData['parent_disqus_id']])) {
+            $commentData['parent'] = $this->idMapping[$commentData['parent_disqus_id']];
+        } else {
+            $commentData['parent'] = null;
+        }
 
         // Insert into database
         $dbId = $this->insertComment($commentData);
@@ -238,9 +242,9 @@ class DisqusImporter
         try {
             return $this->db->exec(
                 'INSERT INTO comments 
-                (post, author, ip, email, website, text, html, status, created_at) 
+                (post, author, ip, email, website, text, html, status, created_at, parent) 
                 VALUES 
-                (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 [
                     $data['post'],
                     $data['author'],
@@ -250,7 +254,8 @@ class DisqusImporter
                     $data['text'],
                     $data['html'],
                     $data['status'],
-                    $data['created_at']
+                    $data['created_at'],
+                    $data['parent']
                 ]
             );
         } catch (\Exception $e) {
@@ -259,45 +264,4 @@ class DisqusImporter
         }
     }
 
-    /**
-     * Update parent relationships for all imported comments
-     */
-    protected function updateParentRelationships(): void
-    {
-        $this->logger->info("Updating parent relationships...");
-
-        // Get all comments with parent_disqus_id from the first pass
-        foreach ($this->xml->xpath('//disqus:post') as $post) {
-            $disqusId = (string)$post->attributes('dsq', true)->id;
-
-            // Skip if we don't have this comment in our mapping
-            if (!isset($this->idMapping[$disqusId])) {
-                continue;
-            }
-
-            $commentId = $this->idMapping[$disqusId];
-
-            // Check if this comment has a parent
-            if (isset($post->parent)) {
-                $parentDisqusId = (string)$post->parent->attributes('dsq', true)->id;
-
-                // Skip if parent doesn't exist in our mapping
-                if (!isset($this->idMapping[$parentDisqusId])) {
-                    continue;
-                }
-
-                $parentId = $this->idMapping[$parentDisqusId];
-
-                // Update the parent relationship
-                try {
-                    $this->db->query(
-                        'UPDATE comments SET parent = ? WHERE id = ?',
-                        [$parentId, $commentId]
-                    );
-                } catch (\Exception $e) {
-                    $this->logger->error("Error updating parent relationship: " . $e->getMessage());
-                }
-            }
-        }
-    }
 }
