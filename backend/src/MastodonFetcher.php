@@ -435,7 +435,7 @@ class MastodonFetcher
             // Insert into comments table
             $commentId = $db->exec(
                 'INSERT INTO comments 
-                (post, author, email, website, text, html, status, created_at, avatar, parent)
+                (post, author, user, website, text, html, status, created_at, avatar, parent)
                 VALUES 
                 (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 [
