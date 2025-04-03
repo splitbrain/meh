@@ -1,5 +1,5 @@
 import {Component, Element, h, Prop, State} from '@stencil/core';
-import {formatRelativeTime, isAdmin, makeApiRequest, TranslationManager, detectBackendUrl} from '../../utils/utils';
+import {detectBackendUrl, formatRelativeTime, isAdmin, makeApiRequest, TranslationManager} from '../../utils/utils';
 
 @Component({
   tag: 'meh-comments',
@@ -22,7 +22,7 @@ export class MehComments {
    * The base URL for where the meh system is hosted
    * If not provided, attempts to detect from script tag
    */
-  @Prop({ mutable: true }) backend: string = '';
+  @Prop({mutable: true}) backend: string = '';
 
   /**
    * The site identifier to use
@@ -54,9 +54,9 @@ export class MehComments {
 
   /**
    * Comment sort order: 'oldest' (default), 'newest', or 'threaded'
-   * Can be initialized from localStorage 'meh-sort' key if present
+   * Can switched by the end user. User preference is saved in localStorage.
    */
-  @Prop({ mutable: true }) sort: 'oldest' | 'newest' | 'threaded' = 'oldest';
+  @Prop({mutable: true}) sort: 'oldest' | 'newest' | 'threaded' = 'oldest';
 
   @State() comments: any[] = [];
   @State() loading: boolean = true;
@@ -146,7 +146,7 @@ export class MehComments {
         this.site,
         'comments',
         {
-          body: { post: this.post }
+          body: {post: this.post}
         }
       );
     } catch (error) {
@@ -225,7 +225,7 @@ export class MehComments {
 
     // Dispatch a custom event with the comment data
     window.dispatchEvent(new CustomEvent('meh-reply', {
-      detail: { comment }
+      detail: {comment}
     }));
   };
 
@@ -262,14 +262,14 @@ export class MehComments {
 
     const actions = [];
 
-    if(comment.status !== 'approved') {
+    if (comment.status !== 'approved') {
       actions.push(
         <a href="#" class="admin-action approve" title={this._('approve')} onClick={handleApprove}>
           {this._('approve')}
         </a>
       );
     }
-    if(comment.status !== 'pending') {
+    if (comment.status !== 'pending') {
       actions.push(
         <a href="#" class="admin-action reject" title={this._('reject')} onClick={handleReject}>
           {this._('reject')}
@@ -281,7 +281,7 @@ export class MehComments {
         {this._('delete')}
       </a>
     );
-    if(comment.status !== 'spam') {
+    if (comment.status !== 'spam') {
       actions.push(
         <a href="#" class="admin-action spam" title={this._('spam')} onClick={handleSpam}>
           {this._('spam')}
@@ -307,7 +307,7 @@ export class MehComments {
       commentElement.classList.add('highlighted');
 
       // Scroll the comment into view
-      commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      commentElement.scrollIntoView({behavior: 'smooth', block: 'center'});
 
       // Remove the highlight after a delay
       setTimeout(() => {
@@ -378,7 +378,7 @@ export class MehComments {
   private renderCommentsList() {
     // Create a copy of comments to avoid mutating the original array
     const sortedComments = [...this.comments];
-    
+
     // Handle different sort modes
     if (this.sort === 'threaded') {
       return this.renderThreadedComments();
@@ -387,7 +387,7 @@ export class MehComments {
       if (this.sort === 'newest') {
         sortedComments.reverse();
       }
-      
+
       return (
         <ul class="comments-list">
           {sortedComments.map(comment => (
@@ -406,7 +406,7 @@ export class MehComments {
   private handleSortChange = (newSort: 'oldest' | 'newest' | 'threaded', e: Event) => {
     e.preventDefault();
     this.sort = newSort;
-    
+
     // Save the sort preference to localStorage
     try {
       localStorage.setItem('meh-sort', newSort);
@@ -422,29 +422,27 @@ export class MehComments {
     return (
       <div class="sort-options">
         <span class="sort-label">{this._('sortBy')}</span>
-        <div class="sort-links">
-          <a 
-            href="#" 
-            class={this.sort === 'oldest' ? 'active' : ''} 
-            onClick={(e) => this.handleSortChange('oldest', e)}
-          >
-            {this._('sortOldest')}
-          </a>
-          <a 
-            href="#" 
-            class={this.sort === 'newest' ? 'active' : ''} 
-            onClick={(e) => this.handleSortChange('newest', e)}
-          >
-            {this._('sortNewest')}
-          </a>
-          <a 
-            href="#" 
-            class={this.sort === 'threaded' ? 'active' : ''} 
-            onClick={(e) => this.handleSortChange('threaded', e)}
-          >
-            {this._('sortThreaded')}
-          </a>
-        </div>
+        <a
+          href="#"
+          class={this.sort === 'oldest' ? 'active' : ''}
+          onClick={(e) => this.handleSortChange('oldest', e)}
+        >
+          {this._('sortOldest')}
+        </a>
+        <a
+          href="#"
+          class={this.sort === 'newest' ? 'active' : ''}
+          onClick={(e) => this.handleSortChange('newest', e)}
+        >
+          {this._('sortNewest')}
+        </a>
+        <a
+          href="#"
+          class={this.sort === 'threaded' ? 'active' : ''}
+          onClick={(e) => this.handleSortChange('threaded', e)}
+        >
+          {this._('sortThreaded')}
+        </a>
       </div>
     );
   }
@@ -455,10 +453,10 @@ export class MehComments {
   private renderThreadedComments() {
     // First, identify top-level comments (those without a parent)
     const topLevelComments = this.comments.filter(comment => !comment.parent);
-    
+
     // Create a map of child comments for quick lookup
     const childrenMap = new Map<number, any[]>();
-    
+
     // Group child comments by their parent ID
     this.comments.forEach(comment => {
       if (comment.parent) {
@@ -468,11 +466,11 @@ export class MehComments {
         childrenMap.get(comment.parent).push(comment);
       }
     });
-    
+
     // Recursive function to render a comment and its children
     const renderCommentThread = (comment: any) => {
       const children = childrenMap.get(comment.id) || [];
-      
+
       return (
         <li key={comment.id}>
           {this.renderComment(comment)}
@@ -484,7 +482,7 @@ export class MehComments {
         </li>
       );
     };
-    
+
     return (
       <ul class="comments-list threaded">
         {topLevelComments.map(comment => renderCommentThread(comment))}

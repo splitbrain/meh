@@ -35,6 +35,10 @@ export namespace Components {
           * The site identifier to use If not provided, defaults to 'meh'
          */
         "site": string;
+        /**
+          * Comment sort order: 'oldest' (default), 'newest', or 'threaded' Can switched by the end user. User preference is saved in localStorage.
+         */
+        "sort": 'oldest' | 'newest' | 'threaded';
     }
     interface MehCount {
         /**
@@ -210,6 +214,10 @@ declare namespace LocalJSX {
           * The site identifier to use If not provided, defaults to 'meh'
          */
         "site"?: string;
+        /**
+          * Comment sort order: 'oldest' (default), 'newest', or 'threaded' Can switched by the end user. User preference is saved in localStorage.
+         */
+        "sort"?: 'oldest' | 'newest' | 'threaded';
     }
     interface MehCount {
         /**

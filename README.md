@@ -61,6 +61,7 @@ More details on how to set up the server can be found in the [Server Setup](doc/
 
 ## Server Setup
 
+* [Server Setup](doc/server.md)
 * [Command Line Tool](doc/cli.md)
 * [Database Setup and Upgrade](doc/migrate.md)
 * [Configuration](doc/config.md)

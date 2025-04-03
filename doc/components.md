@@ -42,7 +42,7 @@ Of course, you can surround the components with any other HTML you like. The com
 
 ## Common Properties
 
-All Meh components share these common properties:
+All Meh components share some common properties described below. Check the individual component documentation for more specific properties.
 
 ### `backend`
 
