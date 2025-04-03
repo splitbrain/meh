@@ -5,6 +5,7 @@
 Meh…
 
 * …is a simple, no-frills commenting system
+* …has threaded comments
 * …is self-hosted
 * …has multi-site support from a single installation
 * …has multi-language support
