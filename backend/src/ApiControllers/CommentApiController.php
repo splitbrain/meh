@@ -5,7 +5,6 @@ namespace splitbrain\meh\ApiControllers;
 use Parsedown;
 use PHPMailer\PHPMailer\PHPMailer;
 use splitbrain\meh\ApiController;
-use splitbrain\meh\CommentUtils;
 use splitbrain\meh\HttpException;
 
 
@@ -49,6 +48,19 @@ class CommentApiController extends ApiController
             'status' => 'pending',
             'user' => $user,
         ];
+
+        // Check if the comment is a reply to another comment in the same post
+        if ($data['parent']) {
+            $parent = $this->app->db()->queryValue(
+                'SELECT id FROM comments WHERE id = ? AND post = ?',
+                $data['parent'],
+                $data['post']
+            );
+            if (!$parent) {
+                throw new HttpException('Parent comment not found', 404);
+            }
+            $record['parent'] = (int)$parent;
+        }
 
         // check post limits (except for admins)
         if (!$this->checkScopes('admin')) {
@@ -202,7 +214,7 @@ class CommentApiController extends ApiController
             $mailer->Password = $this->app->conf('smtp_password');
         }
 
-        if((bool) $this->app->conf('smtp_verify') === false) {
+        if ((bool)$this->app->conf('smtp_verify') === false) {
             $mailer->SMTPOptions = [
                 'ssl' => [
                     'verify_peer' => false,

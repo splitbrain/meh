@@ -55,6 +55,7 @@ export class MehForm {
   @State() email: string = '';
   @State() website: string = '';
   @State() commentStatus: 'pending' | 'approved' | null = null;
+  @State() replyingTo: { comment: any; id: number } | null = null;
   // Reference to the form element
   private formElement?: HTMLFormElement;
 
@@ -70,6 +71,7 @@ export class MehForm {
     websiteLabel: 'Your Website',
     websitePlaceholder: 'https://example.com/~jane',
     commentLabel: 'Your Comment',
+    replyLabel: 'Your Reply to',
     commentPlaceholder: 'Your text here. You may use Markdown for formatting.',
     submitButton: 'Submit Comment',
     submittingButton: 'Submitting...',
@@ -114,9 +116,41 @@ export class MehForm {
     // Load saved user data from localStorage
     this.loadUserDataFromStorage();
 
+    // Add event listener for reply events
+    window.addEventListener('meh-reply', this.handleReplyEvent);
+
     // Refresh token before allowing form submission
     await this.refreshToken();
   }
+
+  disconnectedCallback() {
+    // Remove event listener when component is destroyed
+    window.removeEventListener('meh-reply', this.handleReplyEvent);
+  }
+
+  /**
+   * Handle the meh-reply custom event
+   */
+  private handleReplyEvent = (event: CustomEvent) => {
+    console.log('Reply event received:', event);
+    if (event.detail && event.detail.comment) {
+      this.replyingTo = {
+        comment: event.detail.comment,
+        id: event.detail.comment.id
+      };
+
+      // Scroll the form into view
+      this.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Focus the comment textarea after a short delay to ensure scrolling is complete
+      setTimeout(() => {
+        const textarea = this.formElement?.elements['text'] as HTMLTextAreaElement;
+        if (textarea) {
+          textarea.focus();
+        }
+      }, 300);
+    }
+  };
 
   private loadUserDataFromStorage() {
     try {
@@ -184,6 +218,17 @@ export class MehForm {
     this.errorMessage = '';
 
     try {
+      // Prepare the request body
+      const requestBody: any = {
+        post: this.post,
+        ...formValues
+      };
+
+      // Add parent ID if replying to a comment
+      if (this.replyingTo) {
+        requestBody.parent = this.replyingTo.id;
+      }
+
       // Submit the comment
       const comment = await makeApiRequest(
         this.backend,
@@ -191,10 +236,7 @@ export class MehForm {
         'comment',
         {
           method: 'POST',
-          body: {
-            post: this.post,
-            ...formValues
-          }
+          body: requestBody
         }
       );
 
@@ -211,6 +253,9 @@ export class MehForm {
       // Reset form on success
       this.formElement.elements['text'].value = '';
       this.status = 'success';
+
+      // Clear the replying state
+      this.replyingTo = null;
 
       // Reload user data to update the form fields
       this.loadUserDataFromStorage();
@@ -273,7 +318,10 @@ export class MehForm {
 
           <div>
             <label class="required">
-              <span>{this._('commentLabel')}</span>
+              <span>
+                {!this.replyingTo && this._('commentLabel')}
+                {this.replyingTo && [this._('replyLabel'), ' ',  this.replyingTo.comment.author]}
+              </span>
               <textarea
                 name="text"
                 required

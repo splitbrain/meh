@@ -6,6 +6,7 @@
   "websiteLabel": "Votre site web",
   "websitePlaceholder": "https://exemple.fr/~jean",
   "commentLabel": "Votre commentaire",
+  "replyLabel": "Votre réponse à",
   "commentPlaceholder": "Écrivez votre commentaire ici. Vous pouvez utiliser Markdown pour le formatage.",
   "submitButton": "Envoyer le commentaire",
   "submittingButton": "Envoi en cours...",
@@ -13,6 +14,5 @@
   "successMessageApproved": "Merci pour votre commentaire ! Il a été publié.",
   "toosoon": "Vous avez posté très rapidement. Avez-vous vraiment lu l'article ?",
   "toolate": "Désolé, vous avez mis trop de temps à poster votre commentaire. Veuillez recharger la page et réessayer.",
-  "pending": "Votre commentaire précédent est toujours en attente d'approbation. Vous devrez attendre qu'il soit approuvé avant d'en poster un autre.",
-  "errorPrefix": "Erreur : "
+  "pending": "Votre commentaire précédent est toujours en attente d'approbation. Vous devrez attendre qu'il soit approuvé avant d'en poster un autre."
 }

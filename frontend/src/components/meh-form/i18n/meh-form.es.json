@@ -6,6 +6,7 @@
   "websiteLabel": "Tu sitio web",
   "websitePlaceholder": "https://ejemplo.es/~juan",
   "commentLabel": "Tu comentario",
+  "replyLabel": "Tu respuesta a",
   "commentPlaceholder": "Escribe tu comentario aquí. Puedes usar Markdown para el formato.",
   "submitButton": "Enviar comentario",
   "submittingButton": "Enviando...",
@@ -13,6 +14,5 @@
   "successMessageApproved": "¡Gracias por tu comentario! Ha sido publicado.",
   "toosoon": "Has publicado muy rápido. ¿Realmente has leído el artículo?",
   "toolate": "Lo sentimos, has tardado demasiado en publicar tu comentario. Por favor, recarga la página e inténtalo de nuevo.",
-  "pending": "Tu comentario anterior aún está pendiente de aprobación. Deberás esperar a que sea aprobado antes de publicar otro.",
-  "errorPrefix": "Error: "
+  "pending": "Tu comentario anterior aún está pendiente de aprobación. Deberás esperar a que sea aprobado antes de publicar otro."
 }
