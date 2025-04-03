@@ -52,6 +52,11 @@ export class MehComments {
    */
   @Prop() noreply: boolean = false;
 
+  /**
+   * Comment sort order: 'oldest' (default) or 'newest'
+   */
+  @Prop() sort: 'oldest' | 'newest' = 'oldest';
+
   @State() comments: any[] = [];
   @State() loading: boolean = true;
   @State() error: string = '';
@@ -355,9 +360,17 @@ export class MehComments {
    * Render the list of comments
    */
   private renderCommentsList() {
+    // Create a copy of comments to avoid mutating the original array
+    const sortedComments = [...this.comments];
+    
+    // Sort comments based on the sort prop
+    if (this.sort === 'newest') {
+      sortedComments.reverse();
+    }
+    
     return (
       <ul class="comments-list">
-        {this.comments.map(comment => (
+        {sortedComments.map(comment => (
           <li key={comment.id}>
             {this.renderComment(comment)}
           </li>
