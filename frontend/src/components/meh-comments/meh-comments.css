@@ -5,6 +5,37 @@
     color: var(--meh-error);
   }
 
+  div.sort-options {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--meh-spacing);
+    font-size: 0.9em;
+    
+    .sort-label {
+      margin-right: 0.5em;
+      color: var(--meh-text-muted, #666);
+    }
+    
+    .sort-links {
+      display: flex;
+      gap: 1em;
+      
+      a {
+        color: var(--meh-link-color);
+        text-decoration: none;
+        
+        &.active {
+          font-weight: bold;
+          text-decoration: underline;
+        }
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
   > ul {
     list-style-type: none;
     padding: 0;

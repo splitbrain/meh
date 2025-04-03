@@ -75,6 +75,10 @@ export class MehComments {
     reply: 'Reply',
     confirmDelete: 'Are you sure you want to delete this comment?',
     inReplyTo: 'in reply to',
+    sortOldest: 'Oldest',
+    sortNewest: 'Newest',
+    sortThreaded: 'Threaded',
+    sortBy: 'Sort by:',
   };
 
   // Translation manager instance
@@ -397,6 +401,55 @@ export class MehComments {
   }
 
   /**
+   * Handle sort change
+   */
+  private handleSortChange = (newSort: 'oldest' | 'newest' | 'threaded', e: Event) => {
+    e.preventDefault();
+    this.sort = newSort;
+    
+    // Save the sort preference to localStorage
+    try {
+      localStorage.setItem('meh-sort', newSort);
+    } catch (e) {
+      console.warn('Could not save sort preference to localStorage:', e);
+    }
+  };
+
+  /**
+   * Render sort options
+   */
+  private renderSortOptions() {
+    return (
+      <div class="sort-options">
+        <span class="sort-label">{this._('sortBy')}</span>
+        <div class="sort-links">
+          <a 
+            href="#" 
+            class={this.sort === 'oldest' ? 'active' : ''} 
+            onClick={(e) => this.handleSortChange('oldest', e)}
+          >
+            {this._('sortOldest')}
+          </a>
+          <a 
+            href="#" 
+            class={this.sort === 'newest' ? 'active' : ''} 
+            onClick={(e) => this.handleSortChange('newest', e)}
+          >
+            {this._('sortNewest')}
+          </a>
+          <a 
+            href="#" 
+            class={this.sort === 'threaded' ? 'active' : ''} 
+            onClick={(e) => this.handleSortChange('threaded', e)}
+          >
+            {this._('sortThreaded')}
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  /**
    * Render comments in a threaded/nested structure
    */
   private renderThreadedComments() {
@@ -467,6 +520,8 @@ export class MehComments {
     } else if (this.comments.length === 0) {
       elements.push(this.renderNoComments());
     } else {
+      // Add sort options above the comments
+      elements.push(this.renderSortOptions());
       elements.push(this.renderCommentsList());
     }
 
