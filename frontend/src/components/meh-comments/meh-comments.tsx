@@ -280,7 +280,7 @@ export class MehComments {
     }
 
     // Find the comment element by its ID
-    const commentElement = this.el.shadowRoot.querySelector(`li[data-comment-id="${commentId}"]`);
+    const commentElement = this.el.shadowRoot.querySelector(`div[data-comment-id="${commentId}"]`);
 
     if (commentElement) {
       commentElement.classList.add('highlighted');
@@ -307,7 +307,7 @@ export class MehComments {
    */
   private renderComment(comment: any) {
     return (
-      <li class={`comment status-${comment.status}`} key={comment.id} data-comment-id={comment.id}>
+      <div class={`comment status-${comment.status}`} data-comment-id={comment.id}>
         <img src={comment.avatar_url} alt="Avatar" class="avatar"/>
         <div class="comment-user">
           <strong class="author">
@@ -347,7 +347,7 @@ export class MehComments {
             </a>
           )}
         </div>
-      </li>
+      </div>
     );
   }
 
@@ -357,7 +357,11 @@ export class MehComments {
   private renderCommentsList() {
     return (
       <ul class="comments-list">
-        {this.comments.map(comment => this.renderComment(comment))}
+        {this.comments.map(comment => (
+          <li key={comment.id}>
+            {this.renderComment(comment)}
+          </li>
+        ))}
       </ul>
     );
   }

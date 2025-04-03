@@ -13,7 +13,7 @@
     gap: var(--meh-spacing);
   }
 
-  li.comment {
+  div.comment {
     display: grid;
     grid-template-columns: var(--avatar-size) 1fr;
     grid-template-rows: auto auto auto;
