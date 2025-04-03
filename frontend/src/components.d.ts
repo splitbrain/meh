@@ -24,6 +24,10 @@ export namespace Components {
          */
         "language": string;
         /**
+          * When set, hides the reply link on comments
+         */
+        "noreply": boolean;
+        /**
           * The post path to fetch comments for If not provided, defaults to the current page path
          */
         "post": string;
@@ -194,6 +198,10 @@ declare namespace LocalJSX {
           * The language code for translations If not provided, defaults to 'en'
          */
         "language"?: string;
+        /**
+          * When set, hides the reply link on comments
+         */
+        "noreply"?: boolean;
         /**
           * The post path to fetch comments for If not provided, defaults to the current page path
          */

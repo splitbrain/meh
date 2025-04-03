@@ -47,6 +47,11 @@ export class MehComments {
    */
   @Prop() externalStyles: string = '';
 
+  /**
+   * When set, hides the reply link on comments
+   */
+  @Prop() noreply: boolean = false;
+
   @State() comments: any[] = [];
   @State() loading: boolean = true;
   @State() error: string = '';
@@ -61,6 +66,7 @@ export class MehComments {
     delete: 'Delete',
     edit: 'Edit',
     spam: 'Spam',
+    reply: 'Reply',
     confirmDelete: 'Are you sure you want to delete this comment?',
     inReplyTo: 'in reply to',
   };
@@ -191,6 +197,18 @@ export class MehComments {
   }
 
   /**
+   * Handle reply click
+   */
+  private handleReplyClick = (comment: any, e: Event) => {
+    e.preventDefault();
+
+    // Dispatch a custom event with the comment data
+    window.dispatchEvent(new CustomEvent('meh-reply', {
+      detail: { comment }
+    }));
+  };
+
+  /**
    * Render admin actions for a comment
    */
   private renderAdminActions(comment: any) {
@@ -221,28 +239,36 @@ export class MehComments {
       }
     };
 
-    return (
-      <div class="admin-actions">
-        {comment.status !== 'approved' && (
-          <a href="#" class="admin-action approve" title={this._('approve')} onClick={handleApprove}>
-            {this._('approve')}
-          </a>
-        )}
-        {comment.status !== 'pending' && (
-          <a href="#" class="admin-action reject" title={this._('reject')} onClick={handleReject}>
-            {this._('reject')}
-          </a>
-        )}
-        <a href="#" class="admin-action delete" title={this._('delete')} onClick={handleDelete}>
-          {this._('delete')}
+    const actions = [];
+
+    if(comment.status !== 'approved') {
+      actions.push(
+        <a href="#" class="admin-action approve" title={this._('approve')} onClick={handleApprove}>
+          {this._('approve')}
         </a>
-        {comment.status !== 'spam' && (
-          <a href="#" class="admin-action spam" title={this._('spam')} onClick={handleSpam}>
-            {this._('spam')}
-          </a>
-        )}
-      </div>
+      );
+    }
+    if(comment.status !== 'pending') {
+      actions.push(
+        <a href="#" class="admin-action reject" title={this._('reject')} onClick={handleReject}>
+          {this._('reject')}
+        </a>
+      );
+    }
+    actions.push(
+      <a href="#" class="admin-action delete" title={this._('delete')} onClick={handleDelete}>
+        {this._('delete')}
+      </a>
     );
+    if(comment.status !== 'spam') {
+      actions.push(
+        <a href="#" class="admin-action spam" title={this._('spam')} onClick={handleSpam}>
+          {this._('spam')}
+        </a>
+      );
+    }
+
+    return actions;
   }
 
   /**
@@ -312,8 +338,15 @@ export class MehComments {
         >
           {this.formatRelativeTime(comment.created_at)}
         </time>
-                <div class="comment-content" innerHTML={comment.html}></div>
-        {this.renderAdminActions(comment)}
+        <div class="comment-content" innerHTML={comment.html}></div>
+        <div class="comment-actions">
+          {this.renderAdminActions(comment)}
+          {!this.noreply && (
+            <a href="#" class="reply-action" onClick={(e) => this.handleReplyClick(comment, e)}>
+              {this._('reply')}
+            </a>
+          )}
+        </div>
       </li>
     );
   }

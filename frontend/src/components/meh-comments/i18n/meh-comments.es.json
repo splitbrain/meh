@@ -7,6 +7,7 @@
   "delete": "Eliminar",
   "edit": "Editar",
   "spam": "Spam",
+  "reply": "Responder",
   "confirmDelete": "¿Estás seguro de que quieres eliminar este comentario?",
   "inReplyTo": "en respuesta a"
 }
