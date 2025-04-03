@@ -53,9 +53,9 @@ export class MehComments {
   @Prop() noreply: boolean = false;
 
   /**
-   * Comment sort order: 'oldest' (default) or 'newest'
+   * Comment sort order: 'oldest' (default), 'newest', or 'threaded'
    */
-  @Prop() sort: 'oldest' | 'newest' = 'oldest';
+  @Prop() sort: 'oldest' | 'newest' | 'threaded' = 'oldest';
 
   @State() comments: any[] = [];
   @State() loading: boolean = true;
@@ -363,18 +363,66 @@ export class MehComments {
     // Create a copy of comments to avoid mutating the original array
     const sortedComments = [...this.comments];
     
-    // Sort comments based on the sort prop
-    if (this.sort === 'newest') {
-      sortedComments.reverse();
+    // Handle different sort modes
+    if (this.sort === 'threaded') {
+      return this.renderThreadedComments();
+    } else {
+      // Sort comments based on the sort prop
+      if (this.sort === 'newest') {
+        sortedComments.reverse();
+      }
+      
+      return (
+        <ul class="comments-list">
+          {sortedComments.map(comment => (
+            <li key={comment.id}>
+              {this.renderComment(comment)}
+            </li>
+          ))}
+        </ul>
+      );
     }
+  }
+
+  /**
+   * Render comments in a threaded/nested structure
+   */
+  private renderThreadedComments() {
+    // First, identify top-level comments (those without a parent)
+    const topLevelComments = this.comments.filter(comment => !comment.parent);
+    
+    // Create a map of child comments for quick lookup
+    const childrenMap = new Map<number, any[]>();
+    
+    // Group child comments by their parent ID
+    this.comments.forEach(comment => {
+      if (comment.parent) {
+        if (!childrenMap.has(comment.parent)) {
+          childrenMap.set(comment.parent, []);
+        }
+        childrenMap.get(comment.parent).push(comment);
+      }
+    });
+    
+    // Recursive function to render a comment and its children
+    const renderCommentThread = (comment: any) => {
+      const children = childrenMap.get(comment.id) || [];
+      
+      return (
+        <li key={comment.id}>
+          {this.renderComment(comment)}
+          {children.length > 0 && (
+            <ul class="comment-replies">
+              {children.map(child => renderCommentThread(child))}
+            </ul>
+          )}
+        </li>
+      );
+    };
     
     return (
-      <ul class="comments-list">
-        {sortedComments.map(comment => (
-          <li key={comment.id}>
-            {this.renderComment(comment)}
-          </li>
-        ))}
+      <ul class="comments-list threaded">
+        {topLevelComments.map(comment => renderCommentThread(comment))}
       </ul>
     );
   }

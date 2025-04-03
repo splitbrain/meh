@@ -11,6 +11,17 @@
     display: flex;
     flex-direction: column;
     gap: var(--meh-spacing);
+    
+    &.threaded {
+      ul.comment-replies {
+        list-style-type: none;
+        padding-left: var(--avatar-size);
+        margin-top: var(--meh-spacing);
+        display: flex;
+        flex-direction: column;
+        gap: var(--meh-spacing);
+      }
+    }
   }
 
   div.comment {
