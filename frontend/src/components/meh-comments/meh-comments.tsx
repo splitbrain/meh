@@ -54,8 +54,9 @@ export class MehComments {
 
   /**
    * Comment sort order: 'oldest' (default), 'newest', or 'threaded'
+   * Can be initialized from localStorage 'meh-sort' key if present
    */
-  @Prop() sort: 'oldest' | 'newest' | 'threaded' = 'oldest';
+  @Prop({ mutable: true }) sort: 'oldest' | 'newest' | 'threaded' = 'oldest';
 
   @State() comments: any[] = [];
   @State() loading: boolean = true;
@@ -92,6 +93,17 @@ export class MehComments {
 
     // Process the backend URL (clean or detect)
     this.backend = detectBackendUrl(this.backend);
+
+    // Check localStorage for sort preference
+    try {
+      const savedSort = localStorage.getItem('meh-sort');
+      if (savedSort && ['oldest', 'newest', 'threaded'].includes(savedSort)) {
+        this.sort = savedSort as 'oldest' | 'newest' | 'threaded';
+      }
+    } catch (e) {
+      // Ignore localStorage errors (e.g., in private browsing mode)
+      console.warn('Could not access localStorage for sort preference:', e);
+    }
 
     // Initialize the TranslationManager with default translations
     this.translator = new TranslationManager(this.defaultTranslations);
