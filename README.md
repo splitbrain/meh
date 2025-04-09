@@ -78,3 +78,7 @@ More details on how to set up the server can be found in the [Server Setup](doc/
     * [Styling Components](doc/styling.md)
 * [Comment Moderation](doc/moderation.md)
 * [Customizing Translations](doc/translations.md)
+
+## Alternatives
+
+Check out [open-source self-hosted comments for a static website](https://lisakov.com/projects/open-source-comments/) for a big list of similar projects.
