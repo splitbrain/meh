@@ -56,7 +56,7 @@ In your blog, add the following to your HTML:
 <meh-comments></meh-comments>
 ```
 
-This should give you a rough idea how Meh works. For a production setup, you should point your web server at the public.
+This should give you a rough idea how Meh works. For a production setup, you should point your web server at the `public` directory.
 
 More details on how to set up the server can be found in the [Server Setup](doc/server.md) section.
 
