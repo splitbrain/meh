@@ -19,8 +19,6 @@ Here's how to add the comments list to your website:
 
 Typically, the component will only display approved comments. To access moderation features, you can use the [meh-login](../meh-login/readme.md) component somewhere on your site to authenticate as an administrator. Once logged in, the component will display all comments, including pending and spam and provide options to moderate them.
 
-```html
-
 <!-- Auto Generated Below -->
 
 
