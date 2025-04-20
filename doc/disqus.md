@@ -30,6 +30,5 @@ For multi-site setups, specify the site name:
 
 ## Notes
 
-* Meh currently does not support threaed comments, so all comments will be imported flat.
 * Disqus does not export E-Mail addresses, so imported comments will not have an associated E-Mail address.
 * It *worked for me*™ but your mileage may vary. You can always import into a new site to test it out before importing into your main site.
