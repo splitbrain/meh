@@ -80,9 +80,22 @@ class FileController
         $html = \Parsedown::instance()->text(file_get_contents($mdfile));
 
         header('Content-Type: text/html; charset=utf-8');
-        echo '<html lang="en"><head><title>' . $file . '</title>';
+        echo '<html lang="en"><head><title>' . $file . ' - Meh… another comment system</title>';
         echo '<link rel="stylesheet" href="https://unpkg.com/chota@latest">';
         echo '</head><body><div class="container">';
+
+        echo '<nav class="nav">';
+        echo '<div class="nav-left">';
+        echo '</div>';
+        echo '<div class="nav-center">';
+        echo '<a class="brand" href="/"><img src="/meh.svg" alt="Meh… another comment system"></a>';
+        echo '</div>';
+        echo '<div class="nav-right">';
+        echo '<a href="https://www.splitbrain.org/blog/2025-03/26-meh_another_comment_system">Introduction &amp; Demo</a>';
+        echo '<a href="https://github.com/splitbrain/meh">Github</a>';
+        echo '</div>';
+        echo '</nav>';
+
         echo $html;
         echo '</div></body></html>';
     }
