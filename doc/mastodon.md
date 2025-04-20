@@ -27,6 +27,8 @@ To set up Mastodon integration:
 
 For multi-site setups you need to set up a `mastodon_account` config and cron job for each site. But you can have all sites use the same account.
 
+For setting up the cronjob when using Docker, you can either use the host's cron or use a container like [Ofelia](https://github.com/mcuadros/ofelia) or [Chadburn](https://github.com/PremoWeb/chadburn).
+
 ### How It Works
 
 The Mastodon integration:
