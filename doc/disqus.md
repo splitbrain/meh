@@ -1,6 +1,6 @@
 # Importing Comments from Disqus
 
-Meh provides a built-in [CLI tool](cli) to import comments from Disqus, making it easy to migrate your existing comment system.
+Meh provides a built-in [CLI tool](cli.md) to import comments from Disqus, making it easy to migrate your existing comment system.
 
 ## Exporting from Disqus
 
