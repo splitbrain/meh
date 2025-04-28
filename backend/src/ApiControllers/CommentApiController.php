@@ -211,7 +211,7 @@ class CommentApiController extends ApiController
         if ($this->app->conf('smtp_user')) {
             $mailer->SMTPAuth = true;
             $mailer->Username = $this->app->conf('smtp_user');
-            $mailer->Password = $this->app->conf('smtp_password');
+            $mailer->Password = $this->app->conf('smtp_pass');
         }
 
         if ((bool)$this->app->conf('smtp_verify') === false) {
