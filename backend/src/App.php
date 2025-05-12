@@ -81,6 +81,7 @@ class App
             'site_url' => 'http://localhost:8000',
             'mastodon_account' => '',
             'mastodon_token' => '',
+            'avatar' => 'gravatar',
             'gravatar_fallback' => 'initials',
             'gravatar_rating' => 'g',
             'notify_email' => '',

@@ -30,24 +30,15 @@ class CommentUtils
      */
     public function addAvatarUrl(array &$comment): void
     {
-        if (empty($comment['avatar'])) {
-            if (!empty($comment['email'])) {
-                $ident = strtolower(trim((string) $comment['email']));
-            } else {
-                $ident = strtolower(trim((string) $comment['author']));
-            }
-
-            $gravatar = 'https://www.gravatar.com/avatar/' . md5($ident) . '?s=256';
-            $gravatar .= '&d=' . urlencode((string) $this->app->conf('gravatar_fallback'));
-            $gravatar .= '&r=' . $this->app->conf('gravatar_rating');
-            if ($this->app->conf('gravatar_fallback') == 'initials') {
-                $gravatar .= '&name=' . urlencode((string) $comment['author']);
-            }
-
-            $comment['avatar_url'] = $gravatar;
+        if (!empty($comment['email'])) {
+            $ident = strtolower(trim((string)$comment['email']));
         } else {
-            $comment['avatar_url'] = $comment['avatar'];
+            $ident = strtolower(trim((string)$comment['author']));
         }
+        $ident = md5($ident);
+        $comment['avatar_id'] = $ident; // for the frontend
+
+
     }
 
     /**

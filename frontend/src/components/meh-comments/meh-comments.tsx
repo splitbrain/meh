@@ -323,23 +323,31 @@ export class MehComments {
     return this.comments.find(comment => comment.id === parentId);
   }
 
-  private localAvatarUrl(ident: string) {
-    return `${this.backend}/avatar/${ident}`;
+  /**
+   * Generate the local avatar fallback URL
+   *
+   * @param {string} ident
+   * @param {boolean} isError indicates that the original avatar URL failed
+   */
+  private getAvatarUrl(ident: string, isError: boolean = false): string {
+    return `${this.backend}/api/${this.site}/avatar/${ident}?fallback=${isError ? '1' : '0'}`;
   }
 
   /**
    * Render a single comment
    */
   private renderComment(comment: any) {
+    console.log(comment);
     return (
       <div class={`comment status-${comment.status}`} data-comment-id={comment.id}>
-        <img 
-          src={comment.avatar_url} 
-          alt="Avatar" 
-          class="avatar" 
+        <img
+          src={comment.avatar ?? this.getAvatarUrl(comment.avatar_id)}
+          alt="Avatar"
+          class="avatar"
           onError={(e) => {
             const imgElement = e.target as HTMLImageElement;
-            imgElement.src = this.localAvatarUrl(comment.ident);
+            imgElement.onerror = null; // Prevent infinite loop
+            imgElement.src = this.getAvatarUrl(comment.avatar_id, true);
           }}
         />
         <div class="comment-user">

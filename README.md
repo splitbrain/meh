@@ -38,7 +38,7 @@ cd ..
 cp .env.example .env
 $EDITOR .env
 ./meh migrate
-php -s localhost:8000 -t public
+php -S localhost:8000 -t public
 ```
 
 You can now browse this documentation at `http://localhost:8000`. It will also serve the Meh components and the API.

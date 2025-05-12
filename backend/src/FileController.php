@@ -2,6 +2,8 @@
 
 namespace splitbrain\meh;
 
+use splitbrain\RingIcon\RingIconSVG;
+
 class FileController
 {
     const DIST_PATH = __DIR__ . '/../../frontend/dist/meh';
