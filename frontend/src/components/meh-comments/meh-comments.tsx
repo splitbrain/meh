@@ -333,7 +333,15 @@ export class MehComments {
   private renderComment(comment: any) {
     return (
       <div class={`comment status-${comment.status}`} data-comment-id={comment.id}>
-        <img src={comment.avatar_url} alt="Avatar" class="avatar"/>
+        <img 
+          src={comment.avatar_url} 
+          alt="Avatar" 
+          class="avatar" 
+          onError={(e) => {
+            const imgElement = e.target as HTMLImageElement;
+            imgElement.src = this.localAvatarUrl(comment.ident);
+          }}
+        />
         <div class="comment-user">
           <strong class="author">
             {comment.website ? (
