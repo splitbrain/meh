@@ -340,7 +340,7 @@ export class MehComments {
     return (
       <div class={`comment status-${comment.status}`} data-comment-id={comment.id}>
         <img
-          src={comment.avatar ?? this.getAvatarUrl(comment.avatar_id)}
+          src={comment.avatar && comment.avatar.trim() !== '' ? comment.avatar : this.getAvatarUrl(comment.avatar_id)}
           alt="Avatar"
           class="avatar"
           onError={(e) => {
