@@ -337,7 +337,6 @@ export class MehComments {
    * Render a single comment
    */
   private renderComment(comment: any) {
-    console.log(comment);
     return (
       <div class={`comment status-${comment.status}`} data-comment-id={comment.id}>
         <img
