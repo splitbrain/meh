@@ -323,6 +323,10 @@ export class MehComments {
     return this.comments.find(comment => comment.id === parentId);
   }
 
+  private localAvatarUrl(ident: string) {
+    return `${this.backend}/avatar/${ident}`;
+  }
+
   /**
    * Render a single comment
    */
