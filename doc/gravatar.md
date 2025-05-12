@@ -1,42 +1,57 @@
-# Gravatar Support in Meh
+# Avatar Support in Meh
 
-Meh integrates with [Gravatar](https://gravatar.com/) to display user avatars next to comments. This provides a familiar and consistent way for commenters to have their profile images appear across different websites.
+By default, Meh integrates with [Gravatar](https://gravatar.com/) to display user avatars next to comments. This provides a familiar and consistent way for commenters to have their profile images appear across different websites. However, Meh can also generate avatars locally without sending any data to Gravatar.
 
 ## How It Works
 
-When a comment is displayed:
-
-1. Meh checks if the comment has a custom avatar URL (e.g., from Mastodon imports)
-2. If not, it generates a Gravatar URL based on the commenter's email address or name
-3. The Gravatar service returns either:
-   - The user's Gravatar image if they have one registered
-   - A fallback image based on your configuration
+1. Meh will always prefer a custom avatar URL if provided (like from Mastodon imports).
+2. If no custom avatar is available, or it fails to load, Meh will either generate a local avatar or use Gravatar.
+3. If Gravatar is used and the user has no Gravatar image, a fallback image is displayed which again can be local or from Gravatar.
 
 ## Configuration
 
-You can configure Gravatar behavior using these settings:
+First decide whether you want to use Gravatar or local avatars. You can set this in the configuration:
+
+```bash
+# Use Gravatar
+./meh config avatar gravatar
+
+# Use locally generated ring avatars
+./meh config avatar ring
+```
+
+See below for available local avatar types.
+
+When using Gravatar, you can also set the default avatar type and content rating. This is done in the same way as other configuration options:
 
 ```
 # Set the fallback image type
-./meh config gravatar_fallback "initials"
+./meh config gravatar_fallback monsterid
 
 # Set the content rating
 ./meh config gravatar_rating "g"
 ```
 
-### Fallback Options
+See below for available avatar types.
 
-When a user doesn't have a Gravatar, you can choose what appears instead:
+### Avatar Types
 
-- `initials`: Generates an image with the user's initials (default)
-- `mp`: Mystery Person silhouette
-- `identicon`: Geometric pattern
-- `monsterid`: Generated "monster" avatar (did you know those were [invented by Meh's creator](https://www.splitbrain.org/blog/2007-01/20_monsterid_as_gravatar_fallback)?)
-- `wavatar`: Generated face
-- `retro`: 8-bit style pixelated face
-- `robohash`: Robot avatar
-- `blank`: Transparent image
-- Or any URL to a custom default image
+The following avatar types can be used as either a fallback Gravatar or a locally generated avatar.
+
+| Avatar Type   | Local       | Gravatar Fallback | Description                                                                                                                                                  |
+|---------------|-------------|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mp`          | Yes         | Yes               | Mystery Person silhouette                                                                                                                                    |
+| `ring`        | Yes         | Yes               | Three ring segments forming a unique pattern                                                                                                                 |
+| `multiavatar` | Yes         | Yes               | Colorful multicultural avatar. See [multiavatar.com](https://multiavatar.com/)                                                                               |
+| `identicon`   | Yes         | Yes               | Geometric pattern (default gravatar fallback)                                                                                                                |
+| `monsterid`   | No          | Yes               | Generated "monster" avatar (did you know those were [invented by Meh's creator](https://www.splitbrain.org/blog/2007-01/20_monsterid_as_gravatar_fallback)?) |
+| `wavatar`     | No          | Yes               | Generated face                                                                                                                                               |
+| `retro`       | No          | Yes               | 8-bit style pixelated face                                                                                                                                   |
+| `robohash`    | No          | Yes               | Robot avatar                                                                                                                                                 |
+| `blank`       | Yes         | Yes               | Transparent image                                                                                                                                            |
+| Custom URL    | No          | Yes               | Any URL to a custom default image                                                                                                                            |
+
+Please note that the `initials` setting is no longer available to streamline the avatar generation process.
 
 ### Content Rating
 

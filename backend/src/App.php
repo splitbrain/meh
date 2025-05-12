@@ -82,7 +82,7 @@ class App
             'mastodon_account' => '',
             'mastodon_token' => '',
             'avatar' => 'gravatar',
-            'gravatar_fallback' => 'initials',
+            'gravatar_fallback' => 'identicon',
             'gravatar_rating' => 'g',
             'notify_email' => '',
             'smtp_host' => 'localhost',
