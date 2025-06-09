@@ -8,8 +8,7 @@ RUN a2enmod env
 
 VOLUME /app/data
 WORKDIR /app
-# see .dockerignore for what is not copied
-COPY . /app/
+COPY ./release /app/
 
 # Set up the entrypoint script
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

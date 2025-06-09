@@ -21,16 +21,15 @@ jobs:
         with:
           php-version: '8.4'
 
-      - name: Install Composer dependencies
-        run: |
-          cd backend
-          composer install --no-interaction --no-progress --no-suggest --no-dev
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
-      - name: Build Frontend
-        run: |
-          cd frontend
-          npm install
-          npm run build
+      - name: Build Release Dir
+        run: ./build.sh
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
