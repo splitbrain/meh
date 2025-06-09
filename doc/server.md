@@ -52,9 +52,36 @@ docker-compose exec meh /app/meh
 
 Use the [command line tool](cli.md) to [initialize the database](migrate.md) and configure your installation. [Configuration](configuration.md) can also be done via environment variables.
 
-## Manual Setup
+## Manual Setup (production)
 
 Of course, you can run the whole thing the classical way.
+
+### Requirements
+
+- PHP 8.1 or higher
+- SQLite extension for PHP
+- Web server (Apache, Nginx, etc.)
+
+### Installation Steps
+
+1. Download the latest meh-release.zip from https://github.com/splitbrain/meh/releases
+
+2. Unzip the archive on your server
+   ```bash
+   unzip meh-release.zip
+   ```
+3. Point the document root of your web server to the `public` directory
+
+Use the [command line tool](cli.md) to [initialize the database](migrate.md) and configure your installation. [Configuration](configuration.md) can also be done via environment variables.
+
+### URL Rewriting
+
+Meh requires URL rewriting to work correctly. There's a `.htaccess` file included that handles this for Apache. For other web servers, you need to configure URL rewriting manually.
+
+
+## Manual Setup (development)
+
+If you want to tinker with the code, you will need to use composer and node to install and build the dependencies. 
 
 ### Requirements
 
@@ -75,7 +102,7 @@ Of course, you can run the whole thing the classical way.
 2. Install backend dependencies:
    ```bash
    cd backend
-   composer install --no-dev
+   composer install
    cd ..
    ```
 
@@ -87,11 +114,9 @@ Of course, you can run the whole thing the classical way.
    cd ..
    ```
 
-4. Point your web server to the `public` directory
+4. Use the PHP development server  your web server to the `public` directory
+   ```bash
+   php -S localhost:8000 -t public
+   ```
 
 Use the [command line tool](cli.md) to [initialize the database](migrate.md) and configure your installation. [Configuration](configuration.md) can also be done via environment variables.
-
-
-### URL Rewriting
-
-Meh requires URL rewriting to work correctly. There's a `.htaccess` file included that handles this for Apache. For other web servers, you need to configure URL rewriting manually.
