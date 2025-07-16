@@ -200,7 +200,7 @@ class MastodonFetcher
      */
     protected function buildStatusesUrl(string $instance, string $accountId, int $limit, ?string $maxId = null, ?string $sinceId = null): string
     {
-        $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$limit";
+        $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$limit&exclude_reblogs=true";
 
         if ($maxId) {
             $url .= "&max_id=$maxId";
