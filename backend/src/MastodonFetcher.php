@@ -142,21 +142,19 @@ class MastodonFetcher
      *
      * @param string $instance The Mastodon instance URL
      * @param string $accountId The account ID
-     * @param string|null $sinceId Only fetch statuses newer than this ID
+     * @param string|null $minId Only fetch statuses newer than this ID
      * @return array The statuses
      */
-    protected function fetchAllStatuses(string $instance, string $accountId, ?string $sinceId = null): array
+    protected function fetchAllStatuses(string $instance, string $accountId, ?string $minId = null): array
     {
         $allStatuses = [];
         $pageSize = 40;
-        $maxId = null;
         $page = 1;
-        $maxPages = 25;
+        $maxPages = 50; // run-away protection, if no URL in the last 2000 posts it's a problem
 
-        $this->app->log()->info("Fetching posts in batches of $pageSize...");
 
         while ($page <= $maxPages) {
-            $url = $this->buildStatusesUrl($instance, $accountId, $pageSize, $maxId, $sinceId);
+            $url = $this->buildStatusesUrl($instance, $accountId, $pageSize, $minId);
             $response = $this->makeHttpRequest($url);
 
             if (!$response) {
@@ -171,14 +169,22 @@ class MastodonFetcher
             $allStatuses = array_merge($allStatuses, $statuses);
             $this->app->log()->info("Fetched page $page with " . count($statuses) . " posts (total: " . count($allStatuses) . ")");
 
+            $firstStatus = $statuses[0];
+            $lastStatus = end($statuses);
+            $this->app->log()->notice("Status {fid} {fdate} <- {lid} {ldate}", [
+                'fid' => $firstStatus->id,
+                'fdate' => date('Y-m-d H:i:s', strtotime($firstStatus->created_at)),
+                'lid' => $lastStatus->id,
+                'ldate' => date('Y-m-d H:i:s', strtotime($lastStatus->created_at))
+            ]);
+
             // Check if we've reached the end
             if (count($statuses) < $pageSize) {
                 break;
             }
 
             // Get the ID of the last status for pagination
-            $lastStatus = end($statuses);
-            $maxId = $lastStatus->id;
+            $minId = $firstStatus->id;
             $page++;
 
             // Small delay to avoid rate limiting
@@ -194,20 +200,15 @@ class MastodonFetcher
      * @param string $instance The Mastodon instance URL
      * @param string $accountId The account ID
      * @param int $limit Number of statuses to fetch
-     * @param string|null $maxId Only fetch statuses older than this ID
-     * @param string|null $sinceId Only fetch statuses newer than this ID
+     * @param string|null $minId Fetch statuses immediately newer than this ID
      * @return string The URL
      */
-    protected function buildStatusesUrl(string $instance, string $accountId, int $limit, ?string $maxId = null, ?string $sinceId = null): string
+    protected function buildStatusesUrl(string $instance, string $accountId, int $limit, ?string $minId = null): string
     {
         $url = "$instance/api/v1/accounts/$accountId/statuses?limit=$limit&exclude_reblogs=true";
 
-        if ($maxId) {
-            $url .= "&max_id=$maxId";
-        }
-
-        if ($sinceId) {
-            $url .= "&min_id=$sinceId";
+        if ($minId) {
+            $url .= "&min_id=$minId";
         }
 
         return $url;
