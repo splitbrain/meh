@@ -9,22 +9,27 @@ export namespace Components {
     interface MehComments {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language": string;
         /**
           * When set, hides the reply link on comments
+          * @default false
          */
         "noreply": boolean;
         /**
@@ -33,32 +38,39 @@ export namespace Components {
         "post": string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site": string;
         /**
           * Comment sort order: 'oldest' (default), 'newest', or 'threaded' Can switched by the end user. User preference is saved in localStorage.
+          * @default 'oldest'
          */
         "sort": 'oldest' | 'newest' | 'threaded';
     }
     interface MehCount {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language": string;
         /**
           * When set to true, only the number will be displayed without any text
+          * @default false
          */
         "numonly": boolean;
         /**
@@ -67,24 +79,29 @@ export namespace Components {
         "post": string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site": string;
     }
     interface MehForm {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language": string;
         /**
@@ -93,46 +110,56 @@ export namespace Components {
         "post": string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site": string;
     }
     interface MehLogin {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language": string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site": string;
     }
     interface MehMastodon {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend": string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations": string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles": string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language": string;
         /**
@@ -141,6 +168,7 @@ export namespace Components {
         "post": string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site": string;
     }
@@ -188,22 +216,27 @@ declare namespace LocalJSX {
     interface MehComments {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language"?: string;
         /**
           * When set, hides the reply link on comments
+          * @default false
          */
         "noreply"?: boolean;
         /**
@@ -212,32 +245,39 @@ declare namespace LocalJSX {
         "post"?: string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site"?: string;
         /**
           * Comment sort order: 'oldest' (default), 'newest', or 'threaded' Can switched by the end user. User preference is saved in localStorage.
+          * @default 'oldest'
          */
         "sort"?: 'oldest' | 'newest' | 'threaded';
     }
     interface MehCount {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language"?: string;
         /**
           * When set to true, only the number will be displayed without any text
+          * @default false
          */
         "numonly"?: boolean;
         /**
@@ -246,24 +286,29 @@ declare namespace LocalJSX {
         "post"?: string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site"?: string;
     }
     interface MehForm {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language"?: string;
         /**
@@ -272,46 +317,56 @@ declare namespace LocalJSX {
         "post"?: string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site"?: string;
     }
     interface MehLogin {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language"?: string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site"?: string;
     }
     interface MehMastodon {
         /**
           * The base URL for where the meh system is hosted If not provided, attempts to detect from script tag
+          * @default ''
          */
         "backend"?: string;
         /**
           * Custom translations object that overrides default and loaded translations This allows users to provide their own translations directly
+          * @default ''
          */
         "customTranslations"?: string | Partial<typeof this.defaultTranslations>;
         /**
           * URL to an external stylesheet to be injected into the shadow DOM
+          * @default ''
          */
         "externalStyles"?: string;
         /**
           * The language code for translations If not provided, defaults to 'en'
+          * @default 'en'
          */
         "language"?: string;
         /**
@@ -320,6 +375,7 @@ declare namespace LocalJSX {
         "post"?: string;
         /**
           * The site identifier to use If not provided, defaults to 'meh'
+          * @default 'meh'
          */
         "site"?: string;
     }
