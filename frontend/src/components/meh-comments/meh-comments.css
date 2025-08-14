@@ -82,6 +82,7 @@
     > div.comment-content {
       grid-column: 2 / -1;
       grid-row: 3 / 4;
+      overflow: auto;
     }
 
     > div.comment-actions {
