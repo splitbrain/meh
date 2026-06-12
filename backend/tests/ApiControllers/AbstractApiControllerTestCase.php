@@ -17,8 +17,10 @@ abstract class AbstractApiControllerTestCase extends TestCase
         unlink($this->tempDbDir);
         mkdir($this->tempDbDir);
 
-        // Initialize the App with a configuration that uses the temporary database
-        $_ENV['DB_PATH'] = $this->tempDbDir;
+        // Initialize the App with a configuration that uses the temporary database.
+        // Must use putenv() with the MEH_ prefix: App reads MEH_DB_PATH and rebuilds $_ENV
+        // from getenv() in loadConfigFromEnvironment(), so a plain $_ENV assignment is lost.
+        putenv('MEH_DB_PATH=' . $this->tempDbDir);
         $this->app = new App('test', null, true);
 
         // initialize the database
@@ -31,6 +33,7 @@ abstract class AbstractApiControllerTestCase extends TestCase
     protected function tearDown(): void
     {
         // clear environment
+        putenv('MEH_DB_PATH');
         unset($_ENV);
 
         // Close database connection

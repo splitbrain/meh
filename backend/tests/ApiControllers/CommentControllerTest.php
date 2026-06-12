@@ -248,7 +248,7 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         ];
 
         $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('{pending} Your previous comment is still pending approval');
+        $this->expectExceptionMessage('`pending` Your previous comment is still pending approval');
         $userController->create($commentData);
     }
 }

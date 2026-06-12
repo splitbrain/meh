@@ -50,7 +50,7 @@ class CommentApiController extends ApiController
         ];
 
         // Check if the comment is a reply to another comment in the same post
-        if ($data['parent']) {
+        if (!empty($data['parent'])) {
             $parent = $this->app->db()->queryValue(
                 'SELECT id FROM comments WHERE id = ? AND post = ?',
                 $data['parent'],

@@ -17,13 +17,22 @@ class TokenControllerTest extends AbstractApiControllerTestCase
 
     protected function setUp(): void
     {
-        $_ENV['ADMIN_PASSWORD'] = password_hash((string) $this->testPassword, PASSWORD_DEFAULT);
-        $_ENV['JWT_SECRET'] = $this->testSecret;
+        // Must use putenv() with the MEH_ prefix: App reads MEH_* env vars and rebuilds $_ENV
+        // from getenv() in loadConfigFromEnvironment(), so a plain $_ENV assignment is lost.
+        putenv('MEH_ADMIN_PASSWORD=' . password_hash((string) $this->testPassword, PASSWORD_DEFAULT));
+        putenv('MEH_JWT_SECRET=' . $this->testSecret);
 
         parent::setUp();
 
         // Create the controller with the test App
         $this->controller = new TokenApiController($this->app);
+    }
+
+    protected function tearDown(): void
+    {
+        putenv('MEH_ADMIN_PASSWORD');
+        putenv('MEH_JWT_SECRET');
+        parent::tearDown();
     }
 
     public function testAdminRequiresPassword(): void
