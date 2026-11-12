@@ -41,7 +41,7 @@ class CommentApiController extends ApiController
             'post' => $data['post'],
             'author' => $data['author'],
             'email' => $data['email'] ?? '',
-            'website' => $data['website'] ?? '',
+            'website' => $this->sanitizeWebsite($data['website'] ?? ''),
             'text' => $data['text'],
             'html' => $html,
             'ip' => $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '',
@@ -125,14 +125,43 @@ class CommentApiController extends ApiController
 
         // make sure $data only contains fields that can be updated
         $data = array_intersect_key($data, array_flip(['author', 'email', 'website', 'text']));
+        if (isset($data['website'])) {
+            $data['website'] = $this->sanitizeWebsite($data['website']);
+        }
         if (isset($data['text'])) {
-            $data['html'] = $data['text']; // Simple text for now, could add Markdown processing
+            // Render through the same safe-mode Markdown pipeline as create(); do not
+            // copy the raw text into the html column (it is rendered via innerHTML).
+            $parsedown = new Parsedown();
+            $parsedown->setSafeMode(true);
+            $parsedown->setBreaksEnabled(true);
+            $data['html'] = $parsedown->text($data['text']);
         }
 
         // merge with existing record
         $record = array_merge($record, $data);
         $new = $this->app->db()->saveRecord('comments', $record);
         return $this->app->commentUtils()->process($new);
+    }
+
+    /**
+     * Only allow http(s) website URLs to be stored; the frontend renders the
+     * value directly into an anchor href, so a javascript:/data: scheme would be
+     * stored XSS. Empty and schemeless (relative) values are left as-is.
+     */
+    private function sanitizeWebsite(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return '';
+        }
+        // Collapse control chars/whitespace the browser strips when resolving the
+        // scheme, so "java	script:..." cannot smuggle a dangerous scheme past this.
+        $probe = preg_replace('/[\x00-\x20]+/', '', $url);
+        $scheme = parse_url((string) $probe, PHP_URL_SCHEME);
+        if ($scheme !== null && !in_array(strtolower($scheme), ['http', 'https'], true)) {
+            return '';
+        }
+        return $url;
     }
 
     /**
