@@ -4,6 +4,7 @@ namespace splitbrain\meh;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ResponseException;
 
 /**
  * Class to handle fetching and processing posts from Mastodon
@@ -566,7 +567,7 @@ class MastodonFetcher
             $response = $client->request('GET', $url);
             return (string)$response->getBody();
         } catch (RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 'unknown';
+            $statusCode = $e instanceof ResponseException ? $e->getResponse()->getStatusCode() : 'unknown';
             $this->app->log()->error("HTTP request failed: {$e->getMessage()} (HTTP $statusCode)");
             return null;
         } catch (\Exception $e) {
