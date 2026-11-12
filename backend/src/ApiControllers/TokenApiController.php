@@ -44,7 +44,7 @@ class TokenApiController extends ApiController
             'scopes' => ['admin', 'user'] // Admin tokens should also have user scope
         ];
 
-        $token = JWT::encode($payload, $this->app->conf('jwt_secret'), 'HS256');
+        $token = JWT::encode($payload, $this->app->jwtSecret(), 'HS256');
 
         return [
             'token' => $token,
@@ -83,7 +83,7 @@ class TokenApiController extends ApiController
             // No valid token, issue a new one
         }
 
-        $token = JWT::encode($payload, $this->app->conf('jwt_secret'), 'HS256');
+        $token = JWT::encode($payload, $this->app->jwtSecret(), 'HS256');
 
         return [
             'token' => $token,

@@ -13,7 +13,7 @@ class TokenControllerTest extends AbstractApiControllerTestCase
 {
     private $controller;
     private $testPassword = 'test-password';
-    private $testSecret = 'test-secret';
+    private $testSecret = 'test-secret-with-at-least-32-bytes';
 
     protected function setUp(): void
     {

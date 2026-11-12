@@ -108,7 +108,7 @@ class ApiRouter extends Router
 
         // Validate the token if any
         try {
-            $tokenPayload = $this->getTokenPayload($app->conf('jwt_secret'));
+            $tokenPayload = $this->getTokenPayload($app->jwtSecret());
         } catch (HttpException $e) {
             if ($scopes) {
                 throw $e;

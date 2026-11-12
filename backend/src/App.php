@@ -10,6 +10,9 @@ use splitbrain\phpsqlite\SQLite;
 
 class App
 {
+    /** @var int minimum length of the JWT secret in bytes, as required for HS256 signatures */
+    public const JWT_SECRET_MIN_LENGTH = 32;
+
     /** @var string the site this app is running for */
     protected string $site = 'meh';
 
@@ -178,6 +181,24 @@ class App
     public function conf(string $key, mixed $default = null): mixed
     {
         return $this->config[$key] ?? $default;
+    }
+
+    /**
+     * Get the JWT secret used to sign and verify tokens
+     *
+     * @return string The JWT secret
+     * @throws \RuntimeException If the secret is shorter than JWT_SECRET_MIN_LENGTH bytes
+     */
+    public function jwtSecret(): string
+    {
+        $secret = (string)$this->conf('jwt_secret');
+        if (strlen($secret) < self::JWT_SECRET_MIN_LENGTH) {
+            throw new \RuntimeException(
+                'The JWT secret must be at least ' . self::JWT_SECRET_MIN_LENGTH . ' bytes long. ' .
+                'Set a longer secret with the MEH_JWT_SECRET environment variable or with "./meh config jwt_secret".'
+            );
+        }
+        return $secret;
     }
 
     /**
