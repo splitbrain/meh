@@ -54,6 +54,16 @@ class CommentUtils
     }
 
     /**
+     * Drop personal data that must not be visible to the public from a comment
+     *
+     * @param array $comment original comment, will be modified
+     */
+    public function dropPrivateData(array &$comment): void
+    {
+        unset($comment['ip'], $comment['email']);
+    }
+
+    /**
      * Add a timezone to a comment
      *
      * SQLite stores all timestamps in UTC, but we want to display them in the user's timezone

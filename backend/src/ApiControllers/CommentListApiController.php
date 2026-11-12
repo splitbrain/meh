@@ -39,7 +39,12 @@ class CommentListApiController extends ApiController
             );
         }
 
-        return array_map([$this->app->commentUtils(), 'process'], $comments);
+        $utils = $this->app->commentUtils();
+        return array_map(static function (array $comment) use ($utils, $isAdmin) {
+            $comment = $utils->process($comment);
+            if (!$isAdmin) $utils->dropPrivateData($comment);
+            return $comment;
+        }, $comments);
     }
 
     /**

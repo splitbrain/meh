@@ -106,6 +106,25 @@ class CommentListControllerTest extends AbstractApiControllerTestCase
         $this->assertNotContains('User 5', $authors); // deleted
     }
     
+    public function testBypostHidesPrivateDataFromRegularUsers(): void
+    {
+        $this->app->db()->exec(
+            'INSERT INTO comments (post, author, email, ip, text, html, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            ['private-post', 'User 7', 'user7@example.com', '203.0.113.7', 'Comment 7', '<p>Comment 7</p>', 'approved', date('Y-m-d H:i:s')]
+        );
+
+        $result = $this->controller->bypost(['post' => 'private-post']);
+        $this->assertCount(1, $result);
+        $this->assertArrayNotHasKey('email', $result[0]);
+        $this->assertArrayNotHasKey('ip', $result[0]);
+        $this->assertArrayHasKey('avatar_id', $result[0]);
+
+        $result = $this->adminController->bypost(['post' => 'private-post']);
+        $this->assertCount(1, $result);
+        $this->assertEquals('user7@example.com', $result[0]['email']);
+        $this->assertEquals('203.0.113.7', $result[0]['ip']);
+    }
+
     public function testBypostFiltersCommentsByPost(): void
     {
         // Test with regular user
