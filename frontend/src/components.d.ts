@@ -379,23 +379,67 @@ declare namespace LocalJSX {
          */
         "site"?: string;
     }
+
+    interface MehCommentsAttributes {
+        "post": string;
+        "backend": string;
+        "site": string;
+        "language": string;
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        "externalStyles": string;
+        "noreply": boolean;
+        "sort": 'oldest' | 'newest' | 'threaded';
+    }
+    interface MehCountAttributes {
+        "post": string;
+        "backend": string;
+        "site": string;
+        "language": string;
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        "numonly": boolean;
+        "externalStyles": string;
+    }
+    interface MehFormAttributes {
+        "post": string;
+        "backend": string;
+        "site": string;
+        "language": string;
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        "externalStyles": string;
+    }
+    interface MehLoginAttributes {
+        "backend": string;
+        "site": string;
+        "language": string;
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        "externalStyles": string;
+    }
+    interface MehMastodonAttributes {
+        "post": string;
+        "backend": string;
+        "site": string;
+        "language": string;
+        "customTranslations": string | Partial<typeof this.defaultTranslations>;
+        "externalStyles": string;
+    }
+
     interface IntrinsicElements {
-        "meh-comments": MehComments;
-        "meh-count": MehCount;
-        "meh-form": MehForm;
-        "meh-login": MehLogin;
-        "meh-mastodon": MehMastodon;
+        "meh-comments": Omit<MehComments, keyof MehCommentsAttributes> & { [K in keyof MehComments & keyof MehCommentsAttributes]?: MehComments[K] } & { [K in keyof MehComments & keyof MehCommentsAttributes as `attr:${K}`]?: MehCommentsAttributes[K] } & { [K in keyof MehComments & keyof MehCommentsAttributes as `prop:${K}`]?: MehComments[K] };
+        "meh-count": Omit<MehCount, keyof MehCountAttributes> & { [K in keyof MehCount & keyof MehCountAttributes]?: MehCount[K] } & { [K in keyof MehCount & keyof MehCountAttributes as `attr:${K}`]?: MehCountAttributes[K] } & { [K in keyof MehCount & keyof MehCountAttributes as `prop:${K}`]?: MehCount[K] };
+        "meh-form": Omit<MehForm, keyof MehFormAttributes> & { [K in keyof MehForm & keyof MehFormAttributes]?: MehForm[K] } & { [K in keyof MehForm & keyof MehFormAttributes as `attr:${K}`]?: MehFormAttributes[K] } & { [K in keyof MehForm & keyof MehFormAttributes as `prop:${K}`]?: MehForm[K] };
+        "meh-login": Omit<MehLogin, keyof MehLoginAttributes> & { [K in keyof MehLogin & keyof MehLoginAttributes]?: MehLogin[K] } & { [K in keyof MehLogin & keyof MehLoginAttributes as `attr:${K}`]?: MehLoginAttributes[K] } & { [K in keyof MehLogin & keyof MehLoginAttributes as `prop:${K}`]?: MehLogin[K] };
+        "meh-mastodon": Omit<MehMastodon, keyof MehMastodonAttributes> & { [K in keyof MehMastodon & keyof MehMastodonAttributes]?: MehMastodon[K] } & { [K in keyof MehMastodon & keyof MehMastodonAttributes as `attr:${K}`]?: MehMastodonAttributes[K] } & { [K in keyof MehMastodon & keyof MehMastodonAttributes as `prop:${K}`]?: MehMastodon[K] };
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "meh-comments": LocalJSX.MehComments & JSXBase.HTMLAttributes<HTMLMehCommentsElement>;
-            "meh-count": LocalJSX.MehCount & JSXBase.HTMLAttributes<HTMLMehCountElement>;
-            "meh-form": LocalJSX.MehForm & JSXBase.HTMLAttributes<HTMLMehFormElement>;
-            "meh-login": LocalJSX.MehLogin & JSXBase.HTMLAttributes<HTMLMehLoginElement>;
-            "meh-mastodon": LocalJSX.MehMastodon & JSXBase.HTMLAttributes<HTMLMehMastodonElement>;
+            "meh-comments": LocalJSX.IntrinsicElements["meh-comments"] & JSXBase.HTMLAttributes<HTMLMehCommentsElement>;
+            "meh-count": LocalJSX.IntrinsicElements["meh-count"] & JSXBase.HTMLAttributes<HTMLMehCountElement>;
+            "meh-form": LocalJSX.IntrinsicElements["meh-form"] & JSXBase.HTMLAttributes<HTMLMehFormElement>;
+            "meh-login": LocalJSX.IntrinsicElements["meh-login"] & JSXBase.HTMLAttributes<HTMLMehLoginElement>;
+            "meh-mastodon": LocalJSX.IntrinsicElements["meh-mastodon"] & JSXBase.HTMLAttributes<HTMLMehMastodonElement>;
         }
     }
 }
