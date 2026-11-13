@@ -193,7 +193,7 @@ class DisqusImporter
         // Extract author information
         $authorName = isset($post->author->name) ? (string)$post->author->name : 'Anonymous';
         $authorEmail = isset($post->author->email) ? (string)$post->author->email : '';
-        $authorWebsite = isset($post->author->link) ? (string)$post->author->link : '';
+        $authorWebsite = $this->app->commentUtils()->cleanWebsite((string)$post->author->link);
 
         // Extract IP address
         $ipAddress = isset($post->ipAddress) ? (string)$post->ipAddress : '';

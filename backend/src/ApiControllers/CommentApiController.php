@@ -41,7 +41,7 @@ class CommentApiController extends ApiController
             'post' => $data['post'],
             'author' => $data['author'],
             'email' => $data['email'] ?? '',
-            'website' => $data['website'] ?? '',
+            'website' => $this->app->commentUtils()->cleanWebsite($data['website'] ?? ''),
             'text' => $data['text'],
             'html' => $html,
             'ip' => $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '',

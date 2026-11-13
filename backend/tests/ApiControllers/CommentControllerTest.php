@@ -2,6 +2,7 @@
 
 namespace splitbrain\meh\Tests\ApiControllers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use splitbrain\meh\ApiControllers\CommentApiController;
 use splitbrain\meh\HttpException;
 
@@ -135,6 +136,49 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         $savedComment = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $commentId);
         $this->assertEquals('Updated Author', $savedComment['author']);
         $this->assertEquals('Updated comment', $savedComment['text']);
+    }
+
+    /**
+     * Website inputs and the values that are expected to be stored
+     *
+     * @return array<string, array{string, string}>
+     */
+    public static function websiteProvider(): array
+    {
+        return [
+            'empty' => ['', ''],
+            'http' => ['http://example.com', 'http://example.com'],
+            'https' => ['https://example.com/~jane', 'https://example.com/~jane'],
+            'uppercase scheme' => ['HTTPS://example.com', 'HTTPS://example.com'],
+            'whitespace' => ['  https://example.com ', 'https://example.com'],
+            'no scheme' => ['example.com', ''],
+            'protocol relative' => ['//example.com', ''],
+            'no scheme with port' => ['example.com:8080/foo', ''],
+            'unparsable' => ['http:///x', ''],
+            'javascript' => ['javascript:alert(1)', ''],
+            'javascript uppercase' => ['JavaScript:alert(1)', ''],
+            'javascript with tab' => ["java\tscript:alert(1)", ''],
+            'data' => ['data:text/html,foo', ''],
+            'ftp' => ['ftp://example.com', ''],
+        ];
+    }
+
+    /**
+     * Check that only http and https websites are stored
+     *
+     * @param string $input The website as sent by the user
+     * @param string $expected The website as it is expected to be stored
+     */
+    #[DataProvider('websiteProvider')]
+    public function testCreateCleansWebsite(string $input, string $expected): void
+    {
+        $result = $this->adminController->create([
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'website' => $input,
+            'text' => 'Test comment'
+        ]);
+        $this->assertSame($expected, $result['website']);
     }
 
     public function testStatusUpdatesCommentStatus(): void

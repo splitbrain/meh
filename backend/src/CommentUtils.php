@@ -54,6 +54,22 @@ class CommentUtils
     }
 
     /**
+     * Clean a commenter's website URL
+     *
+     * Only http and https URLs are allowed, because the frontend uses the value as a link target.
+     * All other values are removed.
+     *
+     * @param string $url The URL as given by the user
+     * @return string The cleaned URL or an empty string
+     */
+    public function cleanWebsite(string $url): string
+    {
+        $url = trim($url);
+        $scheme = strtolower((string)parse_url($url, PHP_URL_SCHEME));
+        return in_array($scheme, ['http', 'https'], true) ? $url : '';
+    }
+
+    /**
      * Drop personal data that must not be visible to the public from a comment
      *
      * @param array $comment original comment, will be modified
