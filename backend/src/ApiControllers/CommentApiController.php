@@ -21,6 +21,9 @@ class CommentApiController extends ApiController
      */
     public function create(array $data): array
     {
+        $data['author'] = trim($data['author'] ?? '');
+        $data['email'] = trim($data['email'] ?? '');
+
         // Validate required fields
         $requiredFields = ['post', 'author', 'text'];
         foreach ($requiredFields as $field) {
@@ -40,7 +43,7 @@ class CommentApiController extends ApiController
         $record = [
             'post' => $data['post'],
             'author' => $data['author'],
-            'email' => $data['email'] ?? '',
+            'email' => $data['email'],
             'website' => $this->app->commentUtils()->cleanWebsite($data['website'] ?? ''),
             'text' => $data['text'],
             'html' => $html,

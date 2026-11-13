@@ -181,6 +181,36 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         $this->assertSame($expected, $result['website']);
     }
 
+    /**
+     * Check that author and email are stored without surrounding whitespace
+     */
+    public function testCreateTrimsAuthorAndEmail(): void
+    {
+        $result = $this->adminController->create([
+            'post' => 'test-post',
+            'author' => "  Test Author\n",
+            'email' => ' test@example.com ',
+            'text' => 'Test comment'
+        ]);
+        $this->assertSame('Test Author', $result['author']);
+        $this->assertSame('test@example.com', $result['email']);
+    }
+
+    /**
+     * Check that an author name of only whitespace is rejected
+     */
+    public function testCreateRejectsWhitespaceAuthor(): void
+    {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage("Field 'author' is required");
+
+        $this->adminController->create([
+            'post' => 'test-post',
+            'author' => '   ',
+            'text' => 'Test comment'
+        ]);
+    }
+
     public function testStatusUpdatesCommentStatus(): void
     {
         // First create a comment
