@@ -127,6 +127,7 @@ export class MehComments {
 
     // Add event listener for refresh events
     window.addEventListener('meh-refresh', this.handleRefreshEvent);
+    window.addEventListener('meh-edited', this.handleEditedEvent);
   }
 
   /**
@@ -136,6 +137,24 @@ export class MehComments {
     await this.fetchComments();
   };
 
+  /**
+   * Handle the meh-edited custom event
+   *
+   * Replaces the comment in the list and scrolls to it
+   *
+   * @param event The event with the edited comment in its detail
+   */
+  private handleEditedEvent = (event: CustomEvent) => {
+    const edited: MehComment = event.detail.comment;
+    this.comments = this.comments.map(comment => comment.id === edited.id ? edited : comment);
+    this.scrollToComment(edited.id);
+  };
+
+  /**
+   * Load all comments of the post from the backend
+   *
+   * Sets the loading state while the request runs and the error message when it fails
+   */
   private async fetchComments() {
     this.loading = true;
     this.error = '';
@@ -253,6 +272,11 @@ export class MehComments {
       this.updateCommentStatus(comment.id, 'spam');
     };
 
+    const handleEdit = (e: Event) => {
+      e.preventDefault();
+      window.dispatchEvent(new CustomEvent('meh-edit', {detail: {comment}}));
+    };
+
     const handleDelete = (e: Event) => {
       e.preventDefault();
       if (confirm(this._('confirmDelete'))) {
@@ -276,6 +300,11 @@ export class MehComments {
         </a>
       );
     }
+    actions.push(
+      <a href="#" class="admin-action edit" title={this._('edit')} onClick={handleEdit}>
+        {this._('edit')}
+      </a>
+    );
     actions.push(
       <a href="#" class="admin-action delete" title={this._('delete')} onClick={handleDelete}>
         {this._('delete')}
@@ -514,6 +543,7 @@ export class MehComments {
    */
   disconnectedCallback() {
     window.removeEventListener('meh-refresh', this.handleRefreshEvent);
+    window.removeEventListener('meh-edited', this.handleEditedEvent);
   }
 
 

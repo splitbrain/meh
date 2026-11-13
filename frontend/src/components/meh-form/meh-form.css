@@ -36,4 +36,10 @@ form {
     justify-content: space-between;
     align-items: flex-start
   }
+
+  .buttons {
+    display: flex;
+    flex-direction: row;
+    gap: var(--meh-spacing);
+  }
 }

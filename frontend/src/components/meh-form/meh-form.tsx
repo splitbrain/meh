@@ -56,6 +56,7 @@ export class MehForm {
   @State() website: string = '';
   @State() commentStatus: MehComment['status'] | null = null;
   @State() replyingTo: MehComment | null = null;
+  @State() editing: MehComment | null = null;
   // Reference to the form element
   private formElement?: HTMLFormElement;
 
@@ -72,9 +73,12 @@ export class MehForm {
     websitePlaceholder: 'https://example.com/~jane',
     commentLabel: 'Your Comment',
     replyLabel: 'Your Reply to',
+    editLabel: 'Editing the comment by',
     commentPlaceholder: 'Your text here. You may use Markdown for formatting.',
     submitButton: 'Submit Comment',
     submittingButton: 'Submitting...',
+    saveButton: 'Save Changes',
+    cancelButton: 'Cancel',
     successMessagePending: 'Thank you for your comment! It has been submitted for review.',
     successMessageApproved: 'Thank you for your comment! It has been published.',
     toosoon: 'You posted really fast. Did you even read the article?',
@@ -118,6 +122,7 @@ export class MehForm {
 
     // Add event listener for reply events
     window.addEventListener('meh-reply', this.handleReplyEvent);
+    window.addEventListener('meh-edit', this.handleEditEvent);
 
     // Refresh token before allowing form submission
     await this.refreshToken();
@@ -126,6 +131,7 @@ export class MehForm {
   disconnectedCallback() {
     // Remove event listener when component is destroyed
     window.removeEventListener('meh-reply', this.handleReplyEvent);
+    window.removeEventListener('meh-edit', this.handleEditEvent);
   }
 
   /**
@@ -134,6 +140,8 @@ export class MehForm {
   private handleReplyEvent = (event: CustomEvent) => {
     console.log('Reply event received:', event);
     if (event.detail && event.detail.comment) {
+      this.editing = null;
+      this.status = 'idle';
       this.replyingTo = event.detail.comment;
 
       // Scroll the form into view
@@ -148,6 +156,31 @@ export class MehForm {
       }, 300);
     }
   };
+
+  /**
+   * Handle the meh-edit custom event
+   *
+   * Loads the given comment into the form, so that an admin can change it
+   *
+   * @param event The event with the comment to edit in its detail
+   */
+  private handleEditEvent = (event: CustomEvent) => {
+    this.replyingTo = null;
+    this.status = 'idle';
+    this.editing = event.detail.comment;
+    this.el.scrollIntoView({behavior: 'smooth', block: 'start'});
+  };
+
+  /**
+   * Leave the edit mode and let the comment list show the given comment
+   *
+   * @param comment The saved comment, or the unchanged one when the edit was cancelled
+   */
+  private stopEditing(comment: MehComment) {
+    this.editing = null;
+    this.status = 'idle';
+    window.dispatchEvent(new CustomEvent('meh-edited', {detail: {comment}}));
+  }
 
   private loadUserDataFromStorage() {
     try {
@@ -215,27 +248,21 @@ export class MehForm {
     this.errorMessage = '';
 
     try {
-      // Prepare the request body
-      const requestBody: any = {
-        post: this.post,
-        ...formValues
-      };
-
-      // Add parent ID if replying to a comment
-      if (this.replyingTo) {
-        requestBody.parent = this.replyingTo.id;
-      }
-
-      // Submit the comment
+      // Save the edited comment or create a new one, the backend ignores post and parent on edits
       const comment = await makeApiRequest<MehComment>(
         this.backend,
         this.site,
-        'comment',
+        this.editing ? `comment/${this.editing.id}` : 'comment',
         {
-          method: 'POST',
-          body: requestBody
+          method: this.editing ? 'PUT' : 'POST',
+          body: {...formValues, post: this.post, parent: this.replyingTo?.id}
         }
       );
+
+      if (this.editing) {
+        this.stopEditing(comment);
+        return;
+      }
 
       // Store the comment status
       this.commentStatus = comment.status;
@@ -279,7 +306,11 @@ export class MehForm {
 
     elements.push(
       <div class="meh-form-container">
-        <form ref={(el) => this.formElement = el as HTMLFormElement} onSubmit={this.handleSubmit}>
+        <form
+          key={this.editing ? this.editing.id : 'new'}
+          ref={(el) => this.formElement = el as HTMLFormElement}
+          onSubmit={this.handleSubmit}
+        >
           <div class="userdata">
             <label class="required">
               <span>{this._('nameLabel')}</span>
@@ -288,7 +319,7 @@ export class MehForm {
                 type="text"
                 placeholder={this._('namePlaceholder')}
                 required
-                value={this.author}
+                value={this.editing?.author ?? this.author}
               />
             </label>
 
@@ -298,7 +329,7 @@ export class MehForm {
                 name="email"
                 type="email"
                 placeholder={this._('emailPlaceholder')}
-                value={this.email}
+                value={this.editing?.email ?? this.email}
               />
             </label>
 
@@ -308,7 +339,7 @@ export class MehForm {
                 name="website"
                 type="url"
                 placeholder={this._('websitePlaceholder')}
-                value={this.website}
+                value={this.editing?.website ?? this.website}
               />
             </label>
           </div>
@@ -316,14 +347,16 @@ export class MehForm {
           <div>
             <label class="required">
               <span>
-                {!this.replyingTo && this._('commentLabel')}
+                {!this.replyingTo && !this.editing && this._('commentLabel')}
                 {this.replyingTo && [this._('replyLabel'), ' ',  this.replyingTo.author]}
+                {this.editing && [this._('editLabel'), ' ', this.editing.author]}
               </span>
               <textarea
                 name="text"
                 required
                 rows={5}
                 placeholder={this._('commentPlaceholder')}
+                value={this.editing?.text}
               ></textarea>
             </label>
           </div>
@@ -343,9 +376,19 @@ export class MehForm {
           )}
 
           <div class="actions">
-            <button type="submit" disabled={this.status === 'submitting' || this.isLoading}>
-              {this.status === 'submitting' ? this._('submittingButton') : this._('submitButton')}
-            </button>
+            <div class="buttons">
+              <button type="submit" disabled={this.status === 'submitting' || this.isLoading}>
+                {this.status === 'submitting'
+                  ? this._('submittingButton')
+                  : this._(this.editing ? 'saveButton' : 'submitButton')}
+              </button>
+
+              {this.editing && (
+                <button type="button" onClick={() => this.stopEditing(this.editing)}>
+                  {this._('cancelButton')}
+                </button>
+              )}
+            </div>
 
             <slot></slot>
           </div>
