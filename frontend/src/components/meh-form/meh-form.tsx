@@ -1,5 +1,5 @@
 import {Component, Prop, h, State, Element} from '@stencil/core';
-import { TranslationManager, TOKEN_STORAGE_KEY, makeApiRequest, detectBackendUrl } from '../../utils/utils';
+import { TranslationManager, TOKEN_STORAGE_KEY, makeApiRequest, detectBackendUrl, MehComment } from '../../utils/utils';
 
 @Component({
   tag: 'meh-form',
@@ -54,8 +54,8 @@ export class MehForm {
   @State() author: string = '';
   @State() email: string = '';
   @State() website: string = '';
-  @State() commentStatus: 'pending' | 'approved' | null = null;
-  @State() replyingTo: { comment: any; id: number } | null = null;
+  @State() commentStatus: MehComment['status'] | null = null;
+  @State() replyingTo: MehComment | null = null;
   // Reference to the form element
   private formElement?: HTMLFormElement;
 
@@ -134,10 +134,7 @@ export class MehForm {
   private handleReplyEvent = (event: CustomEvent) => {
     console.log('Reply event received:', event);
     if (event.detail && event.detail.comment) {
-      this.replyingTo = {
-        comment: event.detail.comment,
-        id: event.detail.comment.id
-      };
+      this.replyingTo = event.detail.comment;
 
       // Scroll the form into view
       this.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -230,7 +227,7 @@ export class MehForm {
       }
 
       // Submit the comment
-      const comment = await makeApiRequest(
+      const comment = await makeApiRequest<MehComment>(
         this.backend,
         this.site,
         'comment',
@@ -320,7 +317,7 @@ export class MehForm {
             <label class="required">
               <span>
                 {!this.replyingTo && this._('commentLabel')}
-                {this.replyingTo && [this._('replyLabel'), ' ',  this.replyingTo.comment.author]}
+                {this.replyingTo && [this._('replyLabel'), ' ',  this.replyingTo.author]}
               </span>
               <textarea
                 name="text"

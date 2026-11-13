@@ -50,6 +50,24 @@ interface MehJwtPayload extends JwtPayload {
 }
 
 /**
+ * A comment as returned by the API
+ */
+export interface MehComment {
+  id: number;
+  post: string;
+  author: string;
+  email?: string;
+  website: string;
+  text: string;
+  html: string;
+  status: 'pending' | 'approved' | 'spam' | 'deleted';
+  parent?: number;
+  created_at: string;
+  avatar: string;
+  avatar_id: string;
+}
+
+/**
  * Options for the API request
  */
 export interface ApiRequestOptions {

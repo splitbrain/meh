@@ -1,5 +1,5 @@
 import {Component, Element, h, Prop, State} from '@stencil/core';
-import {detectBackendUrl, formatRelativeTime, isAdmin, makeApiRequest, TranslationManager} from '../../utils/utils';
+import {detectBackendUrl, formatRelativeTime, isAdmin, makeApiRequest, MehComment, TranslationManager} from '../../utils/utils';
 
 @Component({
   tag: 'meh-comments',
@@ -58,7 +58,7 @@ export class MehComments {
    */
   @Prop({mutable: true}) sort: 'oldest' | 'newest' | 'threaded' = 'oldest';
 
-  @State() comments: any[] = [];
+  @State() comments: MehComment[] = [];
   @State() loading: boolean = true;
   @State() error: string = '';
 
@@ -141,7 +141,7 @@ export class MehComments {
     this.error = '';
 
     try {
-      this.comments = await makeApiRequest<any[]>(
+      this.comments = await makeApiRequest<MehComment[]>(
         this.backend,
         this.site,
         'comments',
@@ -195,7 +195,7 @@ export class MehComments {
    */
   private async updateCommentStatus(commentId: number, status: string): Promise<void> {
     try {
-      const updatedComment = await makeApiRequest(
+      const updatedComment = await makeApiRequest<MehComment>(
         this.backend,
         this.site,
         `comment/${commentId}/${status}`,
@@ -220,7 +220,7 @@ export class MehComments {
   /**
    * Handle reply click
    */
-  private handleReplyClick = (comment: any, e: Event) => {
+  private handleReplyClick = (comment: MehComment, e: Event) => {
     e.preventDefault();
 
     // Dispatch a custom event with the comment data
@@ -232,7 +232,7 @@ export class MehComments {
   /**
    * Render admin actions for a comment
    */
-  private renderAdminActions(comment: any) {
+  private renderAdminActions(comment: MehComment) {
     if (!isAdmin()) {
       return null;
     }
@@ -336,7 +336,7 @@ export class MehComments {
   /**
    * Render a single comment
    */
-  private renderComment(comment: any) {
+  private renderComment(comment: MehComment) {
     return (
       <div class={`comment status-${comment.status}`} data-comment-id={comment.id}>
         <img
@@ -474,7 +474,7 @@ export class MehComments {
     const topLevelComments = this.comments.filter(comment => !comment.parent);
 
     // Create a map of child comments for quick lookup
-    const childrenMap = new Map<number, any[]>();
+    const childrenMap = new Map<number, MehComment[]>();
 
     // Group child comments by their parent ID
     this.comments.forEach(comment => {
@@ -487,7 +487,7 @@ export class MehComments {
     });
 
     // Recursive function to render a comment and its children
-    const renderCommentThread = (comment: any) => {
+    const renderCommentThread = (comment: MehComment) => {
       const children = childrenMap.get(comment.id) || [];
 
       return (
