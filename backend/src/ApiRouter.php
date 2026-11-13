@@ -35,7 +35,7 @@ class ApiRouter extends Router
         $this->alto->map('POST', '/[s:site]/comment', [CommentApiController::class, 'create', 'user']);
         $this->alto->map('GET', '/[s:site]/comment/[i:id]', [CommentApiController::class, 'get', 'admin']);
 
-        $this->alto->map('PATCH', '/[s:site]/comment/[i:id]', [CommentApiController::class, 'edit', 'admin']);
+        $this->alto->map('PUT', '/[s:site]/comment/[i:id]', [CommentApiController::class, 'edit', 'admin']);
         $this->alto->map('DELETE', '/[s:site]/comment/[i:id]', [CommentApiController::class, 'delete', 'admin']);
         $this->alto->map('PUT', '/[s:site]/comment/[i:id]/[s:status]', [CommentApiController::class, 'status', 'admin']);
 
@@ -55,7 +55,7 @@ class ApiRouter extends Router
         // On CORS preflight requests, return the allowed methods and headers
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             // Handle preflight requests
-            header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE');
+            header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
             header('Access-Control-Allow-Headers: Authorization, Content-Type');
             header('Access-Control-Max-Age: 86400');
             http_response_code(200);

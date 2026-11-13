@@ -119,6 +119,8 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         $editData = [
             'id' => $commentId,
             'author' => 'Updated Author',
+            'email' => 'updated@example.com',
+            'website' => 'https://example.com',
             'text' => 'Updated comment'
         ];
 
@@ -128,9 +130,10 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         $this->assertEquals($commentId, $result['id']);
         $this->assertEquals('test-post', $result['post']); // Unchanged
         $this->assertEquals('Updated Author', $result['author']); // Changed
-        $this->assertEquals('test@example.com', $result['email']); // Unchanged
+        $this->assertEquals('updated@example.com', $result['email']); // Changed
+        $this->assertEquals('https://example.com', $result['website']); // Changed
         $this->assertEquals('Updated comment', $result['text']); // Changed
-        $this->assertEquals('Updated comment', $result['html']); // Changed
+        $this->assertEquals('<p>Updated comment</p>', $result['html']); // Changed
 
         // Verify the comment was actually updated in the database
         $savedComment = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $commentId);
@@ -212,6 +215,61 @@ class CommentControllerTest extends AbstractApiControllerTestCase
     }
 
     /**
+     * Check that edit cleans the input and stores missing optional fields as empty
+     */
+    public function testEditCleansInputAndReplacesAllFields(): void
+    {
+        $created = $this->adminController->create([
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'email' => 'test@example.com',
+            'website' => 'https://example.com',
+            'text' => 'Test comment'
+        ]);
+
+        $result = $this->adminController->edit([
+            'id' => $created['id'],
+            'author' => ' Updated Author ',
+            'website' => 'javascript:alert(1)',
+            'text' => 'Updated comment'
+        ]);
+
+        $this->assertSame('Updated Author', $result['author']);
+        $this->assertSame('', $result['email']);
+        $this->assertSame('', $result['website']);
+    }
+
+    /**
+     * Check that edit keeps the stored HTML when the text is unchanged
+     */
+    public function testEditKeepsHtmlForUnchangedText(): void
+    {
+        $created = $this->adminController->create([
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'text' => 'Imported comment'
+        ]);
+        $this->app->db()->exec(
+            'UPDATE comments SET html = ? WHERE id = ?',
+            ['<p><a href="https://example.com">Imported</a> comment</p>', $created['id']]
+        );
+
+        $result = $this->adminController->edit([
+            'id' => $created['id'],
+            'author' => 'Updated Author',
+            'text' => 'Imported comment'
+        ]);
+        $this->assertSame('<p><a href="https://example.com">Imported</a> comment</p>', $result['html']);
+
+        $result = $this->adminController->edit([
+            'id' => $created['id'],
+            'author' => 'Updated Author',
+            'text' => 'Changed comment'
+        ]);
+        $this->assertSame('<p>Changed comment</p>', $result['html']);
+    }
+
+    /**
      * Check that replies keep their parent when the parent comment is edited
      */
     public function testEditKeepsParentOfReplies(): void
@@ -236,6 +294,23 @@ class CommentControllerTest extends AbstractApiControllerTestCase
 
         $saved = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $reply['id']);
         $this->assertEquals($parent['id'], $saved['parent']);
+    }
+
+    /**
+     * Check that edit rejects a request without an author
+     */
+    public function testEditRequiresAuthor(): void
+    {
+        $created = $this->adminController->create([
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'text' => 'Test comment'
+        ]);
+
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage("Field 'author' is required");
+
+        $this->adminController->edit(['id' => $created['id'], 'text' => 'Updated comment']);
     }
 
     public function testStatusUpdatesCommentStatus(): void

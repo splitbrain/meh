@@ -21,32 +21,17 @@ class CommentApiController extends ApiController
      */
     public function create(array $data): array
     {
-        $data['author'] = trim($data['author'] ?? '');
-        $data['email'] = trim($data['email'] ?? '');
-
-        // Validate required fields
-        $requiredFields = ['post', 'author', 'text'];
-        foreach ($requiredFields as $field) {
-            if (empty($data[$field])) {
-                throw new HttpException("Field '$field' is required", 400);
-            }
+        if (empty($data['post'])) {
+            throw new HttpException("Field 'post' is required", 400);
         }
-
-        $parsedown = new Parsedown();
-        $parsedown->setSafeMode(true);
-        $parsedown->setBreaksEnabled(true);
-        $html = $parsedown->text($data['text']);
+        $input = $this->prepareInput($data);
 
         // Get the 'sub' from token payload
         $user = $this->tokenPayload->sub;
 
         $record = [
             'post' => $data['post'],
-            'author' => $data['author'],
-            'email' => $data['email'],
-            'website' => $this->app->commentUtils()->cleanWebsite($data['website'] ?? ''),
-            'text' => $data['text'],
-            'html' => $html,
+            ...$input,
             'ip' => $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '',
             'status' => 'pending',
             'user' => $user,
@@ -107,7 +92,10 @@ class CommentApiController extends ApiController
     /**
      * Edit a comment
      *
-     * @param array $data Request data, must contain 'id'
+     * All editable fields are replaced. Missing optional fields are stored as empty.
+     * The HTML is only rendered again when the text has changed.
+     *
+     * @param array $data Request data, must contain 'id', 'author' and 'text'
      * @return array The updated comment data
      * @throws HttpException
      */
@@ -118,24 +106,57 @@ class CommentApiController extends ApiController
             throw new HttpException('Comment ID is required', 400);
         }
 
-        $this->app->commentUtils()->dropUserID($data);
-
         $record = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $id);
 
         if (!$record) {
             throw new HttpException('Comment not found', 404);
         }
 
-        // make sure $data only contains fields that can be updated
-        $data = array_intersect_key($data, array_flip(['author', 'email', 'website', 'text']));
-        if (isset($data['text'])) {
-            $data['html'] = $data['text']; // Simple text for now, could add Markdown processing
+        $data = $this->prepareInput($data);
+
+        // keep the stored HTML when the text is unchanged, imported comments have no Markdown source
+        if ($data['text'] === $record['text']) {
+            $data['html'] = $record['html'];
         }
 
         // merge with existing record
         $record = array_merge($record, $data);
         $new = $this->app->db()->saveRecord('comments', $record);
         return $this->app->commentUtils()->process($new);
+    }
+
+    /**
+     * Prepare the user-supplied comment fields for storage
+     *
+     * Author and e-mail are trimmed, the website is cleaned and the text is rendered from
+     * Markdown to HTML. Missing optional fields become empty strings. All other fields are
+     * not returned.
+     *
+     * @param array $data Comment data as given by the user
+     * @return array{author: string, email: string, website: string, text: string, html: string} The fields to store
+     * @throws HttpException If the author or the text is missing
+     */
+    protected function prepareInput(array $data): array
+    {
+        $clean = [
+            'author' => trim($data['author'] ?? ''),
+            'email' => trim($data['email'] ?? ''),
+            'website' => $this->app->commentUtils()->cleanWebsite($data['website'] ?? ''),
+            'text' => $data['text'] ?? '',
+        ];
+
+        foreach (['author', 'text'] as $field) {
+            if (empty($clean[$field])) {
+                throw new HttpException("Field '$field' is required", 400);
+            }
+        }
+
+        $parsedown = new Parsedown();
+        $parsedown->setSafeMode(true);
+        $parsedown->setBreaksEnabled(true);
+        $clean['html'] = $parsedown->text($clean['text']);
+
+        return $clean;
     }
 
     /**
