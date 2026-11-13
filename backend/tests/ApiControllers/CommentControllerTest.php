@@ -211,6 +211,33 @@ class CommentControllerTest extends AbstractApiControllerTestCase
         ]);
     }
 
+    /**
+     * Check that replies keep their parent when the parent comment is edited
+     */
+    public function testEditKeepsParentOfReplies(): void
+    {
+        $parent = $this->adminController->create([
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'text' => 'Parent comment'
+        ]);
+        $reply = $this->adminController->create([
+            'post' => 'test-post',
+            'author' => 'Test Author',
+            'text' => 'Reply',
+            'parent' => $parent['id']
+        ]);
+
+        $this->adminController->edit([
+            'id' => $parent['id'],
+            'author' => 'Test Author',
+            'text' => 'Edited parent comment'
+        ]);
+
+        $saved = $this->app->db()->queryRecord('SELECT * FROM comments WHERE id = ?', $reply['id']);
+        $this->assertEquals($parent['id'], $saved['parent']);
+    }
+
     public function testStatusUpdatesCommentStatus(): void
     {
         // First create a comment

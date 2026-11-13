@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0ac1e5746bb8219401f12adeab1a8083",
+    "content-hash": "6ebdac1190710d6657da15eff6bc8792",
     "packages": [
         {
             "name": "altorouter/altorouter",
@@ -1168,25 +1168,25 @@
         },
         {
             "name": "splitbrain/php-sqlite",
-            "version": "1.1.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/splitbrain/php-sqlite.git",
-                "reference": "6eda1bdb56cf34bdcdcf785a457228d9c417868a"
+                "reference": "6d7e3ff97549b03ac1e18f161938b2af48e86a84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/splitbrain/php-sqlite/zipball/6eda1bdb56cf34bdcdcf785a457228d9c417868a",
-                "reference": "6eda1bdb56cf34bdcdcf785a457228d9c417868a",
+                "url": "https://api.github.com/repos/splitbrain/php-sqlite/zipball/6d7e3ff97549b03ac1e18f161938b2af48e86a84",
+                "reference": "6d7e3ff97549b03ac1e18f161938b2af48e86a84",
                 "shasum": ""
             },
             "require": {
                 "ext-pdo": "*",
                 "ext-pdo_sqlite": "*",
-                "php": ">=7.4"
+                "php": ">=8.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8.0"
+                "phpunit/phpunit": "^11.0"
             },
             "type": "library",
             "autoload": {
@@ -1207,10 +1207,10 @@
             "description": "A simple wrapper around pdo-sqlite with basic migration support and a few helper utils",
             "support": {
                 "issues": "https://github.com/splitbrain/php-sqlite/issues",
-                "source": "https://github.com/splitbrain/php-sqlite/tree/1.1.1"
+                "source": "https://github.com/splitbrain/php-sqlite/tree/2.0.0"
             },
-            "time": "2025-03-22T20:57:13+00:00",
-            "published-time": "2025-03-22T20:59:02+00:00"
+            "time": "2026-11-13T13:49:42+00:00",
+            "published-time": "2026-11-13T13:55:55+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
